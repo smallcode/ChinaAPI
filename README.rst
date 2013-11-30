@@ -12,7 +12,7 @@ ChinaAPI
 安装
 ------------
 
-安装 ChinaAPI, 最简单的方法:
+安装 ChinaAPI，最简单的方法:
 
 .. code-block:: bash
 
