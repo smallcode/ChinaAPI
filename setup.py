@@ -19,14 +19,12 @@ requires = [
 
 with open('README.rst') as f:
     readme = f.read()
-with open('HISTORY.rst') as f:
-    history = f.read()
 
 setup(
     name='chinaapi',
     version=chinaapi.__version__,
     description='Python SDK For China API: Sina Weibo, QQ Weibo, Taobao',
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     author='smallcode',
     author_email='45945756@qq.com',
     url='https://github.com/smallcode/ChinaAPI',
@@ -37,7 +35,7 @@ setup(
     license=chinaapi.__license__,
     zip_safe=False,
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
