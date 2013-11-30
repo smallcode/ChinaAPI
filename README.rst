@@ -19,10 +19,10 @@ ChinaAPI
     $ pip install chinaapi
 
 
-现在只是直接调用外部包，将逐渐抽取共用的代码进行集成。
-
 TODO:
 ----
+现在只是直接调用外部包，将逐渐抽取共用的代码进行集成。
+
 - HTTP部分统一使用requests: https://github.com/kennethreitz/requests
 - 提取APIError基类
 - 提取APIClient基类
