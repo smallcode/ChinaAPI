@@ -1,5 +1,6 @@
 import chinaapi
 
+
 try:
     from setuptools import setup
 except ImportError:
@@ -19,12 +20,14 @@ requires = [
 
 with open('README.rst') as f:
     readme = f.read()
+with open('HISTORY.rst') as f:
+    history = f.read()
 
 setup(
     name='chinaapi',
     version=chinaapi.__version__,
     description='Python SDK For China API: Sina Weibo, QQ Weibo, Taobao',
-    long_description=readme,
+    long_description=readme + '\n\n' + history,
     author='smallcode',
     author_email='45945756@qq.com',
     url='https://github.com/smallcode/ChinaAPI',

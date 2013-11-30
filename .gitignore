@@ -9,13 +9,9 @@ tox.ini
 violations.pyflakes.txt
 cover/
 build/
-docs/_build
-requests.egg-info/
+dist/
+chinaapi.egg-info/
 *.pyc
 *.swp
 *.egg
-env/
-
-.workon
-
 tests_local/
