@@ -4,10 +4,10 @@
 class ApiClient(object):
     def __init__(self, app):
         self.app = app
-        self.access_token = None
+        self.token = None
 
-    def set_access_token(self, access_token):
-        self.access_token = access_token
+    def set_access_token(self, token):
+        self.token = token
 
 
 class WebClient(object):
