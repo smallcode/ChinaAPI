@@ -1,13 +1,13 @@
 # coding=utf-8
 from unittest import TestCase
 from chinaapi.sina_weibo import ApiClient, ApiError
-from chinaapi.utils import models
+from chinaapi.utils.models import App, Token
 
 
 class SinaWeiboTest(TestCase):
     def setUp(self):
-        app = models.App('', '')
-        token = models.Token('')
+        app = App('', '')
+        token = Token('')
         self.client = ApiClient(app)
         self.client.set_access_token(token)
 
