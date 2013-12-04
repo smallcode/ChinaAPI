@@ -9,6 +9,7 @@ Release History
 
 - 添加models，并增加测试
 - 添加ApiClient基类
+- 添加ApiError
 
 
 0.3.1 (2014-12-3)
