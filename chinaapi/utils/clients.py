@@ -1,5 +1,5 @@
 # coding=utf-8
-from chinaapi.utils import jsonDict
+from chinaapi.utils import jsonDict, models
 import requests
 
 
@@ -28,7 +28,7 @@ class ClientWrapper(object):
 class ApiClientBase(object):
     def __init__(self, app):
         self.app = app
-        self.token = None
+        self.token = models.Token('')
         self.session = requests.session()
 
     def set_access_token(self, token):
