@@ -1,19 +1,14 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.taobao import APIClient, APIError
-
-
-APP_KEY = ""
-APP_SECRET = ""
-CALLBACK_URL = ""
-ACCESS_TOKEN = ""
+from chinaapi.taobao import ApiClient
+from chinaapi.utils.models import App
 
 
 class TaobaoTest(TestCase):
     def setUp(self):
-        self.client = APIClient(APP_KEY, APP_SECRET)
+        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        self.client = ApiClient(app)
 
-    def test_without_app_key(self):
-        with self.assertRaises(APIError) as cm:
-            self.client.items_get(nicks='kamozi', fields='num_iid,title,price', page_no=1, page_size=2)
-        self.assertEqual(u'Missing app key', cm.exception.msg)
+    def test_tbk_shops_get(self):
+        r = self.client.tbk.shops.get(cid=14, fields='user_id,seller_nick,shop_title,pic_url')
+        self.assertEqual(40, len(r.tbk_shops_get_response.tbk_shops.tbk_shop))
