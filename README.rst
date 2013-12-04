@@ -13,7 +13,7 @@ ChinaAPI
 注：chinaapi依赖外部模块requests: https://github.com/kennethreitz/requests
 
 使用方法:
---------
+---------
 
 新浪微博的使用：
 
@@ -37,14 +37,13 @@ ChinaAPI
         r = client.statuses.upload(status=u'发布的内容', pic=pic)
         print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 
-
-调用规则: 斜杠映射为点
+调用规则: **斜杠映射为点**
 
 - users/show    ==>    client.users.show()
 - statuses/upload     ==>    client.statuses.upload()
 
 感谢以下Python SDK的开发者们的贡献：
----------------------------
+-----------------------------------
 
 - 新浪微博：https://github.com/michaelliao/sinaweibopy
 - 腾讯微博：https://github.com/upbit/tweibo-pysdk
