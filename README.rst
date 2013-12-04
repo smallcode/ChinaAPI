@@ -48,7 +48,7 @@ ChinaAPI就是为此而存在的。
         print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 
 
-调用规则：**斜杠映射为点**
+调用规则：**斜杠(/)映射为点(.)**
 
 - users/show    ==>    client.users.show()
 - statuses/upload     ==>    client.statuses.upload()
