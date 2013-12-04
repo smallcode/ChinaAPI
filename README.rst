@@ -44,14 +44,16 @@ ChinaAPI
 - users/show    ==>    client.users.show()
 - statuses/upload     ==>    client.statuses.upload()
 
+
 ----
+
 
 淘宝API的使用示例：
 
 .. code-block:: python
 
         from chinaapi.taobao import ApiClient
-        from chinaapi.utils.models import App, Token
+        from chinaapi.utils.models import App
 
 
         # client的设置
