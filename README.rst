@@ -12,10 +12,12 @@ ChinaAPI
 
 注：chinaapi依赖外部模块requests: https://github.com/kennethreitz/requests
 
-使用方法:
----------
+----
 
-**新浪微博API的使用示例**：
+新浪微博API:
+------------
+
+使用方法：
 
 .. code-block:: python
 
@@ -39,16 +41,18 @@ ChinaAPI
         print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 
 
-新浪微博API的调用规则：斜杠映射为点
+调用规则：**斜杠映射为点**
 
 - users/show    ==>    client.users.show()
 - statuses/upload     ==>    client.statuses.upload()
 
-
 ----
 
+淘宝API:
+------------
 
-**淘宝API的使用示例**：
+
+使用示例：
 
 .. code-block:: python
 
@@ -65,10 +69,12 @@ ChinaAPI
         print len(r.tbk_shops_get_response.tbk_shops.tbk_shop)  # 显示店铺列表的数量：40
 
 
-淘宝API的调用规则：直接映射（可省略前缀taobao.）
+调用规则：**直接映射（可省略前缀taobao.）**
 
 - taobao.itemcats.get    ==>    client.itemcats.get()  或者  client.taobao.itemcats.get()
 - taobao.tbk.shops.get   ==>    client.tbk.shops.get()  或者  client.taobao.tbk.shops.get()
+
+----
 
 感谢以下Python SDK的开发者们的贡献：
 -----------------------------------
