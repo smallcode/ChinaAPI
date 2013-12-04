@@ -9,7 +9,7 @@ CALLBACK_URL = ""
 ACCESS_TOKEN = ""
 
 
-class SinaWeiboTest(TestCase):
+class TaobaoTest(TestCase):
     def setUp(self):
         self.client = APIClient(APP_KEY, APP_SECRET)
 
