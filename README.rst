@@ -17,7 +17,7 @@ ChinaAPI就是为此而存在的。
 
     $ pip install chinaapi
 
-注：chinaapi 依赖外部模块 requests: https://github.com/kennethreitz/requests
+注：chinaapi所使用HTTP模块是Requests: https://github.com/kennethreitz/requests
 
 ----
 
