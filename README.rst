@@ -20,11 +20,11 @@ ChinaAPI
 .. code-block:: python
 
         from chinaapi.sina_weibo import ApiClient
-        from chinaapi.utils import models
+        from chinaapi.utils.models import App, Token
 
         # client的设置
-        app = models.App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        token = models.Token('access_token')  # 填上取得的access_token
+        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        token = Token('access_token')  # 填上取得的access_token
         client = ApiClient(app)
         client.set_access_token(token)
 
