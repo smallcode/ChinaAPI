@@ -15,7 +15,7 @@ ChinaAPI
 使用方法:
 ---------
 
-新浪微博API的使用示例：
+**新浪微博API的使用示例**：
 
 .. code-block:: python
 
@@ -39,7 +39,7 @@ ChinaAPI
         print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 
 
-新浪微博API的调用规则：**斜杠映射为点**
+新浪微博API的调用规则：斜杠映射为点
 
 - users/show    ==>    client.users.show()
 - statuses/upload     ==>    client.statuses.upload()
@@ -48,7 +48,7 @@ ChinaAPI
 ----
 
 
-淘宝API的使用示例：
+**淘宝API的使用示例**：
 
 .. code-block:: python
 
