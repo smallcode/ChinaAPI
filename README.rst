@@ -32,7 +32,7 @@ ChinaAPI
 
         # client的设置
         app = models.App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        token = models.Token('access_token')  # 填上取得access_token
+        token = models.Token('access_token')  # 填上取得的access_token
         client = ApiClient(app)
         client.set_access_token(token)
 
