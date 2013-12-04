@@ -11,7 +11,7 @@ Release History
 - 添加ApiClient基类
 - 添加ApiError
 - 添加sina_weibo和taobao的ApiClient
-- 添加sina_weibo的单元测试（测试成功）
+- 添加sina_weibo的本地单元测试（测试成功，因含有帐号信息不上传到Github）
 
 
 0.3.1 (2014-12-3)
