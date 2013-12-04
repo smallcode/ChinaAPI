@@ -4,5 +4,5 @@ from .packages.tweibo.tweibo import API, TWeiboError
 
 
 OAuth2Handler = OAuth2Handler
-APIClient = API
-APIError = TWeiboError
+ApiClient = API
+ApiError = TWeiboError
