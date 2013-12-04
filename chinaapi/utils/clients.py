@@ -16,18 +16,6 @@ class ClientWrapper(object):
         self._client = client
         self.segments = [attr]
 
-    # def get(self, **kwargs):
-    #     return self.request(Method.GET, **kwargs)
-    #
-    # def post(self, **kwargs):
-    #     return self.request(Method.POST, **kwargs)
-    #
-    # def upload(self, **kwargs):
-    #     return self.request(Method.UPLOAD, **kwargs)
-    #
-    # def request(self, method, **kwargs):
-    #     return self._client.request(method, '/'.join(self.path_segments), **kwargs)
-
     def __call__(self, **kwargs):
         return self._client.request(self.segments[-1], self.segments, **kwargs)
 

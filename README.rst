@@ -19,7 +19,7 @@ ChinaAPI
     $ pip install chinaapi
 
 
-TODO:
+使用示例:
 ----
 现在只是直接调用外部包，将逐渐抽取共用的代码进行集成。
 
