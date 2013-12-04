@@ -72,7 +72,7 @@ ChinaAPI就是为此目的而存在。
         client = ApiClient(app)
 
         # 获取淘宝客店铺列表，对应的接口是：taobao.tbk.shops.get
-        r = self.client.tbk.shops.get(cid=14, fields='user_id,seller_nick,shop_title,pic_url')
+        r = client.tbk.shops.get(cid=14, fields='user_id,seller_nick,shop_title,pic_url')
         print len(r.tbk_shops_get_response.tbk_shops.tbk_shop)  # 显示店铺列表的数量：40
 
 
