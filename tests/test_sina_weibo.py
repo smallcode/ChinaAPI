@@ -5,6 +5,9 @@ from chinaapi.utils.models import App, Token
 
 
 class SinaWeiboTest(TestCase):
+    """
+    测试时需填写app_key,app_secret,access_token
+    """
     def setUp(self):
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
         token = Token('access_token', 1390850926)  # 填上取得的access_token

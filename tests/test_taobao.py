@@ -5,6 +5,9 @@ from chinaapi.utils.models import App
 
 
 class TaobaoTest(TestCase):
+    """
+    测试时需填写app_key,app_secret
+    """
     def setUp(self):
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
         self.client = ApiClient(app)
