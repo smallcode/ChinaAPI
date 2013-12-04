@@ -34,6 +34,13 @@
         <h1>
 <a name="chinaapi" class="anchor" href="#chinaapi"><span class="octicon octicon-link"></span></a>ChinaAPI</h1>
 
+<p>ChinaAPI是一个API库，使用Python编写。</p>
+
+<p>目前国内的几大开放平台，有新浪微博，腾讯微博，淘宝等。
+针对这几个平台，用Python语言编写的API库都比较独立，各具特色。
+但仔细分析，不难发现这些库存在大量可通用的模块，并可抽象出统一的调用接口。
+ChinaAPI就是为此目的而存在。</p>
+
 <h2>
 <a name="%E5%AE%89%E8%A3%85" class="anchor" href="#%E5%AE%89%E8%A3%85"><span class="octicon octicon-link"></span></a>安装</h2>
 
@@ -44,21 +51,22 @@
 <pre><code>$ pip install chinaapi
 </code></pre>
 
-<p>注：chinaapi依赖外部模块requests: <a href="https://github.com/kennethreitz/requests">https://github.com/kennethreitz/requests</a></p>
+<p>注：ChinaAPI所使用HTTP模块是Requests: <a href="https://github.com/kennethreitz/requests">https://github.com/kennethreitz/requests</a></p>
 
-<h2>
-<a name="%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95" class="anchor" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="octicon octicon-link"></span></a>使用方法:</h2>
+<hr><h2>
+<a name="%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aapi" class="anchor" href="#%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aapi"><span class="octicon octicon-link"></span></a>新浪微博API:</h2>
 
-<p>新浪微博的使用：</p>
+<p>使用方法：</p>
 
 <p>.. code-block:: python</p>
 
 <pre><code>    from chinaapi.sina_weibo import ApiClient
-    from chinaapi.utils import models
+    from chinaapi.utils.models import App, Token
+
 
     # client的设置
-    app = models.App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-    token = models.Token('access_token')  # 填上取得的access_token
+    app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+    token = Token('access_token')  # 填上取得的access_token
     client = ApiClient(app)
     client.set_access_token(token)
 
@@ -72,11 +80,42 @@
     print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 </code></pre>
 
-<p>调用规则: 斜杠映射为点</p>
+<p>调用规则：<strong>斜杠（/）映射为点（.）</strong></p>
 
 <ul>
 <li>users/show    ==&gt;    client.users.show()</li>
 <li>statuses/upload     ==&gt;    client.statuses.upload()</li>
+</ul><hr><h2>
+<a name="%E6%B7%98%E5%AE%9Dapi" class="anchor" href="#%E6%B7%98%E5%AE%9Dapi"><span class="octicon octicon-link"></span></a>淘宝API:</h2>
+
+<p>使用示例：</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code>    from chinaapi.taobao import ApiClient
+    from chinaapi.utils.models import App
+
+
+    # client的设置
+    app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+    client = ApiClient(app)
+
+    # 获取淘宝客店铺列表，对应的接口是：taobao.tbk.shops.get
+    r = self.client.tbk.shops.get(cid=14, fields='user_id,seller_nick,shop_title,pic_url')
+    print len(r.tbk_shops_get_response.tbk_shops.tbk_shop)  # 显示店铺列表的数量：40
+</code></pre>
+
+<p>调用规则：<strong>直接映射（可省略前缀taobao.）</strong></p>
+
+<ul>
+<li>taobao.itemcats.get    ==&gt;    client.itemcats.get()  或者  client.taobao.itemcats.get()</li>
+<li>taobao.tbk.shops.get   ==&gt;    client.tbk.shops.get()  或者  client.taobao.tbk.shops.get()</li>
+</ul><hr><h2>
+<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO：</h2>
+
+<ul>
+<li>整合腾讯微博API</li>
+<li>整合各平台API的OAuth2调用模块</li>
 </ul><h2>
 <a name="%E6%84%9F%E8%B0%A2%E4%BB%A5%E4%B8%8Bpython-sdk%E7%9A%84%E5%BC%80%E5%8F%91%E8%80%85%E4%BB%AC%E7%9A%84%E8%B4%A1%E7%8C%AE" class="anchor" href="#%E6%84%9F%E8%B0%A2%E4%BB%A5%E4%B8%8Bpython-sdk%E7%9A%84%E5%BC%80%E5%8F%91%E8%80%85%E4%BB%AC%E7%9A%84%E8%B4%A1%E7%8C%AE"><span class="octicon octicon-link"></span></a>感谢以下Python SDK的开发者们的贡献：</h2>
 
