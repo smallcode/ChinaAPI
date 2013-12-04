@@ -48,8 +48,5 @@ ChinaAPI
 
 调用规则: 斜杠映射为点
 
-API：users/show
-调用：client.users.show()
-
-API：statuses/upload
-调用：client.statuses.upload()
+- users/show    ==>    client.users.show()
+- statuses/upload     ==>    client.statuses.upload()
