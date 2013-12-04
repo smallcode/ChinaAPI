@@ -22,6 +22,7 @@ ChinaAPI
         from chinaapi.sina_weibo import ApiClient
         from chinaapi.utils.models import App, Token
 
+
         # client的设置
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
         token = Token('access_token')  # 填上取得的access_token
@@ -42,6 +43,30 @@ ChinaAPI
 
 - users/show    ==>    client.users.show()
 - statuses/upload     ==>    client.statuses.upload()
+
+----
+
+淘宝API的使用示例：
+
+.. code-block:: python
+
+        from chinaapi.taobao import ApiClient
+        from chinaapi.utils.models import App, Token
+
+
+        # client的设置
+        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        client = ApiClient(app)
+
+        # 获取淘宝客店铺列表，对应的接口是：taobao.tbk.shops.get
+        r = self.client.tbk.shops.get(cid=14, fields='user_id,seller_nick,shop_title,pic_url')
+        print len(r.tbk_shops_get_response.tbk_shops.tbk_shop)  # 显示店铺列表的数量：40
+
+
+淘宝API的调用规则：直接映射（可省略前缀taobao.）
+
+- taobao.itemcats.get    ==>    client.itemcats.get()  或者  client.taobao.itemcats.get()
+- taobao.tbk.shops.get   ==>    client.tbk.shops.get()  或者  client.taobao.tbk.shops.get()
 
 感谢以下Python SDK的开发者们的贡献：
 -----------------------------------
