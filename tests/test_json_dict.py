@@ -5,7 +5,7 @@ from chinaapi.utils import jsonDict
 
 class JsonDictTest(TestCase):
     def test_loads(self):
-        s = r'{"name":"Michael","score":95}'
+        s = r'{"name":"smallcode","score":60}'
         json = jsonDict.loads(s)
-        self.assertEqual('Michael', json.name)
-        self.assertEqual(95, json.score)
+        self.assertEqual('smallcode', json.name)
+        self.assertEqual(60, json.score)
