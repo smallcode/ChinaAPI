@@ -18,6 +18,7 @@ ChinaAPI
 
     $ pip install chinaapi
 
+注：chinaapi依赖外部模块requests: https://github.com/kennethreitz/requests
 
 使用方法:
 --------
