@@ -17,7 +17,7 @@ class ClientWrapper(object):
         self.segments = [attr]
 
     def __call__(self, **kwargs):
-        return self._client.request(self.segments[-1], self.segments, **kwargs)
+        return self._client.request(self.segments, **kwargs)
 
     def __getattr__(self, attr):
         if not attr.startswith('_'):
@@ -49,7 +49,7 @@ class ApiClientBase(object):
     def parse_response(self, response):
         return jsonDict.loads(response.text)
 
-    def request(self, method, segments, **queries):
+    def request(self, segments, **queries):
         method = self.prepare_method(segments)
         url = self.prepare_url(segments, queries)
         headers = self.prepare_headers({'Accept-Encoding': 'gzip'}, queries)

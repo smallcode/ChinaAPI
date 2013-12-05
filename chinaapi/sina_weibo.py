@@ -20,7 +20,7 @@ class ApiClient(ApiClientBase):
 
     def prepare_method(self, segments):
         segment = segments[-1].lower()
-        if segments in self.post_methods or segments.split('_')[0] in self._post_methods:
+        if segment in self.post_methods or segment.split('_')[0] in self._post_methods:
             return Method.POST
         return Method.GET
 
