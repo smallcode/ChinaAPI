@@ -34,8 +34,8 @@ class ApiClientBase(object):
     def set_token(self, token):
         self.token = token
 
-    def prepare_method(self, method):
-        return method
+    def prepare_method(self, segments):
+        return segments
 
     def prepare_url(self, segments, queries):
         raise NotImplemented
@@ -50,7 +50,7 @@ class ApiClientBase(object):
         return jsonDict.loads(response.text)
 
     def request(self, method, segments, **queries):
-        method = self.prepare_method(method)
+        method = self.prepare_method(segments)
         url = self.prepare_url(segments, queries)
         headers = self.prepare_headers({'Accept-Encoding': 'gzip'}, queries)
 

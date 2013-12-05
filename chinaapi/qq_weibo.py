@@ -32,9 +32,9 @@ class ApiClient(ApiClientBase):
             queries['clientip'] = self.clientip
         return 'https://graph.qq.com/{0:s}'.format('/'.join(segments))
 
-    def prepare_method(self, method):
-        method = method.lower()
-        if method in self.post_methods or method.split('_')[0] in self._post_methods:
+    def prepare_method(self, segments):
+        segment = segments[-1].lower()
+        if segment in self.post_methods or segment.split('_')[0] in self._post_methods:
             return Method.POST
         return Method.GET
 

@@ -18,9 +18,9 @@ class ApiClient(ApiClientBase):
             return url.replace('https://api.', 'https://rm.api.')
         return url
 
-    def prepare_method(self, method):
-        method = method.lower()
-        if method in self.post_methods or method.split('_')[0] in self._post_methods:
+    def prepare_method(self, segments):
+        segment = segments[-1].lower()
+        if segments in self.post_methods or segments.split('_')[0] in self._post_methods:
             return Method.POST
         return Method.GET
 
