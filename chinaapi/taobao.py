@@ -68,12 +68,13 @@ class ApiClient(ApiClientBase):
                     "error_response": {"msg": "json decode error", "sub_code": "ism.json-decode-error",
                                        "code": 15, "sub_msg": "json-error: %s || %s" % (str(e), response.text)}}
 
+
+
     def parse_response(self, response):
         r = self.pre_parse_response(response)
         if 'error_response' in r:
-            request = '{0}?{1}'.format(response.url, response.request.body)
             error = r['error_response']
-            raise ApiError(request, error['code'], error['msg'], error['sub_code'], error['sub_msg'])
+            raise ApiError(self.get_error_request(response), error['code'], error['msg'], error['sub_code'], error['sub_msg'])
         return r
 
 

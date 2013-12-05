@@ -62,5 +62,11 @@ class ApiClientBase(object):
 
         return self.parse_response(response)
 
+    @staticmethod
+    def get_error_request(response):
+        if response.request.body:
+            return '{0}?{1}'.format(response.url, response.request.body)
+        return response.url
+
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
