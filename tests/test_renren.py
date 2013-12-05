@@ -7,8 +7,8 @@ from chinaapi.utils.models import App, Token
 
 class RenRenTest(TestCase):
     def setUp(self):
-        app = App('', '')
-        token = Token('')
+        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        token = Token('access_token')  # 填上取得的access_token
         self.client = ApiClient(app)
         self.client.set_token(token)
         self.uid = 334258249
