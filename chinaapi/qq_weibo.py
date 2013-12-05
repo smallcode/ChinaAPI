@@ -77,5 +77,5 @@ class ApiClient(ApiClientBase):
         if 'ret' in r and r.ret != 0:
             error_code = '{0}-{1}'.format(r.ret, r.get('errcode', r.ret))
             raise ApiError(self.get_error_request(response), error_code, r.get('msg', ''))
-        return r
+        return r.data
 
