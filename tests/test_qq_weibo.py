@@ -26,3 +26,8 @@ class QqWeiboTest(TestCase):
         r = self.client.user.info()
         self.assertEqual(self.openid, r.data.openid)
 
+    def test_t_upload_pic(self):
+        pic = open('fixtures/images/pic.jpg', 'rb')
+        r = self.client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')  # clientip必填
+        self.assertIsNotNone(r.data.imgurl)
+
