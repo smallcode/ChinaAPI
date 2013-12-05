@@ -1,11 +1,22 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.utils import jsonDict
+from chinaapi.utils.jsonDict import JsonDict, loads
 
 
 class JsonDictTest(TestCase):
     def test_loads(self):
-        s = r'{"name":"foo","age":100}'
-        json = jsonDict.loads(s)
+        json = loads(r'{"name":"foo","age":100}')
         self.assertEqual('foo', json.name)
         self.assertEqual(100, json.age)
+
+    def test_JsonDict(self):
+        json = JsonDict(name="foo", age=100)
+        self.assertEqual('foo', json.name)
+        self.assertEqual(100, json.age)
+        json.age = 99
+        self.assertEqual(99, json.age)
+
+    def test_value_error(self):
+        json = JsonDict(name="foo", age=100)
+        with self.assertRaises(AttributeError):
+            json.id
