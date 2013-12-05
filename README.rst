@@ -99,6 +99,60 @@ ChinaAPI就是为此目的而存在。
 
 ----
 
+腾讯微博API:
+------------
+
+使用方法：
+
+.. code-block:: python
+
+        from chinaapi.qq_weibo import ApiClient
+        from chinaapi.utils.models import App, Token
+
+
+        # client的设置
+        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        token = Token('access_token')       # 填上取得的access_token
+        openid = 'openid'                   # 填上取得的openid
+        client = ApiClient(app)
+        client.set_token(token)
+        client.set_openid(openid)
+
+        # 获取当前登录用户的信息，对应的接口是：user/info
+        r = client.user.info()
+        print r.name  # 显示用户昵称
+
+        # 发布一条带图片的微博，对应的接口是：t/add_pic
+        pic = open('pic.jpg', 'rb')
+        r = client.t.add_pic(content=u'发布的内容', pic=pic)
+        print r.id  # 显示发布成功的微博的id：1234567890123456
+
+        # 删除一条微博，对应的接口是：t/del
+        r = client.t.delete(id=r.id)  # 请将del替换为delete
+        print r.id  # 显示被删除的微博的id：1234567890123456
+
+        # 有两种设置clientip的方法：
+        # 1.全局设置，在该client所发起的所有调用中有效
+        client.set_clientip('220.181.111.85')
+        # 2.临时设置，只在此次调用中有效，会覆盖全局设置
+        client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')
+
+
+调用规则：**斜杠（/）映射为点（.），del映射为delete（因del是Python保留字，无法作为方法名）**   
+
+====================================== =========================================
+            腾讯微博API                               调  用
+====================================== =========================================
+  user/info                            client.user.info()
+  t/add_pic                            client.t.add_pic()
+  t/del                                client.t.delete()
+====================================== =========================================
+
+附：`腾讯微博API文档`_
+
+
+----
+
 TODO：
 -----------------------------------
 
@@ -118,3 +172,4 @@ TODO：
 .. _`Requests`: https://github.com/kennethreitz/requests
 .. _`新浪微博API文档`: http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
 .. _`淘宝API文档`: http://open.taobao.com/doc/category_list.htm?spm=0.0.0.0.MNfatw&id=102
+.. _`腾讯微博API文档`: http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3
