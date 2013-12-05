@@ -22,6 +22,7 @@ class ApiClient(ApiClientBase):
         self.clientip = clientip
 
     def prepare_url(self, segments, queries):
+        queries['oauth_version'] = '2.a'
         queries['format'] = 'json'
         queries['oauth_consumer_key'] = self.app.key
         if not self.token.is_expires:
