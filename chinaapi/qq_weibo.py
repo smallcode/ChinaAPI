@@ -29,7 +29,7 @@ class ApiClient(ApiClientBase):
             queries['access_token'] = self.token.access_token
         if self.openid:
             queries['openid'] = self.openid
-        if self.clientip:
+        if 'clientip' not in queries and self.clientip:
             queries['clientip'] = self.clientip
         return 'https://open.t.qq.com/api/{0}'.format('/'.join(segments))
 
