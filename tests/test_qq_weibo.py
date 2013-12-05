@@ -1,6 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.qq_weibo import APIClient, OAuth2Handler, APIError
+from chinaapi.qq_weibo import ApiClient
+from chinaapi.utils.models import App, Token
 
 
 # 返回text是unicode，设置默认编码为utf8
@@ -9,23 +10,19 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 
-# 换成你的 APPKEY
-APP_KEY = ""
-APP_SECRET = ""
-CALLBACK_URL = ""
-ACCESS_TOKEN = ""
-OPENID = ""
-
-
-class QQWeiboTest(TestCase):
+class QqWeiboTest(TestCase):
+    """
+    测试时需填写app_key,app_secret,access_token
+    """
     def setUp(self):
-        oauth = OAuth2Handler()
-        oauth.set_app_key_secret(APP_KEY, APP_SECRET, CALLBACK_URL)
-        oauth.set_token(ACCESS_TOKEN)
-        oauth.set_openid(OPENID)
-        self.client = APIClient(oauth)
+        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        token = Token('access_token')  # 填上取得的access_token
+        self.openid = 'openid'  # 填上取得的openid
+        self.client = ApiClient(app)
+        self.client.set_token(token)
+        self.client.set_openid(self.openid)
 
-    def test_without_app_key(self):
-        with self.assertRaises(APIError) as cm:
-            r = self.client.get.t__show(format="json", id=301041004850688)
-        self.assertEqual(u'missing parameter', cm.exception.result.msg)
+    def test_user_info(self):
+        r = self.client.user.info()
+        self.assertEqual(self.openid, r.data.openid)
+
