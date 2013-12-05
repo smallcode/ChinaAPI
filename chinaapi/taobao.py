@@ -34,9 +34,8 @@ class ApiClient(ApiClientBase):
         Return encoded data and files
         """
         data, files = {}, {}
-        if not values:
-            raise NotImplementedError('no values')
-        args = {'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0', 'timestamp': datetime.now()}
+        args = {'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0',
+                'timestamp': datetime.now()}
 
         for k, v in values.items() + args.items():
             kk = k.replace('__', '.')
@@ -64,17 +63,15 @@ class ApiClient(ApiClientBase):
                 text = response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
                 return jsonDict.loads(text)
             except ValueError, e:
-                return {
-                    "error_response": {"msg": "json decode error", "sub_code": "ism.json-decode-error",
-                                       "code": 15, "sub_msg": "json-error: %s || %s" % (str(e), response.text)}}
-
-
+                raise ApiError(self.get_error_request(response), 15, 'json decode error',
+                               'ism.json-decode-error', "json-error: %s || %s" % (str(e), response.text))
 
     def parse_response(self, response):
         r = self.pre_parse_response(response)
         if 'error_response' in r:
-            error = r['error_response']
-            raise ApiError(self.get_error_request(response), error['code'], error['msg'], error['sub_code'], error['sub_msg'])
+            error = r.error_response
+            raise ApiError(self.get_error_request(response), error.get('code', ''), error.get('msg', ''),
+                           error.get('sub_code', ''), error.get('sub_msg', ''))
         return r
 
 
