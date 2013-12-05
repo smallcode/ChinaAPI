@@ -86,7 +86,7 @@ class ApiClient(ApiClientBase):
             raise ApiError(self.get_error_request(response), response.status_code, 'Request Api not found!')
         r = super(ApiClient, self).parse_response(response)
         if 'ret' in r and r.ret != 0:
-            raise ApiError(self.get_error_request(response), r.ret, RET.get(r.ret, None), r.get('errcode', r.ret),
+            raise ApiError(self.get_error_request(response), r.ret, RET.get(r.ret, u''), r.get('errcode', ''),
                            r.get('msg', ''))
         return r.data
 
