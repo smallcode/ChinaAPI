@@ -10,6 +10,6 @@ class ApiError(StandardError):
 
     def __str__(self):
         if self.sub_code or self.sub_msg:
-            return 'ApiError: {0:n}: {1:s}, {2:n}: {3:s}, request: {4:s}'.format(self.code, self.msg, self.sub_code,
+            return '[{0}]: {1}, [{2}]: {3}, request: {4}'.format(str(self.code), self.msg, str(self.sub_code),
                                                                                  self.sub_msg, self.request)
-        return 'ApiError: {0:n}: {1:s}, request: {2:s}'.format(self.code, self.msg, self.request)
+        return '[{0}]: {1}, request: {2}'.format(str(self.code), self.msg, self.request)

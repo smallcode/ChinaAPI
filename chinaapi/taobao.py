@@ -71,8 +71,9 @@ class ApiClient(ApiClientBase):
     def parse_response(self, response):
         r = self.pre_parse_response(response)
         if 'error_response' in r:
+            request = '{0}?{1}'.format(response.url, response.request.body)
             error = r['error_response']
-            raise ApiError(response.url, error['code'], error['msg'], error['sub_code'], error['sub_msg'])
+            raise ApiError(request, error['code'], error['msg'], error['sub_code'], error['sub_msg'])
         return r
 
 
