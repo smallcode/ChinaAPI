@@ -16,7 +16,7 @@ class JsonDictTest(TestCase):
         json.age = 99
         self.assertEqual(99, json.age)
 
-    def test_value_error(self):
+    def test_AttributeError(self):
         json = JsonDict(name="foo", age=100)
         with self.assertRaises(AttributeError):
             json.id
