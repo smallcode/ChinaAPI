@@ -32,7 +32,7 @@ class App(object):
         self.redirect_uri = redirect_uri
 
 
-class Account(object):
+class User(object):
     def __init__(self, username, password):
         self.username = username
         self.password = password
