@@ -2,24 +2,24 @@
 from .utils.clients import ApiClientBase, Method
 from .utils.exceptions import ApiError
 
-
-VALUE_TO_STR = {
-    'friends': lambda v: v.strftime('%Y-%m-%d %H:%M:%S'),
-    type(u'a'): lambda v: v.encode('utf-8'),
-    type(0.1): lambda v: "%.2f" % v,
-    type(True): lambda v: str(v).lower(),
+IS_POST_METHOD = {
+    'user': lambda m: m in ['verify'],
+    'friends': lambda m: m in ['addspecial','delspecial', 'addblacklist', 'delblacklist'],
+    't': lambda m: m in ['re_add', 'reply', 'comment', 'like', 'unlike'],
+    'fav': lambda m: m in ['addht', 'addt', 'delht', 'delt'],
+    'vote': lambda m: m in ['createvote', 'vote'],
+    'list': lambda m: m != 'timeline',  # 只有timeline接口是读接口，其他全是写接口
+    'lbs': lambda m: True  # 全是写接口
 }
+
+DEFAULT_IS_POST_METHOD = lambda m: False
 
 
 class ApiClient(ApiClientBase):
     #写接口
-    post_methods = ['add', 'del', 'create', 'delete', 'update', 'verify']
+    post_methods = ['add', 'del', 'create', 'delete', 'update']
     #含下划线的写入接口，如：t/add_pic
     _post_methods = ['add', 'del', 'upload', 'update']
-    friends_post_methods = ['addspecial','delspecial', 'addblacklist', 'delblacklist']
-    t_post_methods = ['re_add', 'reply', 'comment', 'like', 'unlike']
-    fav_post_methods = ['addht', 'addt', 'delht', 'delt']
-    vote_post_methods = ['createvote', 'vote']
 
     def __init__(self, app):
         super(ApiClient, self).__init__(app)
@@ -54,17 +54,7 @@ class ApiClient(ApiClientBase):
         model, method = tuple([segment.lower() for segment in segments])
         if method in self.post_methods or method.split('_')[0] in self._post_methods:
             return Method.POST
-        elif model == 't' and method in self.t_post_methods:
-            return Method.POST
-        elif model == 'friends' and method in self.friends_post_methods:
-            return Method.POST
-        elif model == 'list' and method != 'timeline':  # 只有timeline接口是读接口，其他全是写接口
-            return Method.POST
-        elif model == 'fav' and method in self.fav_post_methods:
-            return Method.POST
-        elif model == 'lbs':  # 全是写接口
-            return Method.POST
-        elif model == 'vote' and method in self.vote_post_methods:
+        elif IS_POST_METHOD.get(model, DEFAULT_IS_POST_METHOD)(method):
             return Method.POST
         return Method.GET
 
