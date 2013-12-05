@@ -3,10 +3,19 @@ import time
 
 
 class Token(object):
-    def __init__(self, access_token, expired_at=None, created_at=None):
+    def __init__(self, access_token, expired_at=None, created_at=None, expires_in=None, refresh_token=None):
+        """
+        access_token：访问令牌
+        expired_at：令牌到期日期，为timestamp格式
+        created_at：令牌创建日期，为timestamp格式
+        expires_in：令牌剩余授权时间的秒数
+        refresh_token：用于刷新令牌
+        """
         self.access_token = access_token
-        self.expired_at = expired_at  # expired_at表示到期日期，为timestamp格式
+        self.expired_at = expired_at
         self.created_at = created_at
+        self.expires_in = expires_in
+        self.refresh_token = refresh_token
 
     @property
     def is_expires(self):
