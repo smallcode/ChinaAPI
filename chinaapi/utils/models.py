@@ -10,7 +10,7 @@ class Token(object):
 
     @property
     def is_expires(self):
-        return not self.access_token or time.time() > self.expired_at
+        return not self.access_token or (self.expired_at is not None and time.time() > self.expired_at)
 
 
 class App(object):
