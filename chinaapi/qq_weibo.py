@@ -34,6 +34,9 @@ class ApiClient(ApiClientBase):
 
     @staticmethod
     def get_api_url(segments):
+        # 因del为Python保留字，无法作为方法名，需将del替换为delete，并在此处进行反向转换，除list之外（list本身有delete方法）
+        if segments[-1] == 'delete' and segments[-2] != 'list':
+            segments[-1] = 'del'
         return 'https://open.t.qq.com/api/{0}'.format('/'.join(segments))
 
     def prepare_url(self, segments, queries):
