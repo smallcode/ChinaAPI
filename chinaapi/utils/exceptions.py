@@ -1,6 +1,6 @@
 # coding=utf-8
 class ApiError(StandardError):
-    def __init__(self, request, code, msg, sub_code='', sub_msg=''):
+    def __init__(self, request, code, msg, sub_code=None, sub_msg=None):
         self.request = request
         self.code = code
         self.msg = msg

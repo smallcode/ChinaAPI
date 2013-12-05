@@ -14,6 +14,17 @@ IS_POST_METHOD = {
 
 DEFAULT_IS_POST_METHOD = lambda m: False
 
+RET = {
+    0: u'成功返回',
+    1: u'参数错误',
+    2: u'频率受限',
+    3: u'鉴权失败',
+    4: u'服务器内部错误',
+    5: u'用户错误',
+    6: u'未注册微博',
+    7: u'未实名认证'
+}
+
 
 class ApiClient(ApiClientBase):
     #写接口
@@ -75,7 +86,7 @@ class ApiClient(ApiClientBase):
             raise ApiError(self.get_error_request(response), response.status_code, 'Request Api not found!')
         r = super(ApiClient, self).parse_response(response)
         if 'ret' in r and r.ret != 0:
-            error_code = '{0}-{1}'.format(r.ret, r.get('errcode', r.ret))
-            raise ApiError(self.get_error_request(response), error_code, r.get('msg', ''))
+            raise ApiError(self.get_error_request(response), r.ret, RET.get(r.ret, None), r.get('errcode', r.ret),
+                           r.get('msg', ''))
         return r.data
 
