@@ -30,7 +30,7 @@ class ApiClient(ApiClientBase):
             queries['openid'] = self.openid
         if self.clientip:
             queries['clientip'] = self.clientip
-        return 'https://graph.qq.com/{0:s}'.format('/'.join(segments))
+        return 'https://open.t.qq.com/api/{0}'.format('/'.join(segments))
 
     def prepare_method(self, segments):
         segment = segments[-1].lower()
