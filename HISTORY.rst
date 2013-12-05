@@ -4,14 +4,14 @@ Release History
 ---------------
 
 
-0.3.2 (2014-12-4)
+1.0 (2014-12-5)
 ++++++++++++++++++
 
 - 添加models，并增加测试
-- 添加ApiClient基类
+- 添加ApiClientBase
 - 添加ApiError
-- 添加sina_weibo和taobao的ApiClient
-- 添加sina_weibo和taobao的ApiClient本地单元测试（测试成功，因含有帐号信息不上传到Github）
+- 添加sina_weibo、sina_weibo、taobao的ApiClient
+- 添加sina_weibo、sina_weibo、taobao的ApiClient本地单元测试（测试成功，因含有帐号信息不上传到Github）
 
 
 0.3.1 (2014-12-3)
