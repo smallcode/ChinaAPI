@@ -17,7 +17,7 @@ ChinaAPI就是为此目的而存在。
 
     $ pip install chinaapi
 
-注：ChinaAPI所使用HTTP模块是Requests: https://github.com/kennethreitz/requests
+注：ChinaAPI所使用HTTP模块是 `Requests`_
 
 ----
 
@@ -48,10 +48,12 @@ ChinaAPI就是为此目的而存在。
         print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 
 
-调用规则：**斜杠（/）映射为点（.）**
+调用规则：**斜杠（/）映射为点（.）**   
 
 - users/show    ==>    client.users.show()
 - statuses/upload     ==>    client.statuses.upload()
+
+附：`新浪微博API文档`_
 
 ----
 
@@ -76,10 +78,12 @@ ChinaAPI就是为此目的而存在。
         print len(r.tbk_shops_get_response.tbk_shops.tbk_shop)  # 显示店铺列表的数量：40
 
 
-调用规则：**直接映射（可省略前缀taobao.）**
+调用规则：**直接映射（可省略前缀taobao.）** 
 
 - taobao.itemcats.get    ==>    client.itemcats.get()  或者  client.taobao.itemcats.get()
 - taobao.tbk.shops.get   ==>    client.tbk.shops.get()  或者  client.taobao.tbk.shops.get()
+
+附：`淘宝API文档`_
 
 ----
 
@@ -92,6 +96,13 @@ TODO：
 感谢以下Python SDK的开发者们的贡献：
 -----------------------------------
 
-- 新浪微博：https://github.com/michaelliao/sinaweibopy
-- 腾讯微博：https://github.com/upbit/tweibo-pysdk
-- 淘宝：https://github.com/sempr/taobaopy
+- 新浪微博：`sinaweibopy`_
+- 腾讯微博：`tweibo`_
+- 淘宝：`taobaopy`_
+
+.. _`sinaweibopy`: https://github.com/michaelliao/sinaweibopy
+.. _`tweibo`: https://github.com/upbit/tweibo-pysdk
+.. _`taobaopy`: https://github.com/sempr/taobaopy
+.. _`Requests`: https://github.com/kennethreitz/requests
+.. _`新浪微博API文档`: http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
+.. _`淘宝API文档`: http://open.taobao.com/doc/category_list.htm?spm=0.0.0.0.MNfatw&id=102
