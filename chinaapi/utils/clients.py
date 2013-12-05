@@ -31,7 +31,7 @@ class ApiClientBase(object):
         self.token = models.Token('')
         self.session = requests.session()
 
-    def set_access_token(self, token):
+    def set_token(self, token):
         self.token = token
 
     def prepare_method(self, method):

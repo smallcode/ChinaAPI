@@ -21,7 +21,7 @@ class QQWeiboTest(TestCase):
     def setUp(self):
         oauth = OAuth2Handler()
         oauth.set_app_key_secret(APP_KEY, APP_SECRET, CALLBACK_URL)
-        oauth.set_access_token(ACCESS_TOKEN)
+        oauth.set_token(ACCESS_TOKEN)
         oauth.set_openid(OPENID)
         self.client = APIClient(oauth)
 
