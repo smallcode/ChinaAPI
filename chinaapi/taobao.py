@@ -1,6 +1,6 @@
 # coding=utf-8
 from .utils.clients import ApiClientBase, Method
-from .utils.exceptions import ApiError
+from .utils.exceptions import ApiError, ApiResponseError
 from .utils import jsonDict
 from datetime import datetime
 import hmac
@@ -58,20 +58,24 @@ class ApiClient(ApiClientBase):
     def pre_parse_response(self, response):
         try:
             return super(ApiClient, self).parse_response(response)
-        except ValueError:
+        except ApiResponseError:
             try:
                 text = response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
                 return jsonDict.loads(text)
             except ValueError, e:
-                raise ApiError(self.get_error_request(response), 15, 'json decode error',
-                               'ism.json-decode-error', "json-error: %s || %s" % (str(e), response.text))
+                raise ApiResponseError(response, 15, 'json decode error', 'ism.json-decode-error',
+                                       "json-error: %s || %s" % (str(e), response.text))
 
     def parse_response(self, response):
         r = self.pre_parse_response(response)
-        if 'error_response' in r:
-            error = r.error_response
-            raise ApiError(self.get_error_request(response), error.get('code', ''), error.get('msg', ''),
-                           error.get('sub_code', ''), error.get('sub_msg', ''))
+        keys = r.keys()
+        if keys:
+            key = keys[0]
+            if 'error_response' in keys:
+                error = r.error_response
+                raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''), error.get('sub_code', ''),
+                                       error.get('sub_msg', ''))
+            return r[key]
         return r
 
 

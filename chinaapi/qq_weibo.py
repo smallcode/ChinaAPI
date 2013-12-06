@@ -1,6 +1,6 @@
 # coding=utf-8
 from .utils.clients import ApiClientBase, Method
-from .utils.exceptions import ApiError
+from .utils.exceptions import ApiInvalidError, ApiResponseError
 
 IS_POST_METHOD = {
     'user': lambda m: m in ['verify'],
@@ -67,7 +67,7 @@ class ApiClient(ApiClientBase):
 
     def prepare_method(self, segments):
         if len(segments) != 2:
-            raise ApiError(self.get_api_url(segments), 404, 'Request Api not found!')
+            raise ApiInvalidError(self.get_api_url(segments))
         model, method = tuple([segment.lower() for segment in segments])
         if method in self.post_methods or method.split('_')[0] in self._post_methods:
             return Method.POST
@@ -82,11 +82,8 @@ class ApiClient(ApiClientBase):
         return queries, files
 
     def parse_response(self, response):
-        if response.status_code == 404 and not response.content:
-            raise ApiError(self.get_error_request(response), response.status_code, 'Request Api not found!')
         r = super(ApiClient, self).parse_response(response)
         if 'ret' in r and r.ret != 0:
-            raise ApiError(self.get_error_request(response), r.ret, RET.get(r.ret, u''), r.get('errcode', ''),
-                           r.get('msg', ''))
+            raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
         return r.data
 

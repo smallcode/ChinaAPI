@@ -1,6 +1,6 @@
 # coding=utf-8
 from .utils.clients import ApiClientBase, Method
-from .utils.exceptions import ApiError
+from .utils.exceptions import ApiError, ApiNotExistError, ApiResponseError
 
 
 class ApiClient(ApiClientBase):
@@ -27,6 +27,6 @@ class ApiClient(ApiClientBase):
     def parse_response(self, response):
         r = super(ApiClient, self).parse_response(response)
         if 'error' in r:
-            raise ApiError(self.get_error_request(response), r.error.get('code', ''), r.error.get('message', ''))
+            raise ApiResponseError(response, r.error.get('code', ''), r.error.get('message', ''))
         return r
 

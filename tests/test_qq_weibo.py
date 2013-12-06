@@ -1,6 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
 from chinaapi.qq_weibo import ApiClient
+from chinaapi.utils.exceptions import ApiError
 from chinaapi.utils.models import App, Token
 
 
@@ -22,12 +23,28 @@ class QqWeiboTest(TestCase):
         self.client.set_token(token)
         self.client.set_openid(self.openid)
 
-    def test_user_info(self):
-        r = self.client.user.info()
-        self.assertEqual(self.openid, r.openid)
+    # def test_user_info(self):
+    #     r = self.client.user.info()
+    #     self.assertEqual(self.openid, r.openid)
+    #
+    # def test_t_upload_pic(self):
+    #     pic = open('fixtures/images/pic.jpg', 'rb')
+    #     r = self.client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')  # clientip必填
+    #     self.assertIsNotNone(r.imgurl)
 
-    def test_t_upload_pic(self):
-        pic = open('fixtures/images/pic.jpg', 'rb')
-        r = self.client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')  # clientip必填
-        self.assertIsNotNone(r.imgurl)
+    def test_not_exist_api(self):
+        with self.assertRaises(ApiError) as cm:
+            self.client.user123.info()
+        self.assertEqual('Request Api not found!', cm.exception.message)
+
+    def test_not_exist_api_with_too_many_segments(self):
+        with self.assertRaises(ApiError) as cm:
+            self.client.user.info.get()
+        self.assertEqual('Request Api not found!', cm.exception.message)
+
+    def test_api_error(self):
+        self.client.openid = ''
+        with self.assertRaises(ApiError) as cm:
+            self.client.user.info()
+        self.assertEqual('missing parameter', cm.exception.sub_message)
 

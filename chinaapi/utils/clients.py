@@ -1,6 +1,7 @@
 # coding=utf-8
 from chinaapi.utils import jsonDict, models
 import requests
+from chinaapi.utils.exceptions import ApiNotExistError, ApiResponseError
 
 
 class Method(object):
@@ -14,14 +15,14 @@ class ClientWrapper(object):
         segments:用于保存路径片段
         """
         self._client = client
-        self.segments = [attr]
+        self._segments = [attr]
 
     def __call__(self, **kwargs):
-        return self._client.request(self.segments, **kwargs)
+        return self._client.request(self._segments, **kwargs)
 
     def __getattr__(self, attr):
         if not attr.startswith('_'):
-            self.segments.append(attr)
+            self._segments.append(attr)
         return self
 
 
@@ -47,7 +48,14 @@ class ApiClientBase(object):
         return queries, None
 
     def parse_response(self, response):
-        return jsonDict.loads(response.text)
+        try:
+            return jsonDict.loads(response.text)
+        except ValueError, e:
+            status_code = 200
+            if response.status_code == status_code:
+                raise ApiResponseError(response, status_code, str(e))
+            else:
+                raise ApiNotExistError(response)
 
     def request(self, segments, **queries):
         method = self.prepare_method(segments)
@@ -61,12 +69,6 @@ class ApiClientBase(object):
             response = self.session.get(url, params=queries, headers=headers)
 
         return self.parse_response(response)
-
-    @staticmethod
-    def get_error_request(response):
-        if response.request.body:
-            return '{0}?{1}'.format(response.url, response.request.body)
-        return response.url
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
