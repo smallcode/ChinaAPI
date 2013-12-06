@@ -39,7 +39,7 @@ class SinaWeiboTest(TestCase):
     #     r = self.client.statuses.upload_pic(pic=pic)
     #     self.assertIsNotNone(r.pic_id)
     #
-    def test_not_exist_api(self):
-        with self.assertRaises(ApiError) as cm:
-            self.client.not_exist_api.get()
-        self.assertEqual('Request Api not found!', cm.exception.message)
+        # def test_not_exist_api(self):
+        #     with self.assertRaises(ApiError) as cm:
+        #         self.client.not_exist_api.get()
+        #     self.assertEqual('Request Api not found!', cm.exception.message)
