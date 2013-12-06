@@ -3,7 +3,7 @@ import time
 
 
 class Token(object):
-    def __init__(self, access_token, expired_at=None, created_at=None, refresh_token=None):
+    def __init__(self, access_token=None, expired_at=None, created_at=None, refresh_token=None):
         """
         access_token：访问令牌
         expired_at：令牌到期日期，为timestamp格式

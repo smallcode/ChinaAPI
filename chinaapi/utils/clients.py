@@ -29,7 +29,7 @@ class ClientWrapper(object):
 class ApiClientBase(object):
     def __init__(self, app):
         self.app = app
-        self.token = models.Token('')
+        self.token = models.Token()
         self.session = requests.session()
 
     def set_token(self, token):
@@ -72,3 +72,20 @@ class ApiClientBase(object):
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
+
+
+class OAuth2Base(object):
+    def __init__(self, app, url):
+        self.app = app
+        self.url = url
+        self.session = requests.session()
+
+    def authorize(self, **kwargs):
+        raise NotImplemented
+
+    def access_token(self, code):
+        raise NotImplemented
+
+    def revoke(self):
+        raise NotImplemented
+
