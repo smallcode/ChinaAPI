@@ -26,7 +26,7 @@ class Token(object):
 
 
 class App(object):
-    def __init__(self, key, secret=None, redirect_uri=None):
+    def __init__(self, key, secret, redirect_uri=''):
         self.key = key
         self.secret = secret
         self.redirect_uri = redirect_uri

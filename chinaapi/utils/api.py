@@ -1,6 +1,7 @@
 # coding=utf-8
-from chinaapi.utils import jsonDict, models
 import requests
+from chinaapi.utils import jsonDict
+from chinaapi.utils.models import Token
 from chinaapi.utils.exceptions import ApiNotExistError, ApiResponseError
 
 
@@ -9,10 +10,25 @@ class Method(object):
     POST = 'POST'
 
 
+class Response(object):
+    def __init__(self, requests_response):
+        self.requests_response = requests_response
+
+    def get_data(self):
+        try:
+            return jsonDict.loads(self.requests_response.text)
+        except ValueError, e:
+            status_code = 200
+            if self.requests_response.status_code == status_code:
+                raise ApiResponseError(self.requests_response, status_code, str(e))
+            else:
+                raise ApiNotExistError(self.requests_response)
+
+
 class ClientWrapper(object):
     def __init__(self, client, attr):
         """
-        segments:用于保存路径片段
+        segments:用于保存API路径片段
         """
         self._client = client
         self._segments = [attr]
@@ -26,11 +42,12 @@ class ClientWrapper(object):
         return self
 
 
-class ApiClientBase(object):
-    def __init__(self, app):
+class Client(object):
+    def __init__(self, app, response_class):
         self.app = app
-        self.token = models.Token()
+        self.token = Token()
         self.session = requests.session()
+        self.response_class = response_class
 
     def set_token(self, token):
         self.token = token
@@ -47,16 +64,6 @@ class ApiClientBase(object):
     def prepare_body(self, queries):
         return queries, None
 
-    def parse_response(self, response):
-        try:
-            return jsonDict.loads(response.text)
-        except ValueError, e:
-            status_code = 200
-            if response.status_code == status_code:
-                raise ApiResponseError(response, status_code, str(e))
-            else:
-                raise ApiNotExistError(response)
-
     def request(self, segments, **queries):
         method = self.prepare_method(segments)
         url = self.prepare_url(segments, queries)
@@ -68,13 +75,13 @@ class ApiClientBase(object):
         else:
             response = self.session.get(url, params=queries, headers=headers)
 
-        return self.parse_response(response)
+        return self.response_class(response).get_data()
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
 
 
-class OAuth2Base(object):
+class OAuth2(object):
     def __init__(self, app, url):
         self.app = app
         self.url = url
@@ -83,9 +90,8 @@ class OAuth2Base(object):
     def authorize(self, **kwargs):
         raise NotImplemented
 
-    def access_token(self, code):
+    def access_token(self, code, **kwargs):
         raise NotImplemented
 
-    def revoke(self):
+    def revoke(self, access_token):
         raise NotImplemented
-

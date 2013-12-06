@@ -1,6 +1,6 @@
 # coding=utf-8
-from .utils.clients import ApiClientBase, Method
-from .utils.exceptions import ApiError, ApiResponseError
+from .utils.api import Client, Method, Response
+from .utils.exceptions import ApiResponseError
 from .utils import jsonDict
 from datetime import datetime
 import hmac
@@ -16,7 +16,38 @@ VALUE_TO_STR = {
 DEFAULT_VALUE_TO_STR = lambda x: str(x)
 
 
-class ApiClient(ApiClientBase):
+class ApiResponse(Response):
+    def __init__(self, requests_response):
+        super(ApiResponse, self).__init__(requests_response)
+
+    def _parse_response(self):
+        try:
+            return super(ApiResponse, self).get_data()
+        except ApiResponseError:
+            try:
+                text = self.requests_response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
+                return jsonDict.loads(text)
+            except ValueError, e:
+                raise ApiResponseError(self.requests_response, 15, 'json decode error', 'ism.json-decode-error',
+                                       "json-error: %s || %s" % (str(e), self.requests_response.text))
+
+    def get_data(self):
+        r = self._parse_response()
+        keys = r.keys()
+        if keys:
+            key = keys[0]
+            if 'error_response' in keys:
+                error = r.error_response
+                raise ApiResponseError(self.requests_response, error.get('code', ''), error.get('msg', ''),
+                                       error.get('sub_code', ''), error.get('sub_msg', ''))
+            return r[key]
+        return r
+
+
+class ApiClient(Client):
+    def __init__(self, app):
+        super(ApiClient, self).__init__(app, ApiResponse)
+
     def prepare_url(self, segments, queries):
         if segments[0] != 'taobao':
             segments.insert(0, 'taobao')
@@ -55,27 +86,5 @@ class ApiClient(ApiClientBase):
             queries['session'] = self.client.access_token
         return self.sign(queries)
 
-    def pre_parse_response(self, response):
-        try:
-            return super(ApiClient, self).parse_response(response)
-        except ApiResponseError:
-            try:
-                text = response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
-                return jsonDict.loads(text)
-            except ValueError, e:
-                raise ApiResponseError(response, 15, 'json decode error', 'ism.json-decode-error',
-                                       "json-error: %s || %s" % (str(e), response.text))
-
-    def parse_response(self, response):
-        r = self.pre_parse_response(response)
-        keys = r.keys()
-        if keys:
-            key = keys[0]
-            if 'error_response' in keys:
-                error = r.error_response
-                raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''), error.get('sub_code', ''),
-                                       error.get('sub_msg', ''))
-            return r[key]
-        return r
 
 

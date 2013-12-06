@@ -1,5 +1,5 @@
 # coding=utf-8
-from .utils.clients import ApiClientBase, Method
+from .utils.api import Client, Method, Response
 from .utils.exceptions import ApiInvalidError, ApiResponseError
 
 IS_POST_METHOD = {
@@ -26,14 +26,26 @@ RET = {
 }
 
 
-class ApiClient(ApiClientBase):
+class ApiResponse(Response):
+    def __init__(self, requests_response):
+        super(ApiResponse, self).__init__(requests_response)
+
+    def get_data(self):
+        r = super(ApiResponse, self).get_data()
+        if 'ret' in r and r.ret != 0:
+            raise ApiResponseError(self.requests_response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''),
+                                   r.get('msg', ''))
+        return r.data
+
+
+class ApiClient(Client):
     #写接口
     post_methods = ['add', 'del', 'create', 'delete', 'update']
     #含下划线的写入接口，如：t/add_pic
     _post_methods = ['add', 'del', 'upload', 'update']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app)
+        super(ApiClient, self).__init__(app, ApiResponse)
         self.openid = None
         self.clientip = None
 
@@ -80,10 +92,4 @@ class ApiClient(ApiClientBase):
         if 'pic' in queries:
             files = dict(pic=(queries.pop('pic')))
         return queries, files
-
-    def parse_response(self, response):
-        r = super(ApiClient, self).parse_response(response)
-        if 'ret' in r and r.ret != 0:
-            raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
-        return r.data
 

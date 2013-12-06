@@ -1,11 +1,25 @@
 # coding=utf-8
-from .utils.clients import ApiClientBase, Method
-from .utils.exceptions import ApiError, ApiNotExistError, ApiResponseError
+from .utils.api import Client, Method, Response
+from .utils.exceptions import ApiResponseError
 
 
-class ApiClient(ApiClientBase):
+class ApiResponse(Response):
+    def __init__(self, requests_response):
+        super(ApiResponse, self).__init__(requests_response)
+
+    def get_data(self):
+        r = super(ApiResponse, self).get_data()
+        if 'error' in r:
+            raise ApiResponseError(self.requests_response, r.error.get('code', ''), r.error.get('message', ''))
+        return r
+
+
+class ApiClient(Client):
     #写入接口
     post_methods = ['put', 'share', 'remove', 'upload']
+
+    def __init__(self, app):
+        super(ApiClient, self).__init__(app, ApiResponse)
 
     def prepare_url(self, segments, queries):
         if not self.token.is_expires:
@@ -23,10 +37,3 @@ class ApiClient(ApiClientBase):
         if 'file' in queries:
             files = dict(file=(queries.pop('file')))
         return queries, files
-
-    def parse_response(self, response):
-        r = super(ApiClient, self).parse_response(response)
-        if 'error' in r:
-            raise ApiResponseError(response, r.error.get('code', ''), r.error.get('message', ''))
-        return r
-

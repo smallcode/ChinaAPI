@@ -1,15 +1,35 @@
 # coding=utf-8
-from .utils.clients import ApiClientBase, OAuth2Base, Method
+from chinaapi.utils.api import OAuth2
+from .utils.api import Client, Method, Response
 from .utils.exceptions import ApiError
 from furl import furl
 
 
-class ApiClient(ApiClientBase):
+class EmptyRedirectUriError(ApiError):
+    def __init__(self, request):
+        super(EmptyRedirectUriError, self).__init__(request, 21305, 'Parameter absent: redirect_uri', 'OAuth2 request')
+
+
+class ApiResponse(Response):
+    def __init__(self, requests_response):
+        super(ApiResponse, self).__init__(requests_response)
+
+    def get_data(self):
+        r = super(ApiResponse, self).get_data()
+        if 'error_code' in r:
+            raise ApiError(r.get('request', self.requests_response.url), r.error_code, r.get('error', ''))
+        return r
+
+
+class ApiClient(Client):
     #写入接口
     post_methods = ['create', 'add', 'destroy', 'update', 'upload', 'repost', 'reply', 'send', 'post', 'invite',
                     'shield', 'order']
     #含下划线的写入接口，如：statuses/upload_url_text
-    _post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
+    underlined_post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
+
+    def __init__(self, app):
+        super(ApiClient, self).__init__(app, ApiResponse)
 
     def prepare_url(self, segments, queries):
         url = 'https://api.weibo.com/2/{0:s}.json'.format('/'.join(segments))
@@ -21,7 +41,7 @@ class ApiClient(ApiClientBase):
 
     def prepare_method(self, segments):
         segment = segments[-1].lower()
-        if segment in self.post_methods or segment.split('_')[0] in self._post_methods:
+        if segment in self.post_methods or segment.split('_')[0] in self.underlined_post_methods:
             return Method.POST
         return Method.GET
 
@@ -41,29 +61,33 @@ class ApiClient(ApiClientBase):
             files = dict(image=(queries.pop('image')))
         return queries, files
 
-    def parse_response(self, response):
-        r = super(ApiClient, self).parse_response(response)
-        if 'error_code' in r:
-            raise ApiError(r.get('request', response.url), r.error_code, r.get('error', ''))
-        return r
 
-
-class OAuth2(OAuth2Base):
+class ApiOAuth2(OAuth2):
     def __init__(self, app):
-        super(OAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
+        super(ApiOAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
 
     def authorize(self, **kwargs):
         if 'response_type' not in kwargs:
             kwargs['response_type'] = 'code'
-        kwargs.update(client_id=self.app.key, redirect_uri=self.app.redirect_uri)
-        return furl(self.url).join('authorize').set(args=kwargs).url
+        if 'redirect_uri' not in kwargs:
+            kwargs['redirect_uri'] = self.app.redirect_uri
+        kwargs['client_id'] = self.app.key
+        url = furl(self.url).join('authorize').set(args=kwargs).url
+        if not kwargs['redirect_uri']:
+            raise EmptyRedirectUriError(url)
+        return url
 
-    def access_token(self, code):
-        data = dict(client_id=self.app.key, client_secret=self.app.secret, grant_type='authorization_code',
-                    code=code, redirect_uri=self.app.redirect_uri)
-        r = self.session.post(self.url + 'access_token', data=data)
+    def access_token(self, code, **kwargs):
+        if 'redirect_uri' not in kwargs:
+            kwargs['redirect_uri'] = self.app.redirect_uri
+        kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type='authorization_code', code=code)
+        url = self.url + 'access_token'
+        if not kwargs['redirect_uri']:
+            raise EmptyRedirectUriError(url)
+        r = self.session.post(url, data=kwargs)
+        return ApiResponse(r).get_data()
 
-    def revoke(self):
-        r = self.session.get(self.url + 'revokeoauth2')
-        return r.result
-
+    def revoke(self, access_token):
+        url = furl(self.url).join("revokeoauth2").set(args={'access_token': access_token}).url
+        r = self.session.get(url)
+        return ApiResponse(r).get_data().result
