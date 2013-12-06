@@ -1,6 +1,6 @@
 # coding=utf-8
 from .utils.api import Client, Method, Parser, OAuth2
-from .utils.exceptions import ApiError
+from .utils.exceptions import ApiError, ApiResponseError
 from furl import furl
 
 
@@ -13,7 +13,7 @@ class ApiParser(Parser):
     def parse(self, response):
         r = super(ApiParser, self).parse(response)
         if 'error_code' in r:
-            raise ApiError(r.get('request', response.url), r.error_code, r.get('error', ''))
+            raise ApiResponseError(response, r.error_code, r.get('error', ''))
         return r
 
 
