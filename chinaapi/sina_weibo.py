@@ -85,6 +85,5 @@ class ApiOAuth2(OAuth2):
         return ApiParser().parse(r)
 
     def revoke(self, access_token):
-        url = furl(self.url).join("revokeoauth2").set(args={'access_token': access_token}).url
-        r = self.session.get(url)
+        r = self.session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
         return ApiParser().parse(r).result
