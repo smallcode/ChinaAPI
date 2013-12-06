@@ -4,12 +4,12 @@ Release History
 ---------------
 
 
-1.0 (2014-12-5)
+1.0 (2014-12-6)
 ++++++++++++++++++
 
-- 添加models，并增加测试
+- 添加Token，App等models，并添加测试
 - 添加ApiClientBase
-- 添加ApiError
+- 添加ApiError，并添加测试
 - 添加新浪微博、腾讯微博、淘宝、人人的ApiClient
 - 添加新浪微博、腾讯微博、淘宝、人人的ApiClient本地单元测试（测试成功，因含有帐号信息不上传到Github）
 

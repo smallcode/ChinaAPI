@@ -47,7 +47,7 @@ ChinaAPI就是为此目的而存在。
 
         # 获取用户信息，对应的接口是：users/show
         r = client.users.show(uid=1904178193)
-        print r.name  # 显示用户昵称：微博开放平台
+        print r.name  # 显示用户名
 
         # 发布带图片的微博，对应的接口是：statuses/upload
         pic = open('pic.jpg', 'rb')
@@ -129,16 +129,16 @@ ChinaAPI就是为此目的而存在。
         # 获取当前登录用户的信息，对应的接口是：user/info
         # 返回结果r是json中的data值
         r = client.user.info()
-        print r.name  # 显示用户昵称
+        print r.name  # 显示用户名
 
         # 发布一条带图片的微博，对应的接口是：t/add_pic
         pic = open('pic.jpg', 'rb')
         r = client.t.add_pic(content=u'发布的内容', pic=pic)
-        print r.id  # 显示发布成功的微博的id：1234567890123456
+        print r.id  # 显示微博的ID
 
         # 删除一条微博，对应的接口是：t/del
         r = client.t.delete(id=r.id)  # 请将del替换为delete
-        print r.id  # 显示被删除的微博的id：1234567890123456
+        print r.id  # 显示微博的ID
 
         # 有两种设置clientip的方法：
         # 1.全局设置，在该client所发起的所有调用中有效
@@ -159,6 +159,46 @@ ChinaAPI就是为此目的而存在。
 
 附：`腾讯微博API文档`_
 
+----
+
+人人API:
+------------
+
+使用方法：
+
+.. code-block:: python
+
+        from chinaapi.renren import ApiClient
+        from chinaapi.utils.models import App, Token
+
+
+        # client的设置
+        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        token = Token('access_token')  # 填上取得的access_token
+        client = ApiClient(app)
+        client.set_token(token)
+
+        # 获取用户信息，对应的接口是：/v2/user/get
+        r = client.user.get(userId=334258249)
+        print r.name  # 显示用户名
+
+        # 上传照片至用户相册，对应的接口是：/v2/photo/upload
+        file = open('pic.jpg', 'rb')
+        r = client.photo.upload(file=file)
+        print r.id  # 显示照片的ID
+
+
+调用规则：**斜杠（/）映射为点（.）**
+
+====================================== =========================================
+            人人API                               调  用
+====================================== =========================================
+  /v2/user/get                         client.user.get()
+  /v2/photo/upload                     client.photo.upload()
+
+====================================== =========================================
+
+附：`人人API文档`_
 
 ----
 
@@ -181,3 +221,4 @@ TODO：
 .. _`新浪微博API文档`: http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
 .. _`淘宝API文档`: http://open.taobao.com/doc/category_list.htm?spm=0.0.0.0.MNfatw&id=102
 .. _`腾讯微博API文档`: http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3
+.. _`人人API文档`: http://wiki.dev.renren.com/wiki/API2
