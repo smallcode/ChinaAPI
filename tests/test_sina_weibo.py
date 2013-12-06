@@ -7,7 +7,7 @@ from chinaapi.utils.models import App, Token
 
 class SinaWeiboTest(TestCase):
     """
-    测试时需填写app_key,app_secret,access_token
+    注释部分的测试需填写app_key,app_secret,access_token
     """
     def setUp(self):
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
@@ -39,8 +39,7 @@ class SinaWeiboTest(TestCase):
     #     r = self.client.statuses.upload_pic(pic=pic)
     #     self.assertIsNotNone(r.pic_id)
     #
-    # def test_api_error(self):
-    #     self.client.token.access_token = ''
-    #     with self.assertRaises(ApiError) as cm:
-    #         self.client.users.show(uid=self.uid)
-    #     self.assertEqual('auth faild!', cm.exception.msg)
+    def test_not_exist_api(self):
+        with self.assertRaises(ApiError) as cm:
+            self.client.not_exist_api.get()
+        self.assertEqual('Request Api not found!', cm.exception.message)

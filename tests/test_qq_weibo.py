@@ -1,7 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
 from chinaapi.qq_weibo import ApiClient
-from chinaapi.utils.exceptions import ApiError
+from chinaapi.utils.exceptions import ApiError, ApiNotExistError, ApiInvalidError
 from chinaapi.utils.models import App, Token
 
 
@@ -13,7 +13,7 @@ sys.setdefaultencoding('utf8')
 
 class QqWeiboTest(TestCase):
     """
-    测试时需填写app_key,app_secret,access_token
+    注释部分的测试需填写app_key,app_secret,access_token
     """
     def setUp(self):
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
@@ -33,14 +33,12 @@ class QqWeiboTest(TestCase):
     #     self.assertIsNotNone(r.imgurl)
 
     def test_not_exist_api(self):
-        with self.assertRaises(ApiError) as cm:
-            self.client.user123.info()
-        self.assertEqual('Request Api not found!', cm.exception.message)
+        with self.assertRaises(ApiNotExistError):
+            self.client.not_exist_api.get()
 
-    def test_not_exist_api_with_too_many_segments(self):
-        with self.assertRaises(ApiError) as cm:
-            self.client.user.info.get()
-        self.assertEqual('Request Api not found!', cm.exception.message)
+    def test_invalid_api(self):
+        with self.assertRaises(ApiInvalidError):
+            self.client.too.many.segments.get()
 
     def test_api_error(self):
         self.client.openid = ''
