@@ -2,7 +2,7 @@ ChinaAPI
 =========================
 
 .. image:: https://travis-ci.org/smallcode/ChinaAPI.png
-:target: https://travis-ci.org/smallcode/ChinaAPI
+    :target: https://travis-ci.org/smallcode/ChinaAPI
 
 .. image:: https://badge.fury.io/py/chinaapi.png
     :target: http://badge.fury.io/py/chinaapi
