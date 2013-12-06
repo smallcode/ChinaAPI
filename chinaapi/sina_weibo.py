@@ -1,6 +1,5 @@
 # coding=utf-8
-from chinaapi.utils.api import OAuth2
-from .utils.api import Client, Method, Parser
+from .utils.api import Client, Method, Parser, OAuth2
 from .utils.exceptions import ApiError
 from furl import furl
 
