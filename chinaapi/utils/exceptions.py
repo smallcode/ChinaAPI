@@ -1,7 +1,7 @@
 # coding=utf-8
 class ApiError(StandardError):
-    def __init__(self, request, code, message, sub_code='', sub_message=''):
-        self.request = request
+    def __init__(self, url, code, message, sub_code='', sub_message=''):
+        self.request = url
         self.code = code
         self.sub_code = sub_code
         self.sub_message = sub_message
@@ -17,17 +17,18 @@ class ApiError(StandardError):
 class ApiResponseError(ApiError):
     def __init__(self, response, code, message, sub_code='', sub_message=''):
         self.response = response
-        super(ApiResponseError, self).__init__(self.get_request_url(), code, message, sub_code, sub_message)
+        super(ApiResponseError, self).__init__(self.get_url(response), code, message, sub_code, sub_message)
 
-    def get_request_url(self):
-        if self.response.request.body:
-            return '{0}?{1}'.format(self.response.url, self.response.request.body)
-        return self.response.url
+    @staticmethod
+    def get_url(response):
+        if response.request.body:
+            return '{0}?{1}'.format(response.url, response.request.body)
+        return response.url
 
 
 class ApiInvalidError(ApiError):
-    def __init__(self, request, code=0, message='Invalid Api!'):
-        super(ApiInvalidError, self).__init__(request, code, message)
+    def __init__(self, url, code=0, message='Invalid Api!'):
+        super(ApiInvalidError, self).__init__(url, code, message)
 
 
 class ApiNotExistError(ApiResponseError):

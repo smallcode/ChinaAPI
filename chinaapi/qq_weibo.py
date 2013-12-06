@@ -59,7 +59,7 @@ class ApiClient(Client):
             segments[-1] = 'del'
         return 'https://open.t.qq.com/api/{0}'.format('/'.join(segments))
 
-    def prepare_url(self, segments, queries):
+    def _prepare_url(self, segments, queries):
         queries['oauth_version'] = '2.a'
         queries['format'] = 'json'
         queries['oauth_consumer_key'] = self.app.key
@@ -71,7 +71,7 @@ class ApiClient(Client):
             queries['clientip'] = self.clientip
         return self.get_api_url(segments)
 
-    def prepare_method(self, segments):
+    def _prepare_method(self, segments):
         if len(segments) != 2:
             raise ApiInvalidError(self.get_api_url(segments))
         model, method = tuple([segment.lower() for segment in segments])
@@ -81,7 +81,7 @@ class ApiClient(Client):
             return Method.POST
         return Method.GET
 
-    def prepare_body(self, queries):
+    def _prepare_body(self, queries):
         files = None
         if 'pic' in queries:
             files = dict(pic=(queries.pop('pic')))

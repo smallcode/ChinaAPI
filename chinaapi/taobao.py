@@ -17,19 +17,19 @@ DEFAULT_VALUE_TO_STR = lambda x: str(x)
 
 
 class ApiParser(Parser):
-    def pre_parse_response(self, response):
-        try:
-            return super(ApiParser, self).parse(response)
-        except ApiResponseError:
-            try:
-                text = response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
-                return jsonDict.loads(text)
-            except ValueError, e:
-                raise ApiResponseError(response, 15, 'json decode error', 'ism.json-decode-error',
-                                       "json-error: %s || %s" % (str(e), response.text))
+    # def pre_parse_response(self, response):
+    #     try:
+    #         return super(ApiParser, self).parse(response)
+    #     except ApiResponseError:
+    #         try:
+    #             text = response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
+    #             return jsonDict.loads(text)
+    #         except ValueError, e:
+    #             raise ApiResponseError(response, 15, 'json decode error', 'ism.json-decode-error',
+    #                                    "json-error: %s || %s" % (str(e), response.text))
 
     def parse(self, response):
-        r = self.pre_parse_response(response)
+        r = super(ApiParser, self).parse(response)
         keys = r.keys()
         if keys:
             key = keys[0]
@@ -38,26 +38,25 @@ class ApiParser(Parser):
                 raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
                                        error.get('sub_code', ''), error.get('sub_msg', ''))
             return r[key]
-        return r
 
 
 class ApiClient(Client):
     def __init__(self, app):
         super(ApiClient, self).__init__(app, ApiParser)
 
-    def prepare_url(self, segments, queries):
+    def _prepare_url(self, segments, queries):
         if segments[0] != 'taobao':
             segments.insert(0, 'taobao')
         queries['method'] = '.'.join(segments)
         return 'http://gw.api.taobao.com/router/rest'
 
-    def prepare_method(self, segments):
+    def _prepare_method(self, segments):
         """
         淘宝接口全部使用POST提交
         """
         return Method.POST
 
-    def sign(self, values):
+    def _sign(self, values):
         """
         Return encoded data and files
         """
@@ -78,10 +77,10 @@ class ApiClient(Client):
         data['sign'] = sign.hexdigest().upper()
         return data, files
 
-    def prepare_body(self, queries):
-            if not self.token.is_expires:
-                queries['session'] = self.client.access_token
-            return self.sign(queries)
+    def _prepare_body(self, queries):
+        if not self.token.is_expires:
+            queries['session'] = self.token.access_token
+        return self._sign(queries)
 
 
 

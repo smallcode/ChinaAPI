@@ -5,8 +5,8 @@ from furl import furl
 
 
 class EmptyRedirectUriError(ApiError):
-    def __init__(self, request):
-        super(EmptyRedirectUriError, self).__init__(request, 21305, 'Parameter absent: redirect_uri', 'OAuth2 request')
+    def __init__(self, url):
+        super(EmptyRedirectUriError, self).__init__(url, 21305, 'Parameter absent: redirect_uri', 'OAuth2 request')
 
 
 class ApiParser(Parser):
@@ -27,7 +27,7 @@ class ApiClient(Client):
     def __init__(self, app):
         super(ApiClient, self).__init__(app, ApiParser)
 
-    def prepare_url(self, segments, queries):
+    def _prepare_url(self, segments, queries):
         if 'pic' in queries:
             prefix = 'upload.'
         elif 'remind' in segments:
@@ -36,13 +36,13 @@ class ApiClient(Client):
             prefix = ''
         return 'https://{0}api.weibo.com/2/{1}.json'.format(prefix, '/'.join(segments))
 
-    def prepare_method(self, segments):
+    def _prepare_method(self, segments):
         segment = segments[-1].lower()
         if segment in self.post_methods or segment.split('_')[0] in self.underlined_post_methods:
             return Method.POST
         return Method.GET
 
-    def prepare_headers(self, headers, queries):
+    def _prepare_headers(self, headers, queries):
         if self.token.is_expires:
             #对于不需要授权的API操作需追加source参数
             queries['source'] = self.app.key
@@ -50,7 +50,7 @@ class ApiClient(Client):
             headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
         return headers
 
-    def prepare_body(self, queries):
+    def _prepare_body(self, queries):
         files = None
         if 'pic' in queries:
             files = dict(pic=(queries.pop('pic')))

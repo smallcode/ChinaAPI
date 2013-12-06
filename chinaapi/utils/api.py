@@ -45,37 +45,37 @@ class Client(object):
     def __init__(self, app, parser):
         self.app = app
         self.token = Token()
-        self.session = requests.session()
-        self.parser = parser
+        self._session = requests.session()
+        self._parser = parser
 
     def set_token(self, token):
         self.token = token
 
-    def prepare_method(self, segments):
+    def _prepare_method(self, segments):
         return segments
 
-    def prepare_url(self, segments, queries):
+    def _prepare_url(self, segments, queries):
         raise NotImplemented
 
-    def prepare_headers(self, headers, queries):
+    def _prepare_headers(self, headers, queries):
         return headers
 
-    def prepare_body(self, queries):
+    def _prepare_body(self, queries):
         return queries, None
 
     def request(self, segments, **queries):
-        method = self.prepare_method(segments)
-        url = self.prepare_url(segments, queries)
+        method = self._prepare_method(segments)
+        url = self._prepare_url(segments, queries)
         headers = {'User-Agent': default_user_agent('%s/%s requests' % (__title__, __version__))}
-        self.session.headers.update(self.prepare_headers(headers, queries))
+        self._session.headers.update(self._prepare_headers(headers, queries))
 
         if method == Method.POST:
-            data, files = self.prepare_body(queries)
-            response = self.session.post(url, data=data, files=files)
+            data, files = self._prepare_body(queries)
+            response = self._session.post(url, data=data, files=files)
         else:
-            response = self.session.get(url, params=queries)
+            response = self._session.get(url, params=queries)
 
-        return self.parser().parse(response)
+        return self._parser().parse(response)
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)

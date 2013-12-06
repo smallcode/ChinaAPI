@@ -18,17 +18,17 @@ class ApiClient(Client):
     def __init__(self, app):
         super(ApiClient, self).__init__(app, ApiParser)
 
-    def prepare_url(self, segments, queries):
+    def _prepare_url(self, segments, queries):
         if not self.token.is_expires:
             queries['access_token'] = self.token.access_token
         return 'https://api.renren.com/v2/{0}'.format('/'.join(segments))
 
-    def prepare_method(self, segments):
+    def _prepare_method(self, segments):
         if segments[-1].lower() in self.post_methods:
             return Method.POST
         return Method.GET
 
-    def prepare_body(self, queries):
+    def _prepare_body(self, queries):
         files = None
         if 'file' in queries:
             files = dict(file=(queries.pop('file')))
