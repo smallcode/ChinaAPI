@@ -1,6 +1,7 @@
 # coding=utf-8
-from .utils.clients import ApiClientBase, Method
+from .utils.clients import ApiClientBase, OAuth2Base, Method
 from .utils.exceptions import ApiError
+from furl import furl
 
 
 class ApiClient(ApiClientBase):
@@ -45,4 +46,24 @@ class ApiClient(ApiClientBase):
         if 'error_code' in r:
             raise ApiError(r.get('request', response.url), r.error_code, r.get('error', ''))
         return r
+
+
+class OAuth2(OAuth2Base):
+    def __init__(self, app):
+        super(OAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
+
+    def authorize(self, **kwargs):
+        if 'response_type' not in kwargs:
+            kwargs['response_type'] = 'code'
+        kwargs.update(client_id=self.app.key, redirect_uri=self.app.redirect_uri)
+        return furl(self.url).join('authorize').set(args=kwargs).url
+
+    def access_token(self, code):
+        data = dict(client_id=self.app.key, client_secret=self.app.secret, grant_type='authorization_code',
+                    code=code, redirect_uri=self.app.redirect_uri)
+        r = self.session.post(self.url + 'access_token', data=data)
+
+    def revoke(self):
+        r = self.session.get(self.url + 'revokeoauth2')
+        return r.result
 

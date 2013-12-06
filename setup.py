@@ -15,7 +15,7 @@ packages = [
 ]
 
 requires = [
-    'requests >= 2.0.0',
+    'requests >= 2.1.0',
     'furl >= 0.3.6',
 ]
 
