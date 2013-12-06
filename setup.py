@@ -8,10 +8,7 @@ except ImportError:
 
 packages = [
     'chinaapi',
-    'chinaapi.packages',
-    'chinaapi.packages.sinaweibopy',
-    'chinaapi.packages.taobaopy',
-    'chinaapi.packages.tweibo',
+    'chinaapi.utils',
 ]
 
 requires = [
