@@ -1,5 +1,5 @@
 # coding=utf-8
-from .utils.api import Client, Method, Response
+from .utils.api import Client, Method, Parser
 from .utils.exceptions import ApiInvalidError, ApiResponseError
 
 IS_POST_METHOD = {
@@ -26,26 +26,20 @@ RET = {
 }
 
 
-class ApiResponse(Response):
-    def __init__(self, requests_response):
-        super(ApiResponse, self).__init__(requests_response)
-
-    def get_data(self):
-        r = super(ApiResponse, self).get_data()
+class ApiParser(Parser):
+    def parse(self, response):
+        r = super(ApiParser, self).parse(response)
         if 'ret' in r and r.ret != 0:
-            raise ApiResponseError(self.requests_response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''),
-                                   r.get('msg', ''))
+            raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
         return r.data
 
 
 class ApiClient(Client):
     #写接口
-    post_methods = ['add', 'del', 'create', 'delete', 'update']
-    #含下划线的写入接口，如：t/add_pic
-    _post_methods = ['add', 'del', 'upload', 'update']
+    post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app, ApiResponse)
+        super(ApiClient, self).__init__(app, ApiParser)
         self.openid = None
         self.clientip = None
 
@@ -81,7 +75,7 @@ class ApiClient(Client):
         if len(segments) != 2:
             raise ApiInvalidError(self.get_api_url(segments))
         model, method = tuple([segment.lower() for segment in segments])
-        if method in self.post_methods or method.split('_')[0] in self._post_methods:
+        if method.split('_')[0] in self.post_methods:
             return Method.POST
         elif IS_POST_METHOD.get(model, DEFAULT_IS_POST_METHOD)(method):
             return Method.POST

@@ -1,16 +1,13 @@
 # coding=utf-8
-from .utils.api import Client, Method, Response
+from .utils.api import Client, Method, Parser
 from .utils.exceptions import ApiResponseError
 
 
-class ApiResponse(Response):
-    def __init__(self, requests_response):
-        super(ApiResponse, self).__init__(requests_response)
-
-    def get_data(self):
-        r = super(ApiResponse, self).get_data()
+class ApiParser(Parser):
+    def parse(self, response):
+        r = super(ApiParser, self).parse(response)
         if 'error' in r:
-            raise ApiResponseError(self.requests_response, r.error.get('code', ''), r.error.get('message', ''))
+            raise ApiResponseError(response, r.error.get('code', ''), r.error.get('message', ''))
         return r
 
 
@@ -19,7 +16,7 @@ class ApiClient(Client):
     post_methods = ['put', 'share', 'remove', 'upload']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app, ApiResponse)
+        super(ApiClient, self).__init__(app, ApiParser)
 
     def prepare_url(self, segments, queries):
         if not self.token.is_expires:
@@ -27,8 +24,7 @@ class ApiClient(Client):
         return 'https://api.renren.com/v2/{0}'.format('/'.join(segments))
 
     def prepare_method(self, segments):
-        segment = segments[-1].lower()
-        if segment in self.post_methods:
+        if segments[-1].lower() in self.post_methods:
             return Method.POST
         return Method.GET
 
@@ -37,3 +33,5 @@ class ApiClient(Client):
         if 'file' in queries:
             files = dict(file=(queries.pop('file')))
         return queries, files
+
+

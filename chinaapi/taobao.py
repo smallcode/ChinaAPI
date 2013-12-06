@@ -1,5 +1,5 @@
 # coding=utf-8
-from .utils.api import Client, Method, Response
+from .utils.api import Client, Method, Parser
 from .utils.exceptions import ApiResponseError
 from .utils import jsonDict
 from datetime import datetime
@@ -16,29 +16,26 @@ VALUE_TO_STR = {
 DEFAULT_VALUE_TO_STR = lambda x: str(x)
 
 
-class ApiResponse(Response):
-    def __init__(self, requests_response):
-        super(ApiResponse, self).__init__(requests_response)
-
-    def _parse_response(self):
+class ApiParser(Parser):
+    def pre_parse_response(self, response):
         try:
-            return super(ApiResponse, self).get_data()
+            return super(ApiParser, self).parse(response)
         except ApiResponseError:
             try:
-                text = self.requests_response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
+                text = response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
                 return jsonDict.loads(text)
             except ValueError, e:
-                raise ApiResponseError(self.requests_response, 15, 'json decode error', 'ism.json-decode-error',
-                                       "json-error: %s || %s" % (str(e), self.requests_response.text))
+                raise ApiResponseError(response, 15, 'json decode error', 'ism.json-decode-error',
+                                       "json-error: %s || %s" % (str(e), response.text))
 
-    def get_data(self):
-        r = self._parse_response()
+    def parse(self, response):
+        r = self.pre_parse_response(response)
         keys = r.keys()
         if keys:
             key = keys[0]
             if 'error_response' in keys:
                 error = r.error_response
-                raise ApiResponseError(self.requests_response, error.get('code', ''), error.get('msg', ''),
+                raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
                                        error.get('sub_code', ''), error.get('sub_msg', ''))
             return r[key]
         return r
@@ -46,7 +43,7 @@ class ApiResponse(Response):
 
 class ApiClient(Client):
     def __init__(self, app):
-        super(ApiClient, self).__init__(app, ApiResponse)
+        super(ApiClient, self).__init__(app, ApiParser)
 
     def prepare_url(self, segments, queries):
         if segments[0] != 'taobao':
@@ -82,9 +79,9 @@ class ApiClient(Client):
         return data, files
 
     def prepare_body(self, queries):
-        if not self.token.is_expires:
-            queries['session'] = self.client.access_token
-        return self.sign(queries)
+            if not self.token.is_expires:
+                queries['session'] = self.client.access_token
+            return self.sign(queries)
 
 
 

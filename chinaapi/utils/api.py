@@ -12,19 +12,16 @@ class Method(object):
     POST = 'POST'
 
 
-class Response(object):
-    def __init__(self, requests_response):
-        self.requests_response = requests_response
-
-    def get_data(self):
+class Parser(object):
+    def parse(self, response):
         try:
-            return jsonDict.loads(self.requests_response.text)
+            return jsonDict.loads(response.text)
         except ValueError, e:
             status_code = 200
-            if self.requests_response.status_code == status_code:
-                raise ApiResponseError(self.requests_response, status_code, str(e))
+            if response.status_code == status_code:
+                raise ApiResponseError(response, status_code, str(e))
             else:
-                raise ApiNotExistError(self.requests_response)
+                raise ApiNotExistError(response)
 
 
 class ClientWrapper(object):
@@ -45,11 +42,11 @@ class ClientWrapper(object):
 
 
 class Client(object):
-    def __init__(self, app, response_class):
+    def __init__(self, app, parser):
         self.app = app
         self.token = Token()
         self.session = requests.session()
-        self.response_class = response_class
+        self.parser = parser
 
     def set_token(self, token):
         self.token = token
@@ -78,7 +75,7 @@ class Client(object):
         else:
             response = self.session.get(url, params=queries)
 
-        return self.response_class(response).get_data()
+        return self.parser().parse(response)
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
