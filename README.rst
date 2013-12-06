@@ -4,6 +4,9 @@ ChinaAPI
 .. image:: https://badge.fury.io/py/chinaapi.png
     :target: http://badge.fury.io/py/chinaapi
 
+.. image:: https://travis-ci.org/smallcode/ChinaAPI.png
+    :target: https://travis-ci.org/smallcode/ChinaAPI
+
 ChinaAPI是一个API库，使用Python编写。
 
 目前国内的几大开放平台，有新浪微博，腾讯微博，淘宝等。
