@@ -1,8 +1,10 @@
 # coding=utf-8
 import requests
+from requests.utils import default_user_agent
 from chinaapi.utils import jsonDict
 from chinaapi.utils.models import Token
 from chinaapi.utils.exceptions import ApiNotExistError, ApiResponseError
+from chinaapi import __version__, __title__
 
 
 class Method(object):
@@ -67,13 +69,14 @@ class Client(object):
     def request(self, segments, **queries):
         method = self.prepare_method(segments)
         url = self.prepare_url(segments, queries)
-        headers = self.prepare_headers({'Accept-Encoding': 'gzip'}, queries)
+        headers = {'User-Agent': default_user_agent('%s/%s requests' % (__title__, __version__))}
+        self.session.headers.update(self.prepare_headers(headers, queries))
 
         if method == Method.POST:
             data, files = self.prepare_body(queries)
-            response = self.session.post(url, data=data, files=files, headers=headers)
+            response = self.session.post(url, data=data, files=files)
         else:
-            response = self.session.get(url, params=queries, headers=headers)
+            response = self.session.get(url, params=queries)
 
         return self.response_class(response).get_data()
 
