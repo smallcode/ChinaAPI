@@ -15,3 +15,5 @@ chinaapi.egg-info/
 *.swp
 *.egg
 tests_local/
+extends/
+packages/
