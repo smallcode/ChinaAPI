@@ -24,7 +24,7 @@ ChinaAPI就是为此目的而存在。
 
     $ pip install chinaapi
 
-注：ChinaAPI所使用HTTP模块是 `Requests`_
+注：ChinaAPI所使用HTTP请求模块是： `Requests`_ ，Url组装模块是： `Furl`_
 
 ----
 
@@ -218,6 +218,7 @@ TODO：
 .. _`tweibo`: https://github.com/upbit/tweibo-pysdk
 .. _`taobaopy`: https://github.com/sempr/taobaopy
 .. _`Requests`: https://github.com/kennethreitz/requests
+.. _`Furl`: https://github.com/gruns/furl
 .. _`新浪微博API文档`: http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
 .. _`淘宝API文档`: http://open.taobao.com/doc/category_list.htm?spm=0.0.0.0.MNfatw&id=102
 .. _`腾讯微博API文档`: http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3
