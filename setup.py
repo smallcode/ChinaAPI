@@ -16,6 +16,7 @@ packages = [
 
 requires = [
     'requests >= 2.0.0',
+    'furl >= 0.3.6',
 ]
 
 with open('README.rst') as f:
