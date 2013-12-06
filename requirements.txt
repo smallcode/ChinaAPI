@@ -1,2 +1,2 @@
-requests==0.6.27
+requests==0.2.1
 furl == 0.3.6
