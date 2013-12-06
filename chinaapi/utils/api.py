@@ -88,10 +88,19 @@ class OAuth2(object):
         self.session = requests.session()
 
     def authorize(self, **kwargs):
+        """  授权
+        返回授权链接
+        """
         raise NotImplemented
 
     def access_token(self, code, **kwargs):
+        """ code换取access_token
+        返回Token
+        """
         raise NotImplemented
 
     def revoke(self, access_token):
+        """ 取消认证
+        返回是否成功取消
+        """
         raise NotImplemented
