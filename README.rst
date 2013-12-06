@@ -24,7 +24,7 @@ ChinaAPI就是为此目的而存在。
 
     $ pip install chinaapi
 
-注：ChinaAPI所使用HTTP请求模块是： `Requests`_ ，Url组装模块是： `Furl`_
+注：ChinaAPI使用： `Requests`_  （Http请求模块）和 `Furl`_ （Url组装模块）
 
 ----
 
