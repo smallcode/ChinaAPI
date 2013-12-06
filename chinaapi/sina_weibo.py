@@ -19,10 +19,10 @@ class ApiParser(Parser):
 
 class ApiClient(Client):
     #写入接口
-    post_methods = ['create', 'add', 'destroy', 'update', 'upload', 'repost', 'reply', 'send', 'post', 'invite',
-                    'shield', 'order']
+    _post_methods = ['create', 'add', 'destroy', 'update', 'upload', 'repost', 'reply', 'send', 'post', 'invite',
+                     'shield', 'order']
     #含下划线的写入接口，如：statuses/upload_url_text
-    underlined_post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
+    _underlined_post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
 
     def __init__(self, app):
         super(ApiClient, self).__init__(app, ApiParser)
@@ -38,7 +38,7 @@ class ApiClient(Client):
 
     def _prepare_method(self, segments):
         segment = segments[-1].lower()
-        if segment in self.post_methods or segment.split('_')[0] in self.underlined_post_methods:
+        if segment in self._post_methods or segment.split('_')[0] in self._underlined_post_methods:
             return Method.POST
         return Method.GET
 

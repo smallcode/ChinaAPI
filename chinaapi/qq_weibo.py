@@ -36,7 +36,7 @@ class ApiParser(Parser):
 
 class ApiClient(Client):
     #写接口
-    post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
+    _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
     def __init__(self, app):
         super(ApiClient, self).__init__(app, ApiParser)
@@ -50,7 +50,7 @@ class ApiClient(Client):
         self.clientip = clientip
 
     @staticmethod
-    def get_api_url(segments):
+    def _get_api_url(segments):
         """
         因del为Python保留字，无法作为方法名，需将del替换为delete.
         并在此处进行反向转换，除list之外（list本身有delete方法）
@@ -69,13 +69,13 @@ class ApiClient(Client):
             queries['openid'] = self.openid
         if 'clientip' not in queries and self.clientip:
             queries['clientip'] = self.clientip
-        return self.get_api_url(segments)
+        return self._get_api_url(segments)
 
     def _prepare_method(self, segments):
         if len(segments) != 2:
-            raise ApiInvalidError(self.get_api_url(segments))
+            raise ApiInvalidError(self._get_api_url(segments))
         model, method = tuple([segment.lower() for segment in segments])
-        if method.split('_')[0] in self.post_methods:
+        if method.split('_')[0] in self._post_methods:
             return Method.POST
         elif IS_POST_METHOD.get(model, DEFAULT_IS_POST_METHOD)(method):
             return Method.POST

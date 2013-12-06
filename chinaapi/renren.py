@@ -13,7 +13,7 @@ class ApiParser(Parser):
 
 class ApiClient(Client):
     #写入接口
-    post_methods = ['put', 'share', 'remove', 'upload']
+    _post_methods = ['put', 'share', 'remove', 'upload']
 
     def __init__(self, app):
         super(ApiClient, self).__init__(app, ApiParser)
@@ -24,7 +24,7 @@ class ApiClient(Client):
         return 'https://api.renren.com/v2/{0}'.format('/'.join(segments))
 
     def _prepare_method(self, segments):
-        if segments[-1].lower() in self.post_methods:
+        if segments[-1].lower() in self._post_methods:
             return Method.POST
         return Method.GET
 
