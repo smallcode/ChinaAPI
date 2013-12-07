@@ -63,11 +63,15 @@ class ApiClient(Client):
         queries.update({'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0',
                         'timestamp': datetime.now()})
 
-    def _sign(self, data):
-        data_str = "".join(["%s%s" % (k, data[k]) for k in sorted(data.keys())])
-        sign = hmac.new(self.app.secret)
-        sign.update(data_str)
+    @staticmethod
+    def _hashing(message, secret):
+        sign = hmac.new(secret)
+        sign.update(message)
         return sign.hexdigest().upper()
+
+    def _sign(self, data):
+        message = "".join(["%s%s" % (k, data[k]) for k in sorted(data.keys())])
+        return self._hashing(message, self.app.secret)
 
     def _prepare_body(self, queries):
         """
