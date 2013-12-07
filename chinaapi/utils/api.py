@@ -118,8 +118,21 @@ class OAuth2(object):
             raise EmptyRedirectUriError(url)
         return url
 
+    def _parse_token(self, response):
+        return self._parse_response(response)
+
+    def _get_access_token_url(self):
+        return self.url + 'access_token'
+
     def access_token(self, code, **kwargs):
-        """ code换取access_token
+        """ 用code换取access_token
         返回Token
         """
-        raise NotImplemented
+        if 'redirect_uri' not in kwargs:
+            kwargs['redirect_uri'] = self.app.redirect_uri
+        kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type='authorization_code', code=code)
+        url = self._get_access_token_url()
+        if not kwargs['redirect_uri']:
+            raise EmptyRedirectUriError(url)
+        response = self._session.post(url, data=kwargs)
+        return self._parse_token(response)

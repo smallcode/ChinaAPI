@@ -56,20 +56,15 @@ class ApiOAuth2(OAuth2):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/', ApiParser())
 
-    def access_token(self, code, **kwargs):
-        """ 用code换取access_token
-        返回Token
-        """
-        if 'redirect_uri' not in kwargs:
-            kwargs['redirect_uri'] = self.app.redirect_uri
-        kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type='authorization_code', code=code)
-        url = self.url + 'access_token'
-        if not kwargs['redirect_uri']:
-            raise EmptyRedirectUriError(url)
-        response = self._session.post(url, data=kwargs)
+    def _parse_token(self, response):
         data = self._parse_response(response)
-        token = Token(data.access_token, uid=data.uid)
-        token.set_expires_in(data.expires_in)
+        access_token = data.get('access_token', None)
+        uid = data.get('uid', None)
+        created_at = data.get('create_at', None)
+        expires_in = data.get('expires_in', data.get('expire_in', None))
+
+        token = Token(access_token, created_at=created_at, uid=uid)
+        token.set_expires_in(expires_in)
         return token
 
     def revoke(self, access_token):
@@ -84,10 +79,7 @@ class ApiOAuth2(OAuth2):
         返回Token
         """
         response = self._session.post(self.url + 'get_token_info', data={'access_token': access_token})
-        data = self._parse_response(response)
-        token = Token(access_token, created_at=data.create_at, uid=data.uid)
-        token.set_expires_in(data.expire_in)
-        return token
+        return self._parse_token(response)
 
     def parse_signed_request(self, signed_request):
         """  用于站内应用

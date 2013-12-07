@@ -19,8 +19,9 @@ class Token(object):
         self.uid = uid
 
     def set_expires_in(self, expires_in):
-        current = int(time.time())
-        self.expired_at = expires_in + current
+        if expires_in:
+            current = int(time.time())
+            self.expired_at = expires_in + current
 
     @property
     def is_expires(self):

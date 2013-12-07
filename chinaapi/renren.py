@@ -1,5 +1,5 @@
 # coding=utf-8
-from .utils.api import Client, Method, Parser
+from .utils.api import Client, Method, Parser, OAuth2
 from .utils.exceptions import ApiResponseError
 
 
@@ -33,5 +33,13 @@ class ApiClient(Client):
     def _prepare_body(self, queries):
         files = self._isolated_files(queries, ['file'])
         return queries, files
+
+
+class ApiOAuth2(OAuth2):
+    def __init__(self, app):
+        super(ApiOAuth2, self).__init__(app, 'https://graph.renren.com/oauth/', ApiParser())
+
+    def _get_access_token_url(self):
+        return self.url + 'token'
 
 

@@ -1,5 +1,5 @@
 # coding=utf-8
-from .utils.api import Client, Method, Parser
+from .utils.api import Client, Method, Parser, OAuth2
 from .utils.exceptions import ApiInvalidError, ApiResponseError
 
 IS_POST_METHOD = {
@@ -83,3 +83,16 @@ class ApiClient(Client):
         files = self._isolated_files(queries, ['pic'])
         return queries, files
 
+
+class ApiOAuth2(OAuth2):
+    def __init__(self, app):
+        super(ApiOAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/', ApiParser())
+
+    def revoke(self, **kwargs):
+        """ 取消认证
+        请求参数：oauth或openid&openkey标准参数，并带上以下参数
+        返回是否成功取消
+        """
+        response = self._session.get('http://open.t.qq.com/api/auth/revoke_auth?format=json', params=kwargs)
+        self._parse_response(response)
+        return True  # 没有异常说明ret=0（ret: 0-成功，非0-失败）
