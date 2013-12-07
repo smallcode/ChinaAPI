@@ -71,7 +71,7 @@ class Client(object):
         for k, v in queries.items():
             if hasattr(v, 'read'):  # 判断是否为文件
                 files[k] = v
-            elif v is not None:
+            else:
                 data[k] = v
         return data, files
 
