@@ -1,6 +1,11 @@
 # coding=utf-8
+import base64
+import hashlib
+import hmac
+from chinaapi.utils.models import Token
 from .utils.api import Client, Method, Parser, OAuth2
 from .utils.exceptions import ApiError, ApiResponseError
+from .utils import jsonDict
 from furl import furl
 
 
@@ -81,3 +86,28 @@ class ApiOAuth2(OAuth2):
     def revoke(self, access_token):
         response = self.session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
         return ApiParser().parse(response).result
+
+    def parse_signed_request(self, signed_request):
+        """  用于站内应用
+        Returns:
+            uid, Token
+        """
+
+        def base64decode(s):
+            appendix = '=' * (4 - len(s) % 4)
+            return base64.b64decode(s.replace('-', '+').replace('_', '/') + appendix)
+
+        sr = str(signed_request)
+        encoded_sig, payload = sr.split('.', 1)
+        sig = base64decode(encoded_sig)
+        data = jsonDict.loads(base64decode(payload))
+        if data['algorithm'] != u'HMAC-SHA256':
+            return None
+        expected_sig = hmac.new(self.app.key, payload, hashlib.sha256).digest()
+        if expected_sig == sig:
+            token = Token(data.get('oauth_token', None))
+            token.set_expires_in(data.get('expires', None))
+            token.created_at = data.get('issued_at', None)
+            uid = data.get('user_id', None)
+            return uid, token
+        return None
