@@ -67,6 +67,9 @@ class ApiOAuth2(OAuth2):
         return self._parser.parse(response)
 
     def authorize(self, **kwargs):
+        """  授权
+        返回授权链接
+        """
         if 'response_type' not in kwargs:
             kwargs['response_type'] = 'code'
         if 'redirect_uri' not in kwargs:
@@ -78,6 +81,9 @@ class ApiOAuth2(OAuth2):
         return url
 
     def access_token(self, code, **kwargs):
+        """ code换取access_token
+        返回Token
+        """
         if 'redirect_uri' not in kwargs:
             kwargs['redirect_uri'] = self.app.redirect_uri
         kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type='authorization_code', code=code)
@@ -91,10 +97,16 @@ class ApiOAuth2(OAuth2):
         return token
 
     def revoke(self, access_token):
+        """ 取消认证
+        返回是否成功取消
+        """
         response = self.session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
         return self._parse_response(response).result
 
     def get_token_info(self, access_token):
+        """ 获取access_token详细信息
+        返回Token
+        """
         response = self.session.post(self.url + 'get_token_info', data={'access_token': access_token})
         data = self._parse_response(response)
         token = Token(access_token, created_at=data.create_at, uid=data.uid)
@@ -105,7 +117,7 @@ class ApiOAuth2(OAuth2):
         """  用于站内应用
         signed_request: 应用框架在加载时会通过向Canvas URL post的参数signed_request
         Returns:
-            (token, is_valid) # (令牌, 是否有效)
+            (Token, is_valid) # (令牌, 是否有效)
         """
 
         def base64decode(s):
