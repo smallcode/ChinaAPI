@@ -61,6 +61,10 @@ class ApiClient(Client):
 class ApiOAuth2(OAuth2):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
+        self._parser = ApiParser()
+
+    def _parse_response(self, response):
+        return self._parser.parse(response)
 
     def authorize(self, **kwargs):
         if 'response_type' not in kwargs:
@@ -81,16 +85,27 @@ class ApiOAuth2(OAuth2):
         if not kwargs['redirect_uri']:
             raise EmptyRedirectUriError(url)
         response = self.session.post(url, data=kwargs)
-        return ApiParser().parse(response)
+        data = self._parse_response(response)
+        token = Token(data.access_token, uid=data.uid)
+        token.set_expires_in(data.expires_in)
+        return token
 
     def revoke(self, access_token):
         response = self.session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
-        return ApiParser().parse(response).result
+        return self._parse_response(response).result
+
+    def get_token_info(self, access_token):
+        response = self.session.post(self.url + 'get_token_info', data={'access_token': access_token})
+        data = self._parse_response(response)
+        token = Token(access_token, created_at=data.create_at, uid=data.uid)
+        token.set_expires_in(data.expire_in)
+        return token
 
     def parse_signed_request(self, signed_request):
         """  用于站内应用
+        signed_request: 应用框架在加载时会通过向Canvas URL post的参数signed_request
         Returns:
-            uid, Token
+            (token, is_valid) # (令牌, 是否有效)
         """
 
         def base64decode(s):
@@ -98,16 +113,11 @@ class ApiOAuth2(OAuth2):
             return base64.b64decode(s.replace('-', '+').replace('_', '/') + appendix)
 
         sr = str(signed_request)
-        encoded_sig, payload = sr.split('.', 1)
-        sig = base64decode(encoded_sig)
-        data = jsonDict.loads(base64decode(payload))
-        if data['algorithm'] != u'HMAC-SHA256':
-            return None
-        expected_sig = hmac.new(self.app.key, payload, hashlib.sha256).digest()
-        if expected_sig == sig:
-            token = Token(data.get('oauth_token', None))
-            token.set_expires_in(data.get('expires', None))
-            token.created_at = data.get('issued_at', None)
-            uid = data.get('user_id', None)
-            return uid, token
-        return None
+        encoded_sign, encoded_data = sr.split('.', 1)
+        sign = base64decode(encoded_sign)
+        data = jsonDict.loads(base64decode(encoded_data))
+        token = Token(data.oauth_token, created_at=data.issued_at, uid=data.user_id)
+        token.set_expires_in(data.expires)
+        is_valid = data.algorithm == u'HMAC-SHA256' and hmac.new(self.app.key, encoded_data,
+                                                                 hashlib.sha256).digest() == sign
+        return token, is_valid
