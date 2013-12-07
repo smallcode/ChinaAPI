@@ -40,6 +40,11 @@ class ApiNotExistError(ApiResponseError):
         super(ApiNotExistError, self).__init__(response, code, message)
 
 
-class EmptyRedirectUriError(ApiError):
+class OAuth2Error(ApiError):
+    def __init__(self, url, code, message):
+        super(OAuth2Error, self).__init__(url, code, message)
+
+
+class EmptyRedirectUriError(OAuth2Error):
     def __init__(self, url):
-        super(EmptyRedirectUriError, self).__init__(url, 21305, 'Parameter absent: redirect_uri', 'OAuth2 request')
+        super(EmptyRedirectUriError, self).__init__(url, 'OAuth2 request', 'Parameter absent: redirect_uri')
