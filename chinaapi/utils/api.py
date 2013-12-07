@@ -2,10 +2,9 @@
 import requests
 from furl import furl
 from requests.utils import default_user_agent
-from chinaapi.sina_weibo import EmptyRedirectUriError
 from chinaapi.utils import jsonDict
 from chinaapi.utils.models import Token
-from chinaapi.utils.exceptions import ApiNotExistError, ApiResponseError
+from chinaapi.utils.exceptions import ApiNotExistError, ApiResponseError, EmptyRedirectUriError
 from chinaapi import __version__, __title__
 
 

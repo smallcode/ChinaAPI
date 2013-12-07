@@ -38,3 +38,8 @@ class ApiNotExistError(ApiResponseError):
         if not code:
             code = response.status_code
         super(ApiNotExistError, self).__init__(response, code, message)
+
+
+class EmptyRedirectUriError(ApiError):
+    def __init__(self, url):
+        super(EmptyRedirectUriError, self).__init__(url, 21305, 'Parameter absent: redirect_uri', 'OAuth2 request')

@@ -2,16 +2,10 @@
 import base64
 import hashlib
 import hmac
-from furl import furl
 from .utils.models import Token
 from .utils.api import Client, Method, Parser, OAuth2
-from .utils.exceptions import ApiError, ApiResponseError
+from .utils.exceptions import ApiResponseError, EmptyRedirectUriError
 from .utils import jsonDict
-
-
-class EmptyRedirectUriError(ApiError):
-    def __init__(self, url):
-        super(EmptyRedirectUriError, self).__init__(url, 21305, 'Parameter absent: redirect_uri', 'OAuth2 request')
 
 
 class ApiParser(Parser):
