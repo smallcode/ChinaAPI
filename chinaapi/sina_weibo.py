@@ -86,7 +86,7 @@ class ApiOAuth2(OAuth2):
         url = self.url + 'access_token'
         if not kwargs['redirect_uri']:
             raise EmptyRedirectUriError(url)
-        response = self.session.post(url, data=kwargs)
+        response = self._session.post(url, data=kwargs)
         data = self._parse_response(response)
         token = Token(data.access_token, uid=data.uid)
         token.set_expires_in(data.expires_in)
@@ -96,14 +96,14 @@ class ApiOAuth2(OAuth2):
         """ 取消认证
         返回是否成功取消
         """
-        response = self.session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
+        response = self._session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
         return self._parse_response(response).result
 
     def get_token_info(self, access_token):
         """ 获取access_token详细信息
         返回Token
         """
-        response = self.session.post(self.url + 'get_token_info', data={'access_token': access_token})
+        response = self._session.post(self.url + 'get_token_info', data={'access_token': access_token})
         data = self._parse_response(response)
         token = Token(access_token, created_at=data.create_at, uid=data.uid)
         token.set_expires_in(data.expire_in)

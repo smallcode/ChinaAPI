@@ -97,7 +97,7 @@ class OAuth2(object):
     def __init__(self, app, url, parser):
         self.app = app
         self.url = url
-        self.session = requests.session()
+        self._session = requests.session()
         self._parser = parser
 
     def _parse_response(self, response):
