@@ -45,8 +45,9 @@ class Client(object):
     def __init__(self, app, parser):
         self.app = app
         self.token = Token()
-        self._session = requests.session()
         self._parser = parser
+        self._session = requests.session()
+        self._session.headers['User-Agent'] = default_user_agent('%s/%s requests' % (__title__, __version__))
 
     def set_token(self, token):
         self.token = token
@@ -79,7 +80,6 @@ class Client(object):
         url = self._prepare_url(segments, queries)
         method = self._prepare_method(segments)
         self._prepare_queries(queries)
-        self._session.headers['User-Agent'] = default_user_agent('%s/%s requests' % (__title__, __version__))
 
         if method == Method.POST:
             data, files = self._prepare_body(queries)

@@ -1,6 +1,6 @@
 # coding=utf-8
 from .utils.api import Client, Parser
-from .utils.exceptions import ApiResponseError
+from .utils.exceptions import ApiResponseError, ApiError
 from datetime import datetime
 import hmac
 
@@ -13,6 +13,13 @@ VALUE_TO_STR = {
 }
 
 DEFAULT_VALUE_TO_STR = lambda x: str(x)
+
+RETRY_SUB_CODES = {'isp.top-remote-unknown-error', 'isp.top-remote-connection-timeout',
+                   'isp.remote-connection-error', 'mz.emptybody',
+                   'isp.top-remote-service-unavailable', 'isp.top-remote-connection-timeout-tmall',
+                   'isp.item-update-service-error:GENERIC_FAILURE',
+                   'isp.item-update-service-error:IC_SYSTEM_NOT_READY_TRY_AGAIN_LATER',
+                   'ism.json-decode-error', 'ism.demo-error'}
 
 
 class ApiParser(Parser):
@@ -40,8 +47,9 @@ class ApiParser(Parser):
 
 
 class ApiClient(Client):
-    def __init__(self, app):
+    def __init__(self, app, retry_count=3):
         super(ApiClient, self).__init__(app, ApiParser())
+        self._retry_count = retry_count
 
     def _prepare_url(self, segments, queries):
         if segments[0] != 'taobao':
@@ -52,28 +60,41 @@ class ApiClient(Client):
     def _prepare_queries(self, queries):
         if not self.token.is_expires:
             queries['session'] = self.token.access_token
+        queries.update({'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0',
+                        'timestamp': datetime.now()})
+
+    def _sign(self, data):
+        data_str = "".join(["%s%s" % (k, data[k]) for k in sorted(data.keys())])
+        sign = hmac.new(self.app.secret)
+        sign.update(data_str)
+        return sign.hexdigest().upper()
 
     def _prepare_body(self, queries):
         """
         Return encoded data and files
         """
         data, files = {}, {}
-        args = {'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0',
-                'timestamp': datetime.now()}
-
-        for k, v in queries.items() + args.items():
+        for k, v in queries.items():
             kk = k.replace('__', '.')
             if hasattr(v, 'read'):
                 files[kk] = v
             elif v is not None:
                 data[kk] = VALUE_TO_STR.get(type(v), DEFAULT_VALUE_TO_STR)(v)
-
-        args_str = "".join(["%s%s" % (k, data[k]) for k in sorted(data.keys())])
-        sign = hmac.new(self.app.secret)
-        sign.update(args_str)
-        data['sign'] = sign.hexdigest().upper()
+        data['sign'] = self._sign(data)
         return data, files
 
-
-
+    def request(self, segments, **queries):
+        url = self._prepare_url(segments, queries)
+        self._prepare_queries(queries)
+        data, files = self._prepare_body(queries)
+        for count in xrange(self._retry_count, 0, -1):
+            try:
+                response = self._session.post(url, data=data, files=files)
+                return self._parser.parse(response)
+            except ApiError, e:
+                if e.sub_message in RETRY_SUB_CODES and count > 1:
+                    for f in files.values():
+                        f.seek(0)
+                    continue
+                raise e
 
