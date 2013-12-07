@@ -1,7 +1,6 @@
 # coding=utf-8
-from .utils.api import Client, Method, Parser
+from .utils.api import Client, Parser
 from .utils.exceptions import ApiResponseError
-from .utils import jsonDict
 from datetime import datetime
 import hmac
 
@@ -50,7 +49,11 @@ class ApiClient(Client):
         queries['method'] = '.'.join(segments)
         return 'http://gw.api.taobao.com/router/rest'
 
-    def _sign(self, values):
+    def _prepare_queries(self, queries):
+        if not self.token.is_expires:
+            queries['session'] = self.token.access_token
+
+    def _prepare_body(self, queries):
         """
         Return encoded data and files
         """
@@ -58,7 +61,7 @@ class ApiClient(Client):
         args = {'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0',
                 'timestamp': datetime.now()}
 
-        for k, v in values.items() + args.items():
+        for k, v in queries.items() + args.items():
             kk = k.replace('__', '.')
             if hasattr(v, 'read'):
                 files[kk] = v
@@ -71,10 +74,6 @@ class ApiClient(Client):
         data['sign'] = sign.hexdigest().upper()
         return data, files
 
-    def _prepare_body(self, queries):
-        if not self.token.is_expires:
-            queries['session'] = self.token.access_token
-        return self._sign(queries)
 
 
 

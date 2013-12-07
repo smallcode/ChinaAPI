@@ -42,12 +42,11 @@ class ApiClient(Client):
             return Method.POST
         return Method.GET
 
-    def _prepare_headers(self, headers, queries):
+    def _prepare_queries(self, queries):
         if self.token.is_expires:
             queries['source'] = self.app.key  # 对于不需要授权的API操作需追加source参数
         else:
-            headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
-        return headers
+            self._session.headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
 
     def _prepare_body(self, queries):
         files = self._isolated_files(queries, ['pic', 'image'])

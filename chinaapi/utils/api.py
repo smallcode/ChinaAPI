@@ -63,18 +63,18 @@ class Client(object):
     def _prepare_url(self, segments, queries):
         raise NotImplemented
 
-    def _prepare_headers(self, headers, queries):
-        return headers
+    def _prepare_queries(self, queries):
+        pass
 
     def _prepare_body(self, queries):
         return queries, None
 
     def request(self, segments, **queries):
-        method = self._prepare_method(segments)
         url = self._prepare_url(segments, queries)
-        headers = {'User-Agent': default_user_agent('%s/%s requests' % (__title__, __version__))}
-        self._session.headers.update(self._prepare_headers(headers, queries))
-
+        method = self._prepare_method(segments)
+        self._prepare_queries(queries)
+        self._session.headers['User-Agent'] = default_user_agent('%s/%s requests' % (__title__, __version__))
+        print self._session.headers
         if method == Method.POST:
             data, files = self._prepare_body(queries)
             response = self._session.post(url, data=data, files=files)

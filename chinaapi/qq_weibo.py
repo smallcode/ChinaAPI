@@ -49,8 +49,7 @@ class ApiClient(Client):
     def set_clientip(self, clientip):
         self.clientip = clientip
 
-    @staticmethod
-    def _get_api_url(segments):
+    def _prepare_url(self, segments, queries):
         """
         因del为Python保留字，无法作为方法名，需将del替换为delete.
         并在此处进行反向转换，除list之外（list本身有delete方法）
@@ -59,7 +58,17 @@ class ApiClient(Client):
             segments[-1] = 'del'
         return 'https://open.t.qq.com/api/{0}'.format('/'.join(segments))
 
-    def _prepare_url(self, segments, queries):
+    def _prepare_method(self, segments):
+        if len(segments) != 2:
+            raise ApiInvalidError(self._prepare_url(segments, None))
+        model, method = tuple([segment.lower() for segment in segments])
+        if method.split('_')[0] in self._post_methods:
+            return Method.POST
+        elif IS_POST_METHOD.get(model, DEFAULT_IS_POST_METHOD)(method):
+            return Method.POST
+        return Method.GET
+
+    def _prepare_queries(self, queries):
         queries['oauth_version'] = '2.a'
         queries['format'] = 'json'
         queries['oauth_consumer_key'] = self.app.key
@@ -69,17 +78,6 @@ class ApiClient(Client):
             queries['openid'] = self.openid
         if 'clientip' not in queries and self.clientip:
             queries['clientip'] = self.clientip
-        return self._get_api_url(segments)
-
-    def _prepare_method(self, segments):
-        if len(segments) != 2:
-            raise ApiInvalidError(self._get_api_url(segments))
-        model, method = tuple([segment.lower() for segment in segments])
-        if method.split('_')[0] in self._post_methods:
-            return Method.POST
-        elif IS_POST_METHOD.get(model, DEFAULT_IS_POST_METHOD)(method):
-            return Method.POST
-        return Method.GET
 
     def _prepare_body(self, queries):
         files = self._isolated_files(queries, ['pic'])
