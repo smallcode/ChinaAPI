@@ -25,7 +25,7 @@ class ApiClient(Client):
     _underlined_post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app, ApiParser)
+        super(ApiClient, self).__init__(app, ApiParser())
 
     def _prepare_url(self, segments, queries):
         if 'pic' in queries:
@@ -76,9 +76,9 @@ class ApiOAuth2(OAuth2):
         url = self.url + 'access_token'
         if not kwargs['redirect_uri']:
             raise EmptyRedirectUriError(url)
-        r = self.session.post(url, data=kwargs)
-        return ApiParser().parse(r)
+        response = self.session.post(url, data=kwargs)
+        return ApiParser().parse(response)
 
     def revoke(self, access_token):
-        r = self.session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
-        return ApiParser().parse(r).result
+        response = self.session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
+        return ApiParser().parse(response).result

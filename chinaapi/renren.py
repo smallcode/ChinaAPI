@@ -16,7 +16,7 @@ class ApiClient(Client):
     _post_methods = ['put', 'share', 'remove', 'upload']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app, ApiParser)
+        super(ApiClient, self).__init__(app, ApiParser())
 
     def _prepare_url(self, segments, queries):
         if not self.token.is_expires:

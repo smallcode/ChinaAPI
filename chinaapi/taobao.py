@@ -42,7 +42,7 @@ class ApiParser(Parser):
 
 class ApiClient(Client):
     def __init__(self, app):
-        super(ApiClient, self).__init__(app, ApiParser)
+        super(ApiClient, self).__init__(app, ApiParser())
 
     def _prepare_url(self, segments, queries):
         if segments[0] != 'taobao':

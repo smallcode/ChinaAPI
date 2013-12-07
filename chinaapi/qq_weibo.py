@@ -39,7 +39,7 @@ class ApiClient(Client):
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app, ApiParser)
+        super(ApiClient, self).__init__(app, ApiParser())
         self.openid = None
         self.clientip = None
 

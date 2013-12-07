@@ -51,6 +51,12 @@ class Client(object):
     def set_token(self, token):
         self.token = token
 
+    @staticmethod
+    def _isolated_files(queries, file_keys):
+        for key in file_keys:
+            if key in queries:
+                return {key: queries.pop(key)}
+
     def _prepare_method(self, segments):
         return segments
 
@@ -75,16 +81,10 @@ class Client(object):
         else:
             response = self._session.get(url, params=queries)
 
-        return self._parser().parse(response)
+        return self._parser.parse(response)
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
-
-    @staticmethod
-    def _isolated_files(queries, file_keys):
-        for key in file_keys:
-            if key in queries:
-                return {key: queries.pop(key)}
 
 
 class OAuth2(object):
