@@ -1,5 +1,7 @@
 # coding=utf-8
-from .utils.api import Client, Parser
+import base64
+from coverage.backward import md5
+from .utils.api import Client, Parser, OAuth
 from .utils.exceptions import ApiResponseError, ApiError
 from datetime import datetime
 import hmac
@@ -51,6 +53,10 @@ class ApiClient(Client):
         super(ApiClient, self).__init__(app, ApiParser())
         self._retry_count = retry_count
 
+    @property
+    def session(self):
+        return self.token.access_token
+
     def _prepare_url(self, segments, queries):
         if segments[0] != 'taobao':
             segments.insert(0, 'taobao')
@@ -59,7 +65,7 @@ class ApiClient(Client):
 
     def _prepare_queries(self, queries):
         if not self.token.is_expires:
-            queries['session'] = self.token.access_token
+            queries['session'] = self.session
         queries.update({'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0',
                         'timestamp': datetime.now()})
 
@@ -101,4 +107,15 @@ class ApiClient(Client):
                         f.seek(0)
                     continue
                 raise e
+
+    def validate_sign(self, top_parameters, top_sign):
+        """  验证签名是否有效（用于淘宝帐号登录）
+        """
+        sign = base64.b64encode(md5(self.app.key + top_parameters + self.session + self.app.secret).digest())
+        return top_sign == sign
+
+    def decode_params(self, top_parameters):
+        para_str = base64.b64decode(top_parameters)
+        return dict([item.split('=') for item in para_str.split('&')])
+
 
