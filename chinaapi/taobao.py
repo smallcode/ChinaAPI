@@ -114,7 +114,10 @@ class ApiClient(Client):
         sign = base64.b64encode(md5(self.app.key + top_parameters + self.session + self.app.secret).digest())
         return top_sign == sign
 
-    def decode_params(self, top_parameters):
+    @staticmethod
+    def decode_parameters(top_parameters):
+        """  将top_parameters字符串解码并转换为字典
+        """
         para_str = base64.b64decode(top_parameters)
         return dict([item.split('=') for item in para_str.split('&')])
 
