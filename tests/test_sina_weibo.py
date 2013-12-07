@@ -28,16 +28,16 @@ class SinaWeiboTest(TestCase):
     #     self.client.statuses.destroy(id=r.id)
     #
     # def test_statuses_upload(self):
-    #     pic = open('fixtures/images/pic.jpg', 'rb')
-    #     r = self.client.statuses.upload(status=u'发布的内容', pic=pic)
-    #     self.assertIsNotNone(r.id)
+        #     with open('fixtures/images/pic.jpg', 'rb') as pic:
+        #         r = self.client.statuses.upload(status=u'发布的内容', pic=pic)
+        #     self.assertIsNotNone(r.id)
     #     self.assertEqual(self.uid, r.user.id)
     #     self.client.statuses.destroy(id=r.id)
     #
     # def test_upload_pic(self):
-    #     pic = open('fixtures/images/pic.jpg', 'rb')
-    #     r = self.client.statuses.upload_pic(pic=pic)
-    #     self.assertIsNotNone(r.pic_id)
+        #     with open('fixtures/images/pic.jpg', 'rb') as pic:
+        #         r = self.client.statuses.upload_pic(pic=pic)
+        #     self.assertIsNotNone(r.pic_id)
     #
         # def test_not_exist_api(self):
         #     with self.assertRaises(ApiError) as cm:

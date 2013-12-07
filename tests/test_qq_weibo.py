@@ -28,8 +28,8 @@ class QqWeiboTest(TestCase):
     #     self.assertEqual(self.openid, r.openid)
     #
     # def test_t_upload_pic(self):
-    #     pic = open('fixtures/images/pic.jpg', 'rb')
-    #     r = self.client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')  # clientip必填
+    #     with open('fixtures/images/pic.jpg', 'rb') as pic:
+    #         r = self.client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')  # clientip必填
     #     self.assertIsNotNone(r.imgurl)
 
     def test_not_exist_api(self):
