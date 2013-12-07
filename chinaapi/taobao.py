@@ -1,7 +1,7 @@
 # coding=utf-8
 import base64
-from coverage.backward import md5
-from .utils.api import Client, Parser, OAuth
+from hashlib import md5
+from .utils.api import Client, Parser
 from .utils.exceptions import ApiResponseError, ApiError
 from datetime import datetime
 import hmac
