@@ -50,12 +50,6 @@ class ApiClient(Client):
         queries['method'] = '.'.join(segments)
         return 'http://gw.api.taobao.com/router/rest'
 
-    def _prepare_method(self, segments):
-        """
-        淘宝接口全部使用POST提交
-        """
-        return Method.POST
-
     def _sign(self, values):
         """
         Return encoded data and files

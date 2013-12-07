@@ -58,7 +58,7 @@ class Client(object):
                 return {key: queries.pop(key)}
 
     def _prepare_method(self, segments):
-        return segments
+        return Method.POST
 
     def _prepare_url(self, segments, queries):
         raise NotImplemented
