@@ -1,4 +1,5 @@
 # coding=utf-8
+from .utils.models import Token
 from .utils.api import Client, Method, Parser, OAuth2
 from .utils.exceptions import ApiInvalidError, ApiResponseError
 
@@ -27,19 +28,19 @@ RET = {
 
 
 class ApiParser(Parser):
-    def parse(self, response):
-        r = super(ApiParser, self).parse(response)
+    def parse_response(self, response):
+        r = super(ApiParser, self).parse_response(response)
         if 'ret' in r and r.ret != 0:
             raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
         return r.data
 
 
-class ApiClient(Client):
+class ApiClient(Client, ApiParser):
     #写接口
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app, ApiParser())
+        super(ApiClient, self).__init__(app)
         self.openid = None
         self.clientip = None
 
@@ -84,9 +85,21 @@ class ApiClient(Client):
         return queries, files
 
 
-class ApiOAuth2(OAuth2):
+class ApiOAuth2(OAuth2, ApiParser):
     def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/', ApiParser())
+        super(ApiOAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
+
+    def _parse_token(self, response):
+        data = self.parse_query_string(response.text)
+        if 'errorCode' in data:
+            raise ApiResponseError(response, data['errorCode'], data.get('errorMsg', '').strip("'"))
+        access_token = data.get('access_token', None)
+        expires_in = data.get('expire_in', None)
+        refresh_token = data.get('refresh_token', None)
+
+        token = Token(access_token, refresh_token=refresh_token)
+        token.set_expires_in(expires_in)
+        return token
 
     def revoke(self, **kwargs):
         """ 取消认证
@@ -94,5 +107,5 @@ class ApiOAuth2(OAuth2):
         返回是否成功取消
         """
         response = self._session.get('http://open.t.qq.com/api/auth/revoke_auth?format=json', params=kwargs)
-        self._parse_response(response)
+        self.parse_response(response)
         return True  # 没有异常说明ret=0（ret: 0-成功，非0-失败）

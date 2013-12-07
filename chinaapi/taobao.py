@@ -3,7 +3,9 @@ import base64
 import hmac
 from hashlib import md5
 from datetime import datetime
-from .utils.api import Client, Parser
+from urllib import unquote
+from furl import furl
+from .utils.api import Client, Parser, OAuth
 from .utils.exceptions import ApiResponseError, ApiError
 
 
@@ -24,6 +26,17 @@ RETRY_SUB_CODES = {'isp.top-remote-unknown-error', 'isp.top-remote-connection-ti
                    'ism.json-decode-error', 'ism.demo-error'}
 
 
+def to_message(data):
+    return ''.join(["%s%s" % (k, v) for k, v in sorted(data.iteritems())])
+
+
+def sign(data, app_secret):
+    message = to_message(data)
+    h = hmac.new(app_secret)
+    h.update(message)
+    return h.hexdigest().upper()
+
+
 class ApiParser(Parser):
     # def pre_parse_response(self, response):
     #     try:
@@ -36,8 +49,8 @@ class ApiParser(Parser):
     #             raise ApiResponseError(response, 15, 'json decode error', 'ism.json-decode-error',
     #                                    "json-error: %s || %s" % (str(e), response.text))
 
-    def parse(self, response):
-        r = super(ApiParser, self).parse(response)
+    def parse_response(self, response):
+        r = super(ApiParser, self).parse_response(response)
         keys = r.keys()
         if keys:
             key = keys[0]
@@ -48,9 +61,9 @@ class ApiParser(Parser):
             return r[key]
 
 
-class ApiClient(Client):
+class ApiClient(Client, ApiParser):
     def __init__(self, app, retry_count=3):
-        super(ApiClient, self).__init__(app, ApiParser())
+        super(ApiClient, self).__init__(app)
         self._retry_count = retry_count
 
     @property
@@ -69,16 +82,6 @@ class ApiClient(Client):
         queries.update({'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0',
                         'timestamp': datetime.now()})
 
-    @staticmethod
-    def _hashing(message, secret):
-        sign = hmac.new(secret)
-        sign.update(message)
-        return sign.hexdigest().upper()
-
-    def _sign(self, data):
-        message = "".join(["%s%s" % (k, data[k]) for k in sorted(data.keys())])
-        return self._hashing(message, self.app.secret)
-
     def _prepare_body(self, queries):
         """
         Return encoded data and files
@@ -90,7 +93,7 @@ class ApiClient(Client):
                 files[kk] = v
             elif v is not None:
                 data[kk] = VALUE_TO_STR.get(type(v), DEFAULT_VALUE_TO_STR)(v)
-        data['sign'] = self._sign(data)
+        data['sign'] = sign(data, self.app.secret)
         return data, files
 
     def request(self, segments, **queries):
@@ -100,7 +103,7 @@ class ApiClient(Client):
         for count in xrange(self._retry_count, 0, -1):
             try:
                 response = self._session.post(url, data=data, files=files)
-                return self._parser.parse(response)
+                return self.parse_response(response)
             except ApiError, e:
                 if e.sub_message in RETRY_SUB_CODES and count > 1:
                     for f in files.values():
@@ -108,17 +111,33 @@ class ApiClient(Client):
                     continue
                 raise e
 
-    def validate_sign(self, top_parameters, top_sign):
-        """  验证签名是否正确（用于淘宝帐号登录）
+
+class ApiOAuth(OAuth, ApiParser):
+    def __init__(self, app):
+        super(ApiOAuth, self).__init__(app, 'http://container.open.taobao.com/container')
+
+    def authorize(self):
+        args = dict(appkey=self.app.key, encode='utf-8')
+        return furl(self.url).set(args=args).url
+
+    def refresh_token(self, refresh_token, top_session):
+        # TODO:返回 system error ! 需要更新sign的算法
+        params = dict(appkey=self.app.key, refresh_token=refresh_token, sessionkey=top_session)
+        message = ''.join(["%s%s" % (k, v) for k, v in sorted(params.iteritems())]) + self.app.secret
+        params['sign'] = md5(message).hexdigest().upper()
+        response = self._session.get(self.url + '/refresh', params=params)
+        return self.parse_response(response)
+
+    def validate_sign(self, top_parameters, top_sign, top_session):
+        """  验证签名是否正确（用于淘宝帐号授权）（已测试成功，不要更改）
         """
-        sign = base64.b64encode(md5(self.app.key + top_parameters + self.session + self.app.secret).digest())
+        top_sign = unquote(top_sign)
+        top_parameters = unquote(top_parameters)
+        sign = base64.b64encode(md5(self.app.key + top_parameters + top_session + self.app.secret).digest())
         return top_sign == sign
 
-    @staticmethod
-    def decode_parameters(top_parameters):
-        """  将top_parameters字符串解码并转换为字典
+    def decode_parameters(self, top_parameters):
+        """  将top_parameters字符串解码并转换为字典，（已测试成功，不要更改）
         """
-        para_str = base64.b64decode(top_parameters)
-        return dict([item.split('=') for item in para_str.split('&')])
-
-
+        parameters = base64.decodestring(unquote(top_parameters))
+        return self.parse_query_string(parameters)

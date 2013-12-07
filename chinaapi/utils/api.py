@@ -14,7 +14,7 @@ class Method(object):
 
 
 class Parser(object):
-    def parse(self, response):
+    def parse_response(self, response):
         try:
             return jsonDict.loads(response.text)
         except ValueError, e:
@@ -23,6 +23,9 @@ class Parser(object):
                 raise ApiResponseError(response, status_code, str(e))
             else:
                 raise ApiNotExistError(response)
+
+    def parse_query_string(self, query_string):
+        return dict([item.split('=') for item in query_string.split('&')])
 
 
 class ClientWrapper(object):
@@ -42,11 +45,10 @@ class ClientWrapper(object):
         return self
 
 
-class Client(object):
-    def __init__(self, app, parser):
+class Client(Parser):
+    def __init__(self, app):
         self.app = app
         self.token = Token()
-        self._parser = parser
         self._session = requests.session()
         self._session.headers['User-Agent'] = default_user_agent('%s/%s requests' % (__title__, __version__))
 
@@ -88,21 +90,28 @@ class Client(object):
         else:
             response = self._session.get(url, params=queries)
 
-        return self._parser.parse(response)
+        return self.parse_response(response)
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
 
 
-class OAuth2(object):
-    def __init__(self, app, url, parser):
+class OAuth(Parser):
+    def __init__(self, app, url):
         self.app = app
         self.url = url
         self._session = requests.session()
-        self._parser = parser
 
-    def _parse_response(self, response):
-        return self._parser.parse(response)
+
+class OAuth2(OAuth):
+    def __init__(self, app, url):
+        super(OAuth2, self).__init__(app, url)
+
+    def _parse_token(self, response):
+        return self.parse_response(response)
+
+    def _get_access_token_url(self):
+        return self.url + 'access_token'
 
     def authorize(self, **kwargs):
         """  授权
@@ -118,21 +127,29 @@ class OAuth2(object):
             raise EmptyRedirectUriError(url)
         return url
 
-    def _parse_token(self, response):
-        return self._parse_response(response)
-
-    def _get_access_token_url(self):
-        return self.url + 'access_token'
-
-    def access_token(self, code, **kwargs):
+    def access_token(self, **kwargs):
         """ 用code换取access_token
+        请求参数说明：
+            授权模式             所需参数
+            authorization_code:  code 和 redirect_uri（可选）
+            refresh_token:       refresh_token
+            password:            username 和 password
+            client_credentials:  无
         返回Token
         """
         if 'redirect_uri' not in kwargs:
             kwargs['redirect_uri'] = self.app.redirect_uri
-        kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type='authorization_code', code=code)
+        if 'code' in kwargs:
+            grant_type = 'authorization_code'
+        elif 'refresh_token' in kwargs:
+            grant_type = 'refresh_token'
+        elif 'username' in kwargs and 'password' in kwargs:
+            grant_type = 'password'
+        else:
+            grant_type = 'client_credentials'
+        kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type=grant_type)
         url = self._get_access_token_url()
-        if not kwargs['redirect_uri']:
+        if grant_type == 'authorization_code' and not kwargs['redirect_uri']:
             raise EmptyRedirectUriError(url)
         response = self._session.post(url, data=kwargs)
         return self._parse_token(response)
