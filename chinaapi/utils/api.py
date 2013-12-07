@@ -94,10 +94,14 @@ class Client(object):
 
 
 class OAuth2(object):
-    def __init__(self, app, url):
+    def __init__(self, app, url, parser):
         self.app = app
         self.url = url
         self.session = requests.session()
+        self._parser = parser
+
+    def _parse_response(self, response):
+        return self._parser.parse(response)
 
     def authorize(self, **kwargs):
         """  授权

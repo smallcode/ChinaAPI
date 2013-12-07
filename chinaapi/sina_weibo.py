@@ -60,11 +60,7 @@ class ApiClient(Client):
 
 class ApiOAuth2(OAuth2):
     def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
-        self._parser = ApiParser()
-
-    def _parse_response(self, response):
-        return self._parser.parse(response)
+        super(ApiOAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/', ApiParser())
 
     def authorize(self, **kwargs):
         """  授权
