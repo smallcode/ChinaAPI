@@ -44,8 +44,7 @@ class ApiClient(Client):
 
     def _prepare_headers(self, headers, queries):
         if self.token.is_expires:
-            #对于不需要授权的API操作需追加source参数
-            queries['source'] = self.app.key
+            queries['source'] = self.app.key  # 对于不需要授权的API操作需追加source参数
         else:
             headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
         return headers
