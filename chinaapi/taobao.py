@@ -109,7 +109,7 @@ class ApiClient(Client):
                 raise e
 
     def validate_sign(self, top_parameters, top_sign):
-        """  验证签名是否有效（用于淘宝帐号登录）
+        """  验证签名是否正确（用于淘宝帐号登录）
         """
         sign = base64.b64encode(md5(self.app.key + top_parameters + self.session + self.app.secret).digest())
         return top_sign == sign
