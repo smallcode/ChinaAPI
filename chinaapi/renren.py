@@ -29,9 +29,7 @@ class ApiClient(Client):
         return Method.GET
 
     def _prepare_body(self, queries):
-        files = None
-        if 'file' in queries:
-            files = dict(file=(queries.pop('file')))
+        files = self._isolated_files(queries, ['file'])
         return queries, files
 
 

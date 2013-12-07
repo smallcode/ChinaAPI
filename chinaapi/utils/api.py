@@ -80,6 +80,12 @@ class Client(object):
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
 
+    @staticmethod
+    def _isolated_files(queries, file_keys):
+        for key in file_keys:
+            if key in queries:
+                return {key: queries.pop(key)}
+
 
 class OAuth2(object):
     def __init__(self, app, url):

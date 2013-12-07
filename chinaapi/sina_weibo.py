@@ -51,11 +51,7 @@ class ApiClient(Client):
         return headers
 
     def _prepare_body(self, queries):
-        files = None
-        if 'pic' in queries:
-            files = dict(pic=(queries.pop('pic')))
-        elif 'image' in queries:
-            files = dict(image=(queries.pop('image')))
+        files = self._isolated_files(queries, ['pic', 'image'])
         return queries, files
 
 
