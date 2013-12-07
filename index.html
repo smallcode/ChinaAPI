@@ -34,6 +34,12 @@
         <h1>
 <a name="chinaapi" class="anchor" href="#chinaapi"><span class="octicon octicon-link"></span></a>ChinaAPI</h1>
 
+<p>.. image:: <a href="https://travis-ci.org/smallcode/ChinaAPI.png">https://travis-ci.org/smallcode/ChinaAPI.png</a>
+    :target: <a href="https://travis-ci.org/smallcode/ChinaAPI">https://travis-ci.org/smallcode/ChinaAPI</a></p>
+
+<p>.. image:: <a href="https://badge.fury.io/py/chinaapi.png">https://badge.fury.io/py/chinaapi.png</a>
+    :target: <a href="http://badge.fury.io/py/chinaapi">http://badge.fury.io/py/chinaapi</a></p>
+
 <p>ChinaAPI是一个API库，使用Python编写。</p>
 
 <p>目前国内的几大开放平台，有新浪微博，腾讯微博，淘宝等。
@@ -51,7 +57,7 @@ ChinaAPI就是为此目的而存在。</p>
 <pre><code>$ pip install chinaapi
 </code></pre>
 
-<p>注：ChinaAPI所使用HTTP模块是Requests: <a href="https://github.com/kennethreitz/requests">https://github.com/kennethreitz/requests</a></p>
+<p>注：ChinaAPI使用： <code>Requests</code>_  （Http请求模块）和 <code>Furl</code>_ （Url组装模块）</p>
 
 <hr><h2>
 <a name="%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aapi" class="anchor" href="#%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aapi"><span class="octicon octicon-link"></span></a>新浪微博API:</h2>
@@ -68,11 +74,11 @@ ChinaAPI就是为此目的而存在。</p>
     app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
     token = Token('access_token')  # 填上取得的access_token
     client = ApiClient(app)
-    client.set_access_token(token)
+    client.set_token(token)
 
     # 获取用户信息，对应的接口是：users/show
     r = client.users.show(uid=1904178193)
-    print r.name  # 显示用户昵称：微博开放平台
+    print r.name  # 显示用户名
 
     # 发布带图片的微博，对应的接口是：statuses/upload
     pic = open('pic.jpg', 'rb')
@@ -80,12 +86,19 @@ ChinaAPI就是为此目的而存在。</p>
     print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 </code></pre>
 
-<p>调用规则：<strong>斜杠（/）映射为点（.）</strong></p>
+<p>调用规则：<strong>斜杠（/）映射为点（.）</strong>   </p>
 
-<ul>
-<li>users/show    ==&gt;    client.users.show()</li>
-<li>statuses/upload     ==&gt;    client.statuses.upload()</li>
-</ul><hr><h2>
+<p>====================================== =========================================
+            新浪微博API                               调  用
+====================================== =========================================
+  users/show                           client.users.show()
+  statuses/upload                      client.statuses.upload()</p>
+
+<p>====================================== =========================================</p>
+
+<p>附：<code>新浪微博API文档</code>_</p>
+
+<hr><h2>
 <a name="%E6%B7%98%E5%AE%9Dapi" class="anchor" href="#%E6%B7%98%E5%AE%9Dapi"><span class="octicon octicon-link"></span></a>淘宝API:</h2>
 
 <p>使用示例：</p>
@@ -101,32 +114,137 @@ ChinaAPI就是为此目的而存在。</p>
     client = ApiClient(app)
 
     # 获取淘宝客店铺列表，对应的接口是：taobao.tbk.shops.get
-    r = self.client.tbk.shops.get(cid=14, fields='user_id,seller_nick,shop_title,pic_url')
-    print len(r.tbk_shops_get_response.tbk_shops.tbk_shop)  # 显示店铺列表的数量：40
+    # 返回结果r是json中tbk_shops_get_response的值，所有的接口都直接返回response（键名为：接口+_response后缀）的值
+    r = client.tbk.shops.get(cid=14, fields='user_id,seller_nick,shop_title,pic_url')
+    print len(r.tbk_shops.tbk_shop)  # 显示店铺列表的数量：40
 </code></pre>
 
 <p>调用规则：<strong>直接映射（可省略前缀taobao.）</strong></p>
 
-<ul>
-<li>taobao.itemcats.get    ==&gt;    client.itemcats.get()  或者  client.taobao.itemcats.get()</li>
-<li>taobao.tbk.shops.get   ==&gt;    client.tbk.shops.get()  或者  client.taobao.tbk.shops.get()</li>
-</ul><hr><h2>
+<p>====================================== =========================================
+               淘宝API                               调  用
+====================================== =========================================
+  taobao.itemcats.get                  client.itemcats.get()<br>
+                                       或者 client.taobao.itemcats.get()
+  taobao.tbk.shops.get                 client.tbk.shops.get()<br>
+                                       或者 client.taobao.tbk.shops.get()</p>
+
+<p>====================================== =========================================</p>
+
+<p>附：<code>淘宝API文档</code>_</p>
+
+<hr><h2>
+<a name="%E8%85%BE%E8%AE%AF%E5%BE%AE%E5%8D%9Aapi" class="anchor" href="#%E8%85%BE%E8%AE%AF%E5%BE%AE%E5%8D%9Aapi"><span class="octicon octicon-link"></span></a>腾讯微博API:</h2>
+
+<p>使用方法：</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code>    from chinaapi.qq_weibo import ApiClient
+    from chinaapi.utils.models import App, Token
+
+
+    # client的设置
+    app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+    token = Token('access_token')       # 填上取得的access_token
+    openid = 'openid'                   # 填上取得的openid
+    client = ApiClient(app)
+    client.set_token(token)
+    client.set_openid(openid)
+
+    # 获取当前登录用户的信息，对应的接口是：user/info
+    # 返回结果r是json中的data值
+    r = client.user.info()
+    print r.name  # 显示用户名
+
+    # 发布一条带图片的微博，对应的接口是：t/add_pic
+    pic = open('pic.jpg', 'rb')
+    r = client.t.add_pic(content=u'发布的内容', pic=pic)
+    print r.id  # 显示微博的ID
+
+    # 删除一条微博，对应的接口是：t/del
+    r = client.t.delete(id=r.id)  # 请将del替换为delete
+    print r.id  # 显示微博的ID
+
+    # 有两种设置clientip的方法：
+    # 1.全局设置，在该client所发起的所有调用中有效
+    client.set_clientip('220.181.111.85')
+    # 2.临时设置，只在此次调用中有效，会覆盖全局设置
+    client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')
+</code></pre>
+
+<p>调用规则：<strong>斜杠（/）映射为点（.），del映射为delete（因del是Python保留字，无法作为方法名）</strong>   </p>
+
+<p>====================================== =========================================
+            腾讯微博API                               调  用
+====================================== =========================================
+  user/info                            client.user.info()
+  t/add_pic                            client.t.add_pic()
+  t/del                                client.t.delete()
+====================================== =========================================</p>
+
+<p>附：<code>腾讯微博API文档</code>_</p>
+
+<hr><h2>
+<a name="%E4%BA%BA%E4%BA%BAapi" class="anchor" href="#%E4%BA%BA%E4%BA%BAapi"><span class="octicon octicon-link"></span></a>人人API:</h2>
+
+<p>使用方法：</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code>    from chinaapi.renren import ApiClient
+    from chinaapi.utils.models import App, Token
+
+
+    # client的设置
+    app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+    token = Token('access_token')  # 填上取得的access_token
+    client = ApiClient(app)
+    client.set_token(token)
+
+    # 获取用户信息，对应的接口是：/v2/user/get
+    r = client.user.get(userId=334258249)
+    print r.name  # 显示用户名
+
+    # 上传照片至用户相册，对应的接口是：/v2/photo/upload
+    file = open('pic.jpg', 'rb')
+    r = client.photo.upload(file=file)
+    print r.id  # 显示照片的ID
+</code></pre>
+
+<p>调用规则：<strong>斜杠（/）映射为点（.）</strong></p>
+
+<p>====================================== =========================================
+            人人API                               调  用
+====================================== =========================================
+  /v2/user/get                         client.user.get()
+  /v2/photo/upload                     client.photo.upload()</p>
+
+<p>====================================== =========================================</p>
+
+<p>附：<code>人人API文档</code>_</p>
+
+<hr><h2>
 <a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO：</h2>
 
 <ul>
-<li>整合腾讯微博API</li>
 <li>整合各平台API的OAuth2调用模块</li>
 </ul><h2>
 <a name="%E6%84%9F%E8%B0%A2%E4%BB%A5%E4%B8%8Bpython-sdk%E7%9A%84%E5%BC%80%E5%8F%91%E8%80%85%E4%BB%AC%E7%9A%84%E8%B4%A1%E7%8C%AE" class="anchor" href="#%E6%84%9F%E8%B0%A2%E4%BB%A5%E4%B8%8Bpython-sdk%E7%9A%84%E5%BC%80%E5%8F%91%E8%80%85%E4%BB%AC%E7%9A%84%E8%B4%A1%E7%8C%AE"><span class="octicon octicon-link"></span></a>感谢以下Python SDK的开发者们的贡献：</h2>
 
 <ul>
-<li>新浪微博：<a href="https://github.com/michaelliao/sinaweibopy">https://github.com/michaelliao/sinaweibopy</a>
-</li>
-<li>腾讯微博：<a href="https://github.com/upbit/tweibo-pysdk">https://github.com/upbit/tweibo-pysdk</a>
-</li>
-<li>淘宝：<a href="https://github.com/sempr/taobaopy">https://github.com/sempr/taobaopy</a>
-</li>
-</ul>
+<li>新浪微博：<code>sinaweibopy</code>_</li>
+<li>腾讯微博：<code>tweibo</code>_</li>
+<li>淘宝：<code>taobaopy</code>_</li>
+</ul><p>.. _<code>sinaweibopy</code>: <a href="https://github.com/michaelliao/sinaweibopy">https://github.com/michaelliao/sinaweibopy</a>
+.. _<code>tweibo</code>: <a href="https://github.com/upbit/tweibo-pysdk">https://github.com/upbit/tweibo-pysdk</a>
+.. _<code>taobaopy</code>: <a href="https://github.com/sempr/taobaopy">https://github.com/sempr/taobaopy</a>
+.. _<code>Requests</code>: <a href="https://github.com/kennethreitz/requests">https://github.com/kennethreitz/requests</a>
+.. _<code>Furl</code>: <a href="https://github.com/gruns/furl">https://github.com/gruns/furl</a>
+.. _<code>新浪微博API文档</code>: <a href="http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI">http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI</a>
+.. _<code>淘宝API文档</code>: <a href="http://open.taobao.com/doc/category_list.htm?spm=0.0.0.0.MNfatw&amp;id=102">http://open.taobao.com/doc/category_list.htm?spm=0.0.0.0.MNfatw&amp;id=102</a>
+.. _<code>腾讯微博API文档</code>: <a href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3</a>
+.. _<code>人人API文档</code>: <a href="http://wiki.dev.renren.com/wiki/API2">http://wiki.dev.renren.com/wiki/API2</a></p>
       </section>
     </div>
 
