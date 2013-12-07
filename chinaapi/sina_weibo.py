@@ -2,11 +2,11 @@
 import base64
 import hashlib
 import hmac
-from chinaapi.utils.models import Token
+from furl import furl
+from .utils.models import Token
 from .utils.api import Client, Method, Parser, OAuth2
 from .utils.exceptions import ApiError, ApiResponseError
 from .utils import jsonDict
-from furl import furl
 
 
 class EmptyRedirectUriError(ApiError):
@@ -62,22 +62,8 @@ class ApiOAuth2(OAuth2):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/', ApiParser())
 
-    def authorize(self, **kwargs):
-        """  授权
-        返回授权链接
-        """
-        if 'response_type' not in kwargs:
-            kwargs['response_type'] = 'code'
-        if 'redirect_uri' not in kwargs:
-            kwargs['redirect_uri'] = self.app.redirect_uri
-        kwargs['client_id'] = self.app.key
-        url = furl(self.url).join('authorize').set(args=kwargs).url
-        if not kwargs['redirect_uri']:
-            raise EmptyRedirectUriError(url)
-        return url
-
     def access_token(self, code, **kwargs):
-        """ code换取access_token
+        """ 用code换取access_token
         返回Token
         """
         if 'redirect_uri' not in kwargs:

@@ -1,6 +1,8 @@
 # coding=utf-8
 import requests
+from furl import furl
 from requests.utils import default_user_agent
+from chinaapi.sina_weibo import EmptyRedirectUriError
 from chinaapi.utils import jsonDict
 from chinaapi.utils.models import Token
 from chinaapi.utils.exceptions import ApiNotExistError, ApiResponseError
@@ -107,7 +109,15 @@ class OAuth2(object):
         """  授权
         返回授权链接
         """
-        raise NotImplemented
+        if 'response_type' not in kwargs:
+            kwargs['response_type'] = 'code'
+        if 'redirect_uri' not in kwargs:
+            kwargs['redirect_uri'] = self.app.redirect_uri
+        kwargs['client_id'] = self.app.key
+        url = furl(self.url).join('authorize').set(args=kwargs).url
+        if not kwargs['redirect_uri']:
+            raise EmptyRedirectUriError(url)
+        return url
 
     def access_token(self, code, **kwargs):
         """ code换取access_token
