@@ -110,9 +110,3 @@ class OAuth2(object):
         返回Token
         """
         raise NotImplemented
-
-    def revoke(self, access_token):
-        """ 取消认证
-        返回是否成功取消
-        """
-        raise NotImplemented
