@@ -67,14 +67,20 @@ class Client(object):
         pass
 
     def _prepare_body(self, queries):
-        return queries, None
+        data, files = {}, {}
+        for k, v in queries.items():
+            if hasattr(v, 'read'):  # 判断是否为文件
+                files[k] = v
+            elif v is not None:
+                data[k] = v
+        return data, files
 
     def request(self, segments, **queries):
         url = self._prepare_url(segments, queries)
         method = self._prepare_method(segments)
         self._prepare_queries(queries)
         self._session.headers['User-Agent'] = default_user_agent('%s/%s requests' % (__title__, __version__))
-        print self._session.headers
+
         if method == Method.POST:
             data, files = self._prepare_body(queries)
             response = self._session.post(url, data=data, files=files)

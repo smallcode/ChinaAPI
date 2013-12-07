@@ -1,7 +1,7 @@
 # coding=utf-8
 class ApiError(StandardError):
     def __init__(self, url, code, message, sub_code='', sub_message=''):
-        self.request = url
+        self.url = url
         self.code = code
         self.sub_code = sub_code
         self.sub_message = sub_message
@@ -10,8 +10,8 @@ class ApiError(StandardError):
     def __str__(self):
         if self.sub_code or self.sub_message:
             return u'[{0}]: {1}, [{2}]: {3}, request: {4}'.format(str(self.code), self.message, str(self.sub_code),
-                                                                  self.sub_message, self.request)
-        return u'[{0}]: {1}, request: {2}'.format(str(self.code), self.message, self.request)
+                                                                  self.sub_message, self.url)
+        return u'[{0}]: {1}, request: {2}'.format(str(self.code), self.message, self.url)
 
 
 class ApiResponseError(ApiError):
