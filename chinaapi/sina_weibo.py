@@ -91,8 +91,7 @@ class ApiOAuth2(OAuth2, ApiParser):
             appendix = '=' * (4 - len(s) % 4)
             return base64.b64decode(s.replace('-', '+').replace('_', '/') + appendix)
 
-        sr = str(signed_request)
-        encoded_sign, encoded_data = sr.split('.', 1)
+        encoded_sign, encoded_data = signed_request.split('.', 1)
         sign = base64decode(encoded_sign)
         data = jsonDict.loads(base64decode(encoded_data))
         token = Token(data.oauth_token, created_at=data.issued_at, uid=data.user_id)
