@@ -1,11 +1,12 @@
 # coding=utf-8
-class ApiError(StandardError):
+class ApiError(Exception):
     def __init__(self, url, code, message, sub_code='', sub_message=''):
         self.url = url
         self.code = code
+        self.message = message
         self.sub_code = sub_code
         self.sub_message = sub_message
-        StandardError.__init__(self, message)
+        Exception.__init__(self, message)
 
     def __str__(self):
         if self.sub_code or self.sub_message:
