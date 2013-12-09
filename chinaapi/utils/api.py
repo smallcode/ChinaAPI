@@ -110,6 +110,9 @@ class OAuth2(OAuth):
     def _parse_token(self, response):
         return self.parse_response(response)
 
+    def _get_authorize_url(self):
+        return self.url + 'authorize'
+
     def _get_access_token_url(self):
         return self.url + 'access_token'
 
@@ -122,7 +125,7 @@ class OAuth2(OAuth):
         if 'redirect_uri' not in kwargs:
             kwargs['redirect_uri'] = self.app.redirect_uri
         kwargs['client_id'] = self.app.key
-        url = furl(self.url).join('authorize').set(args=kwargs).url
+        url = furl(self._get_authorize_url()).set(args=kwargs).url
         if not kwargs['redirect_uri']:
             raise EmptyRedirectUriError(url)
         return url

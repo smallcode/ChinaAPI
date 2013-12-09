@@ -251,10 +251,12 @@ TODO：
 - 新浪微博：`sinaweibopy`_
 - 腾讯微博：`tweibo`_
 - 淘宝：`taobaopy`_
+- 豆瓣：`douban-client`_
 
 .. _`sinaweibopy`: https://github.com/michaelliao/sinaweibopy
 .. _`tweibo`: https://github.com/upbit/tweibo-pysdk
 .. _`taobaopy`: https://github.com/sempr/taobaopy
+.. _`douban-client`: https://github.com/douban/douban-client
 .. _`Requests`: https://github.com/kennethreitz/requests
 .. _`Furl`: https://github.com/gruns/furl
 .. _`新浪微博API文档`: http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI
