@@ -30,5 +30,5 @@ class ApiOAuth2(OAuth2, ApiParser):
         expires_in = data.get('expires_in', None)
 
         token = Token(access_token, refresh_token=refresh_token, uid=uid)
-        token.set_expires_in(expires_in)
+        token.expires_in = expires_in
         return token

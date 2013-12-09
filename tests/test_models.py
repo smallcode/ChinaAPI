@@ -24,7 +24,7 @@ class TokenTest(TestCase):
     def test_set_expires_in(self):
         expires_in = 60 * 60
         token = models.Token('token_string')
-        token.set_expires_in(expires_in)
+        token.expires_in = expires_in
         self.assertAlmostEqual(expires_in, token.expires_in, -1)
 
 

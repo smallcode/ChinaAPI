@@ -100,7 +100,7 @@ class ApiOAuth2(OAuth2, ApiParser):
         refresh_token = data.get('refresh_token', None)
 
         token = Token(access_token, refresh_token=refresh_token)
-        token.set_expires_in(expires_in)
+        token.expires_in = expires_in
         return token
 
     def revoke(self, **kwargs):

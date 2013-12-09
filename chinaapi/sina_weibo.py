@@ -64,7 +64,7 @@ class ApiOAuth2(OAuth2, ApiParser):
         expires_in = data.get('expires_in', data.get('expire_in', None))
 
         token = Token(access_token, created_at=created_at, uid=uid)
-        token.set_expires_in(expires_in)
+        token.expires_in = expires_in
         return token
 
     def revoke(self, access_token):
@@ -97,7 +97,7 @@ class ApiOAuth2(OAuth2, ApiParser):
         sign = base64decode(encoded_sign)
         data = jsonDict.loads(base64decode(encoded_data))
         token = Token(data.oauth_token, created_at=data.issued_at, uid=data.user_id)
-        token.set_expires_in(data.expires)
+        token.expires_in = data.expires
         is_valid = data.algorithm == u'HMAC-SHA256' and hmac.new(self.app.key, encoded_data,
                                                                  hashlib.sha256).digest() == sign
         return token, is_valid
