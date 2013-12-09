@@ -98,10 +98,10 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 ====================================== =========================================
             新浪微博oauth2 API                        调  用
 ====================================== =========================================
-  oauth2/authorize                     client.authorize()
-  oauth2/access_token                  client.access_token()
-  oauth2/get_token_info                client.get_token_info()
-  oauth2/revokeoauth2                  client.revoke()
+  oauth2/authorize                     oauth2.authorize()
+  oauth2/access_token                  oauth2.access_token()
+  oauth2/get_token_info                oauth2.get_token_info()
+  oauth2/revokeoauth2                  oauth2.revoke()
 ====================================== =========================================
 
 ----
