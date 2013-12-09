@@ -22,9 +22,10 @@ class TokenTest(TestCase):
         self.assertTrue(token.is_expires)
 
     def test_set_expires_in(self):
-        token = models.Token('token_string', time.time() - 60 * 60)
-        token.set_expires_in(10000)
-        self.assertFalse(token.is_expires)
+        expires_in = 60 * 60
+        token = models.Token('token_string')
+        token.set_expires_in(expires_in)
+        self.assertAlmostEqual(expires_in, token.expires_in, -1)
 
 
 class UserTest(TestCase):
