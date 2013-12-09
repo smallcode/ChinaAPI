@@ -18,6 +18,12 @@ class Token(object):
         self.refresh_token = refresh_token
         self.uid = uid
 
+    @property
+    def expires_in(self):
+        if not self.is_expires:
+            current = int(time.time())
+            return self.expired_at - current
+
     def set_expires_in(self, expires_in):
         if expires_in:
             current = int(time.time())
