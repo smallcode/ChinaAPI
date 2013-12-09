@@ -79,7 +79,9 @@ class ApiOAuth2(OAuth2, ApiParser):
         返回Token
         """
         response = self._session.post(self.url + 'get_token_info', data={'access_token': access_token})
-        return self._parse_token(response)
+        token = self._parse_token(response)
+        token.access_token = access_token
+        return token
 
     def parse_signed_request(self, signed_request):
         """  用于站内应用
