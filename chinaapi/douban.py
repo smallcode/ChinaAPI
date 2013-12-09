@@ -12,7 +12,7 @@ class ApiParser(Parser):
         return r
 
 
-class ApiOAuth2(OAuth2):
+class ApiOAuth2(OAuth2, ApiParser):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://www.douban.com/service/auth2/')
 
@@ -27,7 +27,7 @@ class ApiOAuth2(OAuth2):
         access_token = data.get('access_token', None)
         uid = data.get('douban_user_id', None)
         refresh_token = data.get('refresh_token', None)
-        expires_in = data.get('expire_in', None)
+        expires_in = data.get('expires_in', None)
 
         token = Token(access_token, refresh_token=refresh_token, uid=uid)
         token.set_expires_in(expires_in)

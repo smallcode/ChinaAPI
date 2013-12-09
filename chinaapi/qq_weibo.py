@@ -32,7 +32,9 @@ class ApiParser(Parser):
         r = super(ApiParser, self).parse_response(response)
         if 'ret' in r and r.ret != 0:
             raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
-        return r.data
+        if 'data' in r:
+            return r.data
+        return r
 
 
 class ApiClient(Client, ApiParser):
@@ -94,7 +96,7 @@ class ApiOAuth2(OAuth2, ApiParser):
         if 'errorCode' in data:
             raise ApiResponseError(response, data['errorCode'], data.get('errorMsg', '').strip("'"))
         access_token = data.get('access_token', None)
-        expires_in = data.get('expire_in', None)
+        expires_in = data.get('expires_in', None)
         refresh_token = data.get('refresh_token', None)
 
         token = Token(access_token, refresh_token=refresh_token)
