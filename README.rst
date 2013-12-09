@@ -74,6 +74,7 @@ OAuth2使用方法：
         from chinaapi.sina_weibo import ApiOAuth2
         from chinaapi.utils.models import App
 
+
         # 设置App，填上自己的app_key，app_secret；redirect_uri可不填
         app = App('app_key', 'app_secret', 'redirect_uri')
 
