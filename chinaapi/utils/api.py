@@ -142,10 +142,12 @@ class OAuth2(OAuth):
             client_credentials:  无
         返回Token
         """
-        if 'redirect_uri' not in kwargs:
-            kwargs['redirect_uri'] = self.app.redirect_uri
         if 'code' in kwargs:
             grant_type = 'authorization_code'
+            if 'redirect_uri' not in kwargs:
+                kwargs['redirect_uri'] = self.app.redirect_uri
+            if not kwargs['redirect_uri']:
+                raise EmptyRedirectUriError(self._get_access_token_url())
         elif 'refresh_token' in kwargs:
             grant_type = 'refresh_token'
         elif 'username' in kwargs and 'password' in kwargs:
@@ -153,8 +155,5 @@ class OAuth2(OAuth):
         else:
             grant_type = 'client_credentials'
         kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type=grant_type)
-        url = self._get_access_token_url()
-        if grant_type == 'authorization_code' and not kwargs['redirect_uri']:
-            raise EmptyRedirectUriError(url)
-        response = self._session.post(url, data=kwargs)
+        response = self._session.post(self._get_access_token_url(), data=kwargs)
         return self._parse_token(response)
