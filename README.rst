@@ -55,7 +55,7 @@ ChinaAPI就是为此目的而存在。
 
         # 设置ApiClient
         client = ApiClient(app)
-        client.set_token(token)  # 使用上面所取得的token，也可以另外自定义一个：token = Token('access_token')
+        client.set_token(token)  # 使用上面取得的token，也可以另外自定义一个：token=Token('access_token')
 
         # 获取用户信息，对应的接口是：users/show
         r = client.users.show(uid=1904178193)
