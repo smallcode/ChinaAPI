@@ -35,12 +35,24 @@ ChinaAPI就是为此目的而存在。
 
 .. code-block:: python
 
-        from chinaapi.sina_weibo import ApiClient
+        from chinaapi.sina_weibo import ApiClient, ApiOAuth2
         from chinaapi.utils.models import App, Token
 
+        # 设置App
+        app = App('app_key', 'app_secret', 'redirect_uri')  # 填上自己的app_key，app_secret；redirect_uri可不填
 
-        # client的设置
-        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        # 获取授权链接
+        oauth2 = ApiOAuth2(app)
+        url = oauth2.authorize()  # 如果app中未设置redirect_uri，则此处必须传入
+        print url # 显示授权链接（该url用于提供给用户进行登录授权，授权成功后会回调redirect_uri?code=****）
+
+        # 获取Token
+        token = oauth2.access_token(code='code')  #  code取自回调地址后所附的code参数
+        print token.access_token  # 显示访问令牌
+        print token.expires_in  # 显示令牌剩余授权时间的秒数
+        print token.expired_at  # 显示令牌到期日期，为timestamp格式
+
+        # 设置ApiClient
         token = Token('access_token')  # 填上取得的access_token
         client = ApiClient(app)
         client.set_token(token)
