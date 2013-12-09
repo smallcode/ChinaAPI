@@ -37,8 +37,12 @@ class ApiClient(Client, ApiParser):
 
     def _prepare_method(self, segments):
         segment = segments[-1].lower()
-        if segment in self._post_methods or segment.split('_')[0] in self._underlined_post_methods:
+        if segment in self._post_methods:
             return Method.POST
+        elif '_' in segment:
+            splits = segment.split('_')
+            if splits[0] in self._underlined_post_methods or splits[-1] == 'update':
+                return Method.POST
         return Method.GET
 
     def _prepare_queries(self, queries):
