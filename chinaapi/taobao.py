@@ -51,14 +51,15 @@ class ApiParser(Parser):
 
     def parse_response(self, response):
         r = super(ApiParser, self).parse_response(response)
-        keys = r.keys()
-        if keys:
-            key = keys[0]
-            if 'error_response' in keys:
-                error = r.error_response
-                raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
-                                       error.get('sub_code', ''), error.get('sub_msg', ''))
-            return r[key]
+        if 'error_response' in r:
+            error = r.error_response
+            raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
+                                   error.get('sub_code', ''), error.get('sub_msg', ''))
+        else:
+            keys = r.keys()
+            if keys and keys[0].endswith('_response'):
+                return r.get(keys[0])
+            return r
 
 
 class ApiClient(Client, ApiParser):
@@ -126,7 +127,10 @@ class ApiOAuth(OAuth, ApiParser):
         message = ''.join(["%s%s" % (k, v) for k, v in sorted(params.iteritems())]) + self.app.secret
         params['sign'] = md5(message).hexdigest().upper()
         response = self._session.get(self.url + '/refresh', params=params)
-        return self.parse_response(response)
+        data = self.parse_response(response)
+        if 'error' in data:
+            raise ApiResponseError(response, data.error, data.get('error_description', ''))
+        return data
 
     def validate_sign(self, top_parameters, top_sign, top_session):
         """  验证签名是否正确（用于淘宝帐号授权）（已测试成功，不要更改）
