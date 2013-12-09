@@ -39,7 +39,8 @@ ChinaAPI就是为此目的而存在。
         from chinaapi.utils.models import App, Token
 
         # 设置App
-        app = App('app_key', 'app_secret', 'redirect_uri')  # 填上自己的app_key，app_secret；redirect_uri可不填
+        # 填上自己的app_key，app_secret；redirect_uri可不填
+        app = App('app_key', 'app_secret', 'redirect_uri')
 
         # 获取授权链接
         oauth2 = ApiOAuth2(app)
@@ -53,9 +54,8 @@ ChinaAPI就是为此目的而存在。
         print token.expired_at  # 显示令牌到期日期，为timestamp格式
 
         # 设置ApiClient
-        token = Token('access_token')  # 填上取得的access_token
         client = ApiClient(app)
-        client.set_token(token)
+        client.set_token(token)  # 使用上面所取得的token，也可以另外自定义一个：token = Token('access_token')
 
         # 获取用户信息，对应的接口是：users/show
         r = client.users.show(uid=1904178193)
