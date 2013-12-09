@@ -20,11 +20,13 @@ class Parser(object):
         except ValueError, e:
             status_code = 200
             if response.status_code == status_code:
-                raise ApiResponseError(response, status_code, str(e))
+                message = response.text if response.text else str(e)
+                raise ApiResponseError(response, status_code, message)
             else:
                 raise ApiNotExistError(response)
 
-    def parse_query_string(self, query_string):
+    @staticmethod
+    def parse_query_string(query_string):
         return dict([item.split('=') for item in query_string.split('&')])
 
 
@@ -65,7 +67,7 @@ class Client(Parser):
         return Method.POST
 
     def _prepare_url(self, segments, queries):
-        raise NotImplemented
+        raise NotImplementedError
 
     def _prepare_queries(self, queries):
         pass
