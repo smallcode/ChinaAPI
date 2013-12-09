@@ -62,7 +62,7 @@ ChinaAPI就是为此目的而存在。</p>
 <hr><h2>
 <a name="%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aapi" class="anchor" href="#%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aapi"><span class="octicon octicon-link"></span></a>新浪微博API:</h2>
 
-<p>使用方法：</p>
+<p>Client使用方法：</p>
 
 <p>.. code-block:: python</p>
 
@@ -70,9 +70,9 @@ ChinaAPI就是为此目的而存在。</p>
     from chinaapi.utils.models import App, Token
 
 
-    # client的设置
+    # 设置ApiClient
     app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-    token = Token('access_token')  # 填上取得的access_token
+    token = Token('access_token')  # 填上取得的token（可通过OAuth2取得）
     client = ApiClient(app)
     client.set_token(token)
 
@@ -86,17 +86,55 @@ ChinaAPI就是为此目的而存在。</p>
     print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 </code></pre>
 
-<p>调用规则：<strong>斜杠（/）映射为点（.）</strong>   </p>
+<p>Client调用规则：<strong>斜杠（/）映射为点（.）</strong></p>
 
 <p>====================================== =========================================
             新浪微博API                               调  用
 ====================================== =========================================
   users/show                           client.users.show()
-  statuses/upload                      client.statuses.upload()</p>
+  statuses/upload                      client.statuses.upload()
+  ...                                  ...
+====================================== =========================================</p>
 
-<p>====================================== =========================================</p>
+<p>更多API请参见：<code>新浪微博API文档</code>_</p>
 
-<p>附：<code>新浪微博API文档</code>_</p>
+<p>OAuth2使用方法：</p>
+
+<p>.. code-block:: python</p>
+
+<pre><code>    from chinaapi.sina_weibo import ApiOAuth2
+    from chinaapi.utils.models import App
+
+
+    # 设置App，填上自己的app_key，app_secret；redirect_uri可不填
+    app = App('app_key', 'app_secret', 'redirect_uri')
+
+    # 获取授权链接
+    oauth2 = ApiOAuth2(app)
+    url = oauth2.authorize()  # 如果app中未设置redirect_uri，则此处必须传入
+    print url # 显示授权链接（该url用于提供给用户进行登录授权，授权成功后会回调redirect_uri?code=****）
+
+    # 获取Token
+    token = oauth2.access_token(code='code')  #  code取自回调地址后所附的code参数
+    print token.access_token  # 显示访问令牌
+    print token.expires_in  # 显示令牌剩余授权时间的秒数
+    print token.expired_at  # 显示令牌到期日期，为timestamp格式
+
+    # 取消授权
+    r = oauth2.revoke('access_token')
+    print r # 显示是否成功取消
+</code></pre>
+
+<p>OAuth2调用规则：<strong>斜杠（/）映射为点（.）</strong></p>
+
+<p>====================================== =========================================
+            新浪微博oauth2 API                        调  用
+====================================== =========================================
+  oauth2/authorize                     oauth2.authorize()
+  oauth2/access_token                  oauth2.access_token()
+  oauth2/get_token_info                oauth2.get_token_info()
+  oauth2/revokeoauth2                  oauth2.revoke()
+====================================== =========================================</p>
 
 <hr><h2>
 <a name="%E6%B7%98%E5%AE%9Dapi" class="anchor" href="#%E6%B7%98%E5%AE%9Dapi"><span class="octicon octicon-link"></span></a>淘宝API:</h2>
@@ -114,7 +152,8 @@ ChinaAPI就是为此目的而存在。</p>
     client = ApiClient(app)
 
     # 获取淘宝客店铺列表，对应的接口是：taobao.tbk.shops.get
-    # 返回结果r是json中tbk_shops_get_response的值，所有的接口都直接返回response（键名为：接口+_response后缀）的值
+    # 返回结果r是json中tbk_shops_get_response的值
+    # 所有的接口都直接返回response（键名为：接口+_response后缀）的值
     r = client.tbk.shops.get(cid=14, fields='user_id,seller_nick,shop_title,pic_url')
     print len(r.tbk_shops.tbk_shop)  # 显示店铺列表的数量：40
 </code></pre>
@@ -131,7 +170,7 @@ ChinaAPI就是为此目的而存在。</p>
 
 <p>====================================== =========================================</p>
 
-<p>附：<code>淘宝API文档</code>_</p>
+<p>更多API请参见：<code>淘宝API文档</code>_</p>
 
 <hr><h2>
 <a name="%E8%85%BE%E8%AE%AF%E5%BE%AE%E5%8D%9Aapi" class="anchor" href="#%E8%85%BE%E8%AE%AF%E5%BE%AE%E5%8D%9Aapi"><span class="octicon octicon-link"></span></a>腾讯微博API:</h2>
@@ -183,7 +222,7 @@ ChinaAPI就是为此目的而存在。</p>
   t/del                                client.t.delete()
 ====================================== =========================================</p>
 
-<p>附：<code>腾讯微博API文档</code>_</p>
+<p>更多API请参见：<code>腾讯微博API文档</code>_</p>
 
 <hr><h2>
 <a name="%E4%BA%BA%E4%BA%BAapi" class="anchor" href="#%E4%BA%BA%E4%BA%BAapi"><span class="octicon octicon-link"></span></a>人人API:</h2>
@@ -222,7 +261,7 @@ ChinaAPI就是为此目的而存在。</p>
 
 <p>====================================== =========================================</p>
 
-<p>附：<code>人人API文档</code>_</p>
+<p>更多API请参见：<code>人人API文档</code>_</p>
 
 <hr><h2>
 <a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO：</h2>
