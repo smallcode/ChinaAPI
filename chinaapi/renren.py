@@ -1,4 +1,5 @@
 # coding=utf-8
+from chinaapi.utils.models import Token
 from .utils.api import Client, Method, Parser, OAuth2
 from .utils.exceptions import ApiResponseError
 
@@ -6,8 +7,10 @@ from .utils.exceptions import ApiResponseError
 class ApiParser(Parser):
     def parse_response(self, response):
         r = super(ApiParser, self).parse_response(response)
-        if 'error' in r:
+        if 'error' in r and 'code' in r.error:
             raise ApiResponseError(response, r.error.get('code', ''), r.error.get('message', ''))
+        elif 'error_code' in r:
+            raise ApiResponseError(response, r.error_code, r.get('error_description', r.get('error', '')))
         return r
 
 
@@ -41,5 +44,17 @@ class ApiOAuth2(OAuth2, ApiParser):
 
     def _get_access_token_url(self):
         return self.url + 'token'
+
+    def _parse_token(self, response):
+        data = super(ApiOAuth2, self)._parse_token(response)
+        access_token = data.get('access_token', None)
+        user = data.get('user', None)
+        uid = user.get('id', None) if user is not None else None
+        refresh_token = data.get('refresh_token', None)
+        expires_in = data.get('expires_in', None)
+
+        token = Token(access_token, refresh_token=refresh_token, uid=uid)
+        token.set_expires_in(expires_in)
+        return token
 
 
