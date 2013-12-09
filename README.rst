@@ -31,15 +31,50 @@ ChinaAPI就是为此目的而存在。
 新浪微博API:
 ------------
 
-使用方法：
+Client使用方法：
 
 .. code-block:: python
 
-        from chinaapi.sina_weibo import ApiClient, ApiOAuth2
+        from chinaapi.sina_weibo import ApiClient
         from chinaapi.utils.models import App, Token
 
-        # 设置App
-        # 填上自己的app_key，app_secret；redirect_uri可不填
+
+        # 设置ApiClient
+        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
+        token = Token('access_token')  # 填上取得的token（可通过OAuth2取得）
+        client = ApiClient(app)
+        client.set_token(token)
+
+        # 获取用户信息，对应的接口是：users/show
+        r = client.users.show(uid=1904178193)
+        print r.name  # 显示用户名
+
+        # 发布带图片的微博，对应的接口是：statuses/upload
+        pic = open('pic.jpg', 'rb')
+        r = client.statuses.upload(status=u'发布的内容', pic=pic)
+        print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
+
+
+Client调用规则：**斜杠（/）映射为点（.）**
+
+====================================== =========================================
+            新浪微博API                               调  用
+====================================== =========================================
+  users/show                           client.users.show()
+  statuses/upload                      client.statuses.upload()
+  ...                                  ...
+====================================== =========================================
+
+附：`新浪微博API文档`_
+
+OAuth2使用方法：
+
+.. code-block:: python
+
+        from chinaapi.sina_weibo import ApiOAuth2
+        from chinaapi.utils.models import App
+
+        # 设置App，填上自己的app_key，app_secret；redirect_uri可不填
         app = App('app_key', 'app_secret', 'redirect_uri')
 
         # 获取授权链接
@@ -53,31 +88,20 @@ ChinaAPI就是为此目的而存在。
         print token.expires_in  # 显示令牌剩余授权时间的秒数
         print token.expired_at  # 显示令牌到期日期，为timestamp格式
 
-        # 设置ApiClient
-        client = ApiClient(app)
-        client.set_token(token)  # 使用上面取得的token，也可以另外自定义一个：token=Token('access_token')
+        # 取消授权
+        r = oauth2.revoke('access_token')
+        print r # 显示是否成功取消
 
-        # 获取用户信息，对应的接口是：users/show
-        r = client.users.show(uid=1904178193)
-        print r.name  # 显示用户名
-
-        # 发布带图片的微博，对应的接口是：statuses/upload
-        pic = open('pic.jpg', 'rb')
-        r = client.statuses.upload(status=u'发布的内容', pic=pic)
-        print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
-
-
-调用规则：**斜杠（/）映射为点（.）**   
+OAuth2调用规则：**斜杠（/）映射为点（.）**
 
 ====================================== =========================================
-            新浪微博API                               调  用
+            新浪微博oauth2 API                        调  用
 ====================================== =========================================
-  users/show                           client.users.show()
-  statuses/upload                      client.statuses.upload()
-
+  oauth2/authorize                     client.authorize()
+  oauth2/access_token                  client.access_token()
+  oauth2/get_token_info                client.get_token_info()
+  oauth2/revokeoauth2                  client.revoke()
 ====================================== =========================================
-
-附：`新浪微博API文档`_
 
 ----
 

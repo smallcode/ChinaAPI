@@ -68,7 +68,7 @@ class ApiOAuth2(OAuth2, ApiParser):
         return token
 
     def revoke(self, access_token):
-        """ 取消认证
+        """ 取消授权
         返回是否成功取消
         """
         response = self._session.get(self.url + 'revokeoauth2', params={'access_token': access_token})

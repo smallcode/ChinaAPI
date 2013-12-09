@@ -102,7 +102,7 @@ class ApiOAuth2(OAuth2, ApiParser):
         return token
 
     def revoke(self, **kwargs):
-        """ 取消认证
+        """ 取消授权
         请求参数：oauth或openid&openkey标准参数，并带上以下参数
         返回是否成功取消
         """
