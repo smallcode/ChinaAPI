@@ -20,14 +20,14 @@ class Token(object):
 
     @property
     def expires_in(self):
-        if not self.is_expires:
+        if self.expired_at:
             current = int(time.time())
             return self.expired_at - current
 
     def set_expires_in(self, expires_in):
         if expires_in:
             current = int(time.time())
-            self.expired_at = expires_in + current
+            self.expired_at = int(expires_in) + current
 
     @property
     def is_expires(self):
