@@ -5,7 +5,7 @@ from hashlib import md5
 from datetime import datetime
 from urllib import unquote
 from furl import furl
-from .utils.api import Client, Parser, OAuth
+from .utils.api import Client, Parser, OAuth, OAuth2
 from .utils.exceptions import ApiResponseError, ApiError
 
 
@@ -41,7 +41,14 @@ class ApiParser(Parser):
             keys = r.keys()
             if keys and keys[0].endswith('_response'):
                 return r.get(keys[0])
-            return r
+
+
+class ApiOauthParser(Parser):
+    def parse_response(self, response):
+        r = super(ApiOauthParser, self).parse_response(response)
+        if 'error' in r:
+            raise ApiResponseError(response, r.error, r.get('error_description', ''))
+        return r
 
 
 class ApiClient(Client, ApiParser):
@@ -101,7 +108,25 @@ class ApiClient(Client, ApiParser):
                 raise e
 
 
-class ApiOAuth(OAuth, ApiParser):
+class ApiOAuth2(OAuth2, ApiOauthParser):
+    def __init__(self, app):
+        super(ApiOAuth2, self).__init__(app, 'https://oauth.taobao.com/')
+
+    def _get_access_token_url(self):
+        return self.url + 'token'
+
+    def refresh_token(self, refresh_token, **kwargs):
+        kwargs.update(refresh_token=refresh_token)
+        return super(ApiOAuth2, self).access_token(**kwargs)
+
+    def logoff(self, view='web'):
+        """ 退出登录帐号，目前只支持web访问，起到的作用是清除taobao.com的cookie，并不是取消用户的授权。在WAP上访问无效。
+        返回：用于退出登录的链接
+        """
+        return self.url + 'logoff?client_id={0}&view={1}'.format(self.app.key, view)
+
+
+class ApiOAuth(OAuth, ApiOauthParser):
     """
     基于TOP协议的登录授权方式
     """
@@ -121,10 +146,7 @@ class ApiOAuth(OAuth, ApiParser):
         params = dict(appkey=self.app.key, refresh_token=refresh_token, sessionkey=top_session)
         params['sign'] = self._sign_by_md5(params)
         response = self._session.get(self.url + '/refresh', params=params)
-        data = self.parse_response(response)
-        if 'error' in data:
-            raise ApiResponseError(response, data.error, data.get('error_description', ''))
-        return data
+        return self.parse_response(response)
 
     def validate_sign(self, top_parameters, top_sign, top_session):
         """  验证签名是否正确（用于淘宝帐号授权）（已测试成功，不要更改）
