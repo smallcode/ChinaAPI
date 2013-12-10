@@ -26,29 +26,11 @@ RETRY_SUB_CODES = {'isp.top-remote-unknown-error', 'isp.top-remote-connection-ti
                    'ism.json-decode-error', 'ism.demo-error'}
 
 
-def to_message(data):
+def join_dict(data):
     return ''.join(["%s%s" % (k, v) for k, v in sorted(data.iteritems())])
 
 
-def sign(data, app_secret):
-    message = to_message(data)
-    h = hmac.new(app_secret)
-    h.update(message)
-    return h.hexdigest().upper()
-
-
 class ApiParser(Parser):
-    # def pre_parse_response(self, response):
-    #     try:
-    #         return super(ApiParser, self).parse(response)
-    #     except ApiResponseError:
-    #         try:
-    #             text = response.text.replace('\t', '\\t').replace('\n', '\\n').replace('\r', '\\r')
-    #             return jsonDict.loads(text)
-    #         except ValueError, e:
-    #             raise ApiResponseError(response, 15, 'json decode error', 'ism.json-decode-error',
-    #                                    "json-error: %s || %s" % (str(e), response.text))
-
     def parse_response(self, response):
         r = super(ApiParser, self).parse_response(response)
         if 'error_response' in r:
@@ -70,6 +52,12 @@ class ApiClient(Client, ApiParser):
     @property
     def session(self):
         return self.token.access_token
+
+    def _sign_by_hmac(self, data):
+        message = join_dict(data)
+        h = hmac.new(self.app.secret)
+        h.update(message)
+        return h.hexdigest().upper()
 
     def _prepare_url(self, segments, queries):
         if segments[0] != 'taobao':
@@ -94,7 +82,7 @@ class ApiClient(Client, ApiParser):
                 files[kk] = v
             elif v is not None:
                 data[kk] = VALUE_TO_STR.get(type(v), DEFAULT_VALUE_TO_STR)(v)
-        data['sign'] = sign(data, self.app.secret)
+        data['sign'] = self._sign_by_hmac(data)
         return data, files
 
     def request(self, segments, **queries):
@@ -114,6 +102,10 @@ class ApiClient(Client, ApiParser):
 
 
 class ApiOAuth(OAuth, ApiParser):
+    """
+    基于TOP协议的登录授权方式
+    """
+
     def __init__(self, app):
         super(ApiOAuth, self).__init__(app, 'http://container.open.taobao.com/container')
 
@@ -121,11 +113,13 @@ class ApiOAuth(OAuth, ApiParser):
         args = dict(appkey=self.app.key, encode='utf-8')
         return furl(self.url).set(args=args).url
 
+    def _sign_by_md5(self, data):
+        message = join_dict(data) + self.app.secret
+        return md5(message).hexdigest().upper()
+
     def refresh_token(self, refresh_token, top_session):
-        # TODO:返回 system error ! 需要更新sign的算法
         params = dict(appkey=self.app.key, refresh_token=refresh_token, sessionkey=top_session)
-        message = ''.join(["%s%s" % (k, v) for k, v in sorted(params.iteritems())]) + self.app.secret
-        params['sign'] = md5(message).hexdigest().upper()
+        params['sign'] = self._sign_by_md5(params)
         response = self._session.get(self.url + '/refresh', params=params)
         data = self.parse_response(response)
         if 'error' in data:
