@@ -3,7 +3,7 @@ from unittest import TestCase
 import httpretty
 import requests
 from chinaapi.utils.api import Client, OAuth2, Parser, Method
-from chinaapi.utils.exceptions import EmptyRedirectUriError, ApiResponseError, ApiNotExistError
+from chinaapi.utils.exceptions import MissingRedirectUri, ApiResponseError, NotExistApi
 from chinaapi.utils.models import App, Token
 
 
@@ -95,7 +95,7 @@ class ParserTest(TestBase):
     def test_parse_404_response(self):
         self.register_404_uri()
         response = requests.post(self.HTTP404URL)
-        with self.assertRaises(ApiNotExistError):
+        with self.assertRaises(NotExistApi):
             self.parser.parse_response(response)
 
 
@@ -174,7 +174,7 @@ class OAuth2Test(TestBase):
         self.assertEqual(self.oauth_url, url)
 
     def test_authorize_with_empty_redirect_uri(self):
-        with self.assertRaises(EmptyRedirectUriError):
+        with self.assertRaises(MissingRedirectUri):
             self.oauth2.authorize(redirect_uri='')
 
     @httpretty.activate
@@ -184,7 +184,7 @@ class OAuth2Test(TestBase):
         self.assertToken(token)
 
     def test_access_token_with_empty_redirect_uri(self):
-        with self.assertRaises(EmptyRedirectUriError):
+        with self.assertRaises(MissingRedirectUri):
             self.oauth2.access_token(code='code', redirect_uri='')
 
     @httpretty.activate

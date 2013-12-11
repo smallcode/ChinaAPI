@@ -4,7 +4,7 @@ from furl import furl
 from requests.utils import default_user_agent
 from chinaapi.utils import jsonDict
 from chinaapi.utils.models import Token
-from chinaapi.utils.exceptions import ApiNotExistError, EmptyRedirectUriError, ApiResponseValueError
+from chinaapi.utils.exceptions import NotExistApi, MissingRedirectUri, ApiResponseValueError
 from chinaapi import __version__, __title__
 
 
@@ -22,7 +22,7 @@ class Parser(object):
             if response.status_code == status_code:
                 raise ApiResponseValueError(response, e)
             else:
-                raise ApiNotExistError(response)
+                raise NotExistApi(response)
 
     @staticmethod
     def parse_query_string(query_string):
@@ -128,7 +128,7 @@ class OAuth2(OAuth):
         kwargs['client_id'] = self.app.key
         url = furl(self._get_authorize_url()).set(args=kwargs).url
         if not kwargs['redirect_uri']:
-            raise EmptyRedirectUriError(url)
+            raise MissingRedirectUri(url)
         return url
 
     def access_token(self, **kwargs):
@@ -146,7 +146,7 @@ class OAuth2(OAuth):
             if 'redirect_uri' not in kwargs:
                 kwargs['redirect_uri'] = self.app.redirect_uri
             if not kwargs['redirect_uri']:
-                raise EmptyRedirectUriError(self._get_access_token_url())
+                raise MissingRedirectUri(self._get_access_token_url())
         elif 'refresh_token' in kwargs:
             grant_type = 'refresh_token'
         elif 'username' in kwargs and 'password' in kwargs:

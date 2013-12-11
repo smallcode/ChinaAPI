@@ -1,7 +1,7 @@
 # coding=utf-8
 from .utils.models import Token
 from .utils.api import Client, Method, Parser, OAuth2
-from .utils.exceptions import ApiInvalidError, ApiResponseError
+from .utils.exceptions import InvalidApi, ApiResponseError
 
 IS_POST_METHOD = {
     'user': lambda m: m in ['verify'],
@@ -62,7 +62,7 @@ class ApiClient(Client, ApiParser):
 
     def _prepare_method(self, segments):
         if len(segments) != 2:
-            raise ApiInvalidError(self._prepare_url(segments, None))
+            raise InvalidApi(self._prepare_url(segments, None))
         model, method = tuple([segment.lower() for segment in segments])
         if method.split('_')[0] in self._post_methods:
             return Method.POST
