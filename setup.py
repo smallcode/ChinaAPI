@@ -24,7 +24,7 @@ with open('HISTORY.rst') as f:
 setup(
     name='chinaapi',
     version=chinaapi.__version__,
-    description='Python SDK For China API: Sina Weibo, QQ Weibo, Taobao',
+    description='Python SDK For China API: Sina Weibo, QQ Weibo, Taobao, Renren, Douban',
     long_description=readme + '\n\n' + history,
     author='smallcode',
     author_email='45945756@qq.com',
