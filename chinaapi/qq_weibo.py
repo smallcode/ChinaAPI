@@ -54,10 +54,9 @@ class ApiClient(Client, ApiParser):
 
     def _prepare_url(self, segments, queries):
         """
-        因del为Python保留字，无法作为方法名，需将del替换为delete.
-        并在此处进行反向转换，除list之外（list本身有delete方法）
+        因del为Python保留字，无法作为方法名，需将del替换为delete，并在此处进行反向转换。
         """
-        if segments[-1] == 'delete' and segments[-2] != 'list':
+        if segments[-1] == 'delete' and segments[-2] != 'list':  # list本身有delete方法，需排除
             segments[-1] = 'del'
         return 'https://open.t.qq.com/api/{0}'.format('/'.join(segments))
 
@@ -105,9 +104,10 @@ class ApiOAuth2(OAuth2, ApiParser):
 
     def revoke(self, **kwargs):
         """ 取消授权
-        请求参数：oauth或openid&openkey标准参数，并带上以下参数
+        请求参数：oauth或openid&openkey标准参数
         返回是否成功取消
         """
-        response = self._session.get('http://open.t.qq.com/api/auth/revoke_auth?format=json', params=kwargs)
+        kwargs['format'] = 'json'
+        response = self._session.get('http://open.t.qq.com/api/auth/revoke_auth', params=kwargs)
         self.parse_response(response)
         return True  # 没有异常说明ret=0（ret: 0-成功，非0-失败）
