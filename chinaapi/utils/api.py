@@ -24,8 +24,12 @@ class Parser(object):
                 raise NotExistApi(response)
 
     @staticmethod
-    def parse_query_string(query_string):
+    def querystring_to_dict(query_string):
         return dict([item.split('=') for item in query_string.split('&')])
+
+    @staticmethod
+    def dict_to_querystring(params):
+        return '?' + '&'.join(['='.join([k, str(v)]) for k, v in params.items()])
 
 
 class ClientWrapper(object):
@@ -120,12 +124,13 @@ class OAuth2(OAuth):
         """  授权
         返回授权链接
         """
-        response_type = kwargs.get('response_type', 'code')
-        redirect_uri = kwargs.get('redirect_uri', self.app.redirect_uri)
-        query = '?redirect_uri={0}&response_type={1}&client_id={2}'.format(redirect_uri, response_type,
-                                                                           str(self.app.key))
-        url = self._get_authorize_url() + query
-        if not redirect_uri:
+        if 'response_type' not in kwargs:
+            kwargs['response_type'] = 'code'
+        if 'redirect_uri' not in kwargs:
+            kwargs['redirect_uri'] = self.app.redirect_uri
+        kwargs['client_id'] = self.app.key
+        url = self._get_authorize_url() + self.dict_to_querystring(kwargs)
+        if not kwargs['redirect_uri']:
             raise MissingRedirectUri(url)
         return url
 

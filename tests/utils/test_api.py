@@ -70,11 +70,15 @@ class ParserTest(TestBase):
         httpretty.register_uri(httpretty.POST, self.HTTP404URL, body='error_text', status=404,
                                content_type=self.CONTENT_TYPE)
 
-    def test_parse_query_string(self):
-        r = self.parser.parse_query_string("a=a&b=b")
+    def test_querystring_to_dict(self):
+        r = self.parser.querystring_to_dict("a=a&b=b")
         self.assertEqual(2, len(r))
         self.assertEqual('a', r['a'])
         self.assertEqual('b', r['b'])
+
+    def test_dict_to_querystring(self):
+        r = self.parser.dict_to_querystring(dict(id=1, name='name'))
+        self.assertEqual('?name=name&id=1', r)
 
     @httpretty.activate
     def test_parse_response(self):

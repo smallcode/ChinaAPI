@@ -158,4 +158,4 @@ class ApiOAuth(OAuth, ApiOauthParser):
         """  将top_parameters字符串解码并转换为字典，（已测试成功，不要更改）
         """
         parameters = base64.decodestring(unquote(top_parameters))
-        return self.parse_query_string(parameters)
+        return self.querystring_to_dict(parameters)

@@ -91,7 +91,7 @@ class ApiOAuth2(OAuth2, ApiParser):
         super(ApiOAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
 
     def _parse_token(self, response):
-        data = self.parse_query_string(response.text)
+        data = self.querystring_to_dict(response.text)
         if 'errorCode' in data:
             raise ApiResponseError(response, data['errorCode'], data.get('errorMsg', '').strip("'"))
         access_token = data.get('access_token', None)
