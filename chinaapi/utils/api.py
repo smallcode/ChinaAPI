@@ -1,6 +1,5 @@
 # coding=utf-8
 import requests
-from furl import furl
 from requests.utils import default_user_agent
 from chinaapi.utils import jsonDict
 from chinaapi.utils.models import Token
@@ -121,13 +120,12 @@ class OAuth2(OAuth):
         """  授权
         返回授权链接
         """
-        if 'response_type' not in kwargs:
-            kwargs['response_type'] = 'code'
-        if 'redirect_uri' not in kwargs:
-            kwargs['redirect_uri'] = self.app.redirect_uri
-        kwargs['client_id'] = self.app.key
-        url = furl(self._get_authorize_url()).set(args=kwargs).url
-        if not kwargs['redirect_uri']:
+        response_type = kwargs.get('response_type', 'code')
+        redirect_uri = kwargs.get('redirect_uri', self.app.redirect_uri)
+        query = '?redirect_uri={0}&response_type={1}&client_id={2}'.format(redirect_uri, response_type,
+                                                                           str(self.app.key))
+        url = self._get_authorize_url() + query
+        if not redirect_uri:
             raise MissingRedirectUri(url)
         return url
 

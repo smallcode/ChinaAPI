@@ -4,7 +4,6 @@ import hmac
 from hashlib import md5
 from datetime import datetime
 from urllib import unquote
-from furl import furl
 from .utils.api import Client, Parser, OAuth, OAuth2
 from .utils.exceptions import ApiResponseError, ApiError
 
@@ -135,8 +134,7 @@ class ApiOAuth(OAuth, ApiOauthParser):
         super(ApiOAuth, self).__init__(app, 'http://container.open.taobao.com/container')
 
     def authorize(self):
-        args = dict(appkey=self.app.key, encode='utf-8')
-        return furl(self.url).set(args=args).url
+        return self.url + '?encode=utf-8&appkey={0}'.format(self.app.key)
 
     def _sign_by_md5(self, data):
         message = join_dict(data) + self.app.secret
