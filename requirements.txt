@@ -1,2 +1,3 @@
 requests==2.1.0
-furl == 0.3.6
+furl==0.3.6
+httpretty==0.7.0
