@@ -7,6 +7,7 @@ Release History
 0.5.6 (2014-12-11)
 ++++++++++++++++++
 - 添加淘宝ApiOAuth2
+- 添加ApiResponseValueError
 
 
 0.5.1 (2014-12-8)
