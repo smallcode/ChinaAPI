@@ -18,13 +18,18 @@ class ApiError(Exception):
 class ApiResponseError(ApiError):
     def __init__(self, response, code, message, sub_code='', sub_message=''):
         self.response = response
-        super(ApiResponseError, self).__init__(self.get_url(response), code, message, sub_code, sub_message)
+        super(ApiResponseError, self).__init__(self.get_url(), code, message, sub_code, sub_message)
 
-    @staticmethod
-    def get_url(response):
-        if response.request.body:
-            return '{0}?{1}'.format(response.url, response.request.body)
-        return response.url
+    def get_url(self):
+        if self.response.request.body:
+            return '{0}?{1}'.format(self.response.url, self.response.request.body)
+        return self.response.url
+
+
+class ApiResponseValueError(ApiResponseError):
+    def __init__(self, response, value_error):
+        super(ApiResponseValueError, self).__init__(response, response.status_code,
+                                                    response.text if response.text else str(value_error))
 
 
 class ApiInvalidError(ApiError):

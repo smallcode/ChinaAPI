@@ -4,7 +4,7 @@ from furl import furl
 from requests.utils import default_user_agent
 from chinaapi.utils import jsonDict
 from chinaapi.utils.models import Token
-from chinaapi.utils.exceptions import ApiNotExistError, ApiResponseError, EmptyRedirectUriError
+from chinaapi.utils.exceptions import ApiNotExistError, EmptyRedirectUriError, ApiResponseValueError
 from chinaapi import __version__, __title__
 
 
@@ -20,8 +20,7 @@ class Parser(object):
         except ValueError, e:
             status_code = 200
             if response.status_code == status_code:
-                message = response.text if response.text else str(e)
-                raise ApiResponseError(response, status_code, message)
+                raise ApiResponseValueError(response, e)
             else:
                 raise ApiNotExistError(response)
 
