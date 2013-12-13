@@ -2,7 +2,8 @@
 import base64
 import hashlib
 import hmac
-from .utils.models import Token
+from urlparse import urlparse
+from .utils.models import Token, App
 from .utils.api import Client, Method, Parser, OAuth2
 from .utils.exceptions import ApiResponseError
 from .utils import jsonDict
@@ -105,3 +106,38 @@ class ApiOAuth2(OAuth2, ApiParser):
         is_valid = data.algorithm == u'HMAC-SHA256' and hmac.new(self.app.key, encoded_data,
                                                                  hashlib.sha256).digest() == sign
         return token, is_valid
+
+    def login(self, username, password, allow_redirects=True):
+        data = {"client_id": self.app.key,
+                "redirect_uri": self.app.redirect_uri,
+                "userId": username,
+                "passwd": password,
+                "isLoginSina": "0",
+                "action": "submit",
+                "response_type": "code",
+        }
+
+        headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36",
+        "Host": "api.weibo.com",
+        "Referer": self.authorize()
+        }
+
+        url = self._get_authorize_url()
+        r = self._session.post(url, data=data, headers=headers, allow_redirects=allow_redirects)
+        if allow_redirects:
+            code_url = r.url
+        else:
+            code_url = r.headers['location']
+        code = self.querystring_to_dict((urlparse(code_url)).query)['code']
+        return self.access_token(code=code)
+
+
+class WeicoAndroidApp(App):
+    def __init__(self):
+        super(WeicoAndroidApp, self).__init__('211160679', '63b64d531b98c2dbff2443816f274dd3')
+
+
+class WeicoIphoneApp(App):
+    def __init__(self):
+        super(WeicoIphoneApp, self).__init__('82966982', '72d4545a28a46a6f329c4f2b1e949e6a')
