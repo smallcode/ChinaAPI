@@ -19,4 +19,4 @@ class JsonDictTest(TestCase):
     def test_AttributeError(self):
         json = JsonDict(name="foo", age=100)
         with self.assertRaises(AttributeError):
-            json.id
+            _ = json.id

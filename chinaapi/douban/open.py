@@ -1,17 +1,9 @@
 # coding=utf-8
 from chinaapi.utils.exceptions import ApiResponseError
-from chinaapi.utils.open import OAuth2Base, ParserBase, Token
+from chinaapi.utils.open import OAuth2Base, Token
 
 
-class Parser(ParserBase):
-    def parse_response(self, response):
-        r = super(Parser, self).parse_response(response)
-        if 'code' in r and 'msg' in r:
-            raise ApiResponseError(response, r.code, r.msg)
-        return r
-
-
-class OAuth2(OAuth2Base, Parser):
+class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://www.douban.com/service/auth2/')
 
@@ -31,3 +23,9 @@ class OAuth2(OAuth2Base, Parser):
         token = Token(access_token, refresh_token=refresh_token, uid=uid)
         token.expires_in = expires_in
         return token
+
+    def _parse_response(self, response):
+        r = super(OAuth2, self)._parse_response(response)
+        if 'code' in r and 'msg' in r:
+            raise ApiResponseError(response, r.code, r.msg)
+        return r

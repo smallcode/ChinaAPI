@@ -1,9 +1,8 @@
 # coding=utf-8
 import time
-import requests
 from requests.utils import default_user_agent
-from chinaapi.utils import jsonDict
-from chinaapi.utils.exceptions import NotExistApi, MissingRedirectUri, ApiResponseValueError
+from chinaapi.utils.api import Request
+from chinaapi.utils.exceptions import MissingRedirectUri
 from chinaapi import __version__, __title__
 
 
@@ -52,26 +51,6 @@ class App(object):
         self.redirect_uri = redirect_uri
 
 
-class ParserBase(object):
-    def parse_response(self, response):
-        try:
-            return jsonDict.loads(response.text)
-        except ValueError, e:
-            status_code = 200
-            if response.status_code == status_code:
-                raise ApiResponseValueError(response, e)
-            else:
-                raise NotExistApi(response)
-
-    @staticmethod
-    def querystring_to_dict(query_string):
-        return dict([item.split('=') for item in query_string.split('&')])
-
-    @staticmethod
-    def dict_to_querystring(params):
-        return '?' + '&'.join(['='.join([k, str(v)]) for k, v in params.items()])
-
-
 class ClientWrapper(object):
     def __init__(self, client, attr):
         """
@@ -89,11 +68,11 @@ class ClientWrapper(object):
         return self
 
 
-class ClientBase(ParserBase):
+class ClientBase(Request):
     def __init__(self, app):
+        super(ClientBase, self).__init__()
         self.app = app
         self.token = Token()
-        self._session = requests.session()
         self._session.headers['User-Agent'] = default_user_agent('%s/%s requests' % (__title__, __version__))
 
     def set_token(self, token):
@@ -134,17 +113,17 @@ class ClientBase(ParserBase):
         else:
             response = self._session.get(url, params=queries)
 
-        return self.parse_response(response)
+        return self._parse_response(response)
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
 
 
-class OAuthBase(ParserBase):
+class OAuthBase(Request):
     def __init__(self, app, url):
+        super(OAuthBase, self).__init__()
         self.app = app
         self._url = url
-        self._session = requests.session()
 
 
 class OAuth2Base(OAuthBase):
@@ -152,7 +131,7 @@ class OAuth2Base(OAuthBase):
         super(OAuth2Base, self).__init__(app, url)
 
     def _parse_token(self, response):
-        return self.parse_response(response)
+        return self._parse_response(response)
 
     def _get_authorize_url(self):
         return self._url + 'authorize'

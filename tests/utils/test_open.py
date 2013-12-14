@@ -2,15 +2,12 @@
 import time
 from unittest import TestCase
 import httpretty
-import requests
-from chinaapi.utils.open import ClientBase, OAuth2Base, ParserBase, Method, Token, App
-from chinaapi.utils.exceptions import MissingRedirectUri, ApiResponseError, NotExistApi
+from chinaapi.utils.open import ClientBase, OAuth2Base, Method, Token, App
+from chinaapi.utils.exceptions import MissingRedirectUri
+from test_api import BASE_URL, TestBase
 
 
-BASE_URL = 'http://test/'
-
-
-class ApiClient(ClientBase, ParserBase):
+class ApiClient(ClientBase):
     def __init__(self, app):
         super(ApiClient, self).__init__(app)
 
@@ -22,7 +19,7 @@ class ApiClient(ClientBase, ParserBase):
             return Method.GET
         return super(ApiClient, self)._prepare_method(segments)
 
-    def parse_response(self, response):
+    def _parse_response(self, response):
         return response
 
 
@@ -36,74 +33,12 @@ class ApiOAuth2(OAuth2Base):
         super(ApiOAuth2, self).__init__(app, 'http://test/oauth2/')
 
 
-class TestBase(TestCase):
-    ACCESS_TOKEN_URL = BASE_URL + 'oauth2/access_token'
-    JSON_BODY = '{"access_token":"access_token","expires_in":60, "refresh_token":"refresh_token","uid":"uid"}'
-    CONTENT_TYPE = 'text/json'
-
+class RequestBase(TestBase):
     def setUp(self):
         self.app = App('key', 'secret', 'http://redirect_uri')
 
-    def assertToken(self, token):
-        self.assertEqual('access_token', token.access_token)
-        self.assertEqual(60, token.expires_in)
-        self.assertEqual('refresh_token', token.refresh_token)
-        self.assertEqual('uid', token.uid)
 
-    def register_access_token_uri(self):
-        httpretty.register_uri(httpretty.POST, self.ACCESS_TOKEN_URL, body=self.JSON_BODY,
-                               content_type=self.CONTENT_TYPE)
-
-
-class ParserTest(TestBase):
-    HTTP404URL = BASE_URL + '404'
-    NOT_JSON_RESPONSE_URL = BASE_URL + 'empty_response_uri'
-
-    def setUp(self):
-        self.parser = ParserBase()
-
-    def register_not_json_response_uri(self):
-        httpretty.register_uri(httpretty.POST, self.NOT_JSON_RESPONSE_URL, body='error_text',
-                               content_type=self.CONTENT_TYPE)
-
-    def register_404_uri(self):
-        httpretty.register_uri(httpretty.POST, self.HTTP404URL, body='error_text', status=404,
-                               content_type=self.CONTENT_TYPE)
-
-    def test_querystring_to_dict(self):
-        r = self.parser.querystring_to_dict("a=a&b=b")
-        self.assertEqual(2, len(r))
-        self.assertEqual('a', r['a'])
-        self.assertEqual('b', r['b'])
-
-    def test_dict_to_querystring(self):
-        r = self.parser.dict_to_querystring(dict(id=1, name='name'))
-        self.assertEqual('?name=name&id=1', r)
-
-    @httpretty.activate
-    def test_parse_response(self):
-        self.register_access_token_uri()
-        response = requests.post(self.ACCESS_TOKEN_URL)
-        token = self.parser.parse_response(response)
-        self.assertToken(token)
-
-    @httpretty.activate
-    def test_parse_not_json_response(self):
-        self.register_not_json_response_uri()
-        response = requests.post(self.NOT_JSON_RESPONSE_URL)
-        with self.assertRaises(ApiResponseError) as cm:
-            self.parser.parse_response(response)
-        self.assertEqual('error_text', cm.exception.message)
-
-    @httpretty.activate
-    def test_parse_404_response(self):
-        self.register_404_uri()
-        response = requests.post(self.HTTP404URL)
-        with self.assertRaises(NotExistApi):
-            self.parser.parse_response(response)
-
-
-class ClientTest(TestBase):
+class ClientTest(RequestBase):
     GET_URL = BASE_URL + 'get'
     POST_URL = BASE_URL + 'post'
 
@@ -157,7 +92,7 @@ class ClientTest(TestBase):
             self.assertEqual(123, queries['id'])
 
 
-class NotImplementedClientTest(TestBase):
+class NotImplementedClientTest(RequestBase):
     def setUp(self):
         super(NotImplementedClientTest, self).setUp()
         self.client = NotImplementedClient(self.app)
@@ -167,7 +102,7 @@ class NotImplementedClientTest(TestBase):
             self.client.not_implemented_error.get()
 
 
-class OAuth2Test(TestBase):
+class OAuth2Test(RequestBase):
     def setUp(self):
         super(OAuth2Test, self).setUp()
         self.oauth2 = ApiOAuth2(self.app)

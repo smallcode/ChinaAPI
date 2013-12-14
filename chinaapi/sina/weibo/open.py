@@ -3,20 +3,24 @@ import base64
 import hashlib
 import hmac
 from urlparse import urlparse
-from chinaapi.utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token, App
+from chinaapi.utils.api import Response
+from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token, App
 from chinaapi.utils.exceptions import ApiResponseError
 from chinaapi.utils import jsonDict
 
 
-class Parser(ParserBase):
-    def parse_response(self, response):
-        r = super(Parser, self).parse_response(response)
+class ApiResponse(Response):
+    def __init__(self, response):
+        super(ApiResponse, self).__init__(response)
+
+    def json(self):
+        r = super(ApiResponse, self).json()
         if 'error_code' in r:
-            raise ApiResponseError(response, r.error_code, r.get('error', ''))
+            raise ApiResponseError(self.response, r.error_code, r.get('error', ''))
         return r
 
 
-class Client(ClientBase, Parser):
+class Client(ClientBase):
     #写入接口
     _post_methods = ['create', 'add', 'destroy', 'update', 'upload', 'repost', 'reply', 'send', 'post', 'invite',
                      'shield', 'order']
@@ -55,10 +59,16 @@ class Client(ClientBase, Parser):
         files = self._isolated_files(queries, ['pic', 'image'])
         return queries, files
 
+    def _parse_response(self, response):
+        return ApiResponse(response).json()
 
-class OAuth2(OAuth2Base, Parser):
+
+class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
+
+    def _parse_response(self, response):
+        return ApiResponse(response).json()
 
     def _parse_token(self, response):
         data = super(OAuth2, self)._parse_token(response)
@@ -76,7 +86,7 @@ class OAuth2(OAuth2Base, Parser):
         返回是否成功取消
         """
         response = self._session.get(self._url + 'revokeoauth2', params={'access_token': access_token})
-        return self.parse_response(response).result
+        return self._parse_response(response).result
 
     def get_token_info(self, access_token):
         """ 获取access_token详细信息

@@ -1,19 +1,9 @@
 # coding=utf-8
-from chinaapi.utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token
+from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token
 from chinaapi.utils.exceptions import ApiResponseError
 
 
-class Parser(ParserBase):
-    def parse_response(self, response):
-        r = super(Parser, self).parse_response(response)
-        if 'error' in r and 'code' in r.error:
-            raise ApiResponseError(response, r.error.get('code', ''), r.error.get('message', ''))
-        elif 'error_code' in r:
-            raise ApiResponseError(response, r.error_code, r.get('error_description', r.get('error', '')))
-        return r
-
-
-class Client(ClientBase, Parser):
+class Client(ClientBase):
     #写入接口
     _post_methods = ['put', 'share', 'remove', 'upload']
 
@@ -36,8 +26,14 @@ class Client(ClientBase, Parser):
         files = self._isolated_files(queries, ['file'])
         return queries, files
 
+    def _parse_response(self, response):
+        r = super(Client, self)._parse_response(response)
+        if 'error' in r and 'code' in r.error:
+            raise ApiResponseError(response, r.error.get('code', ''), r.error.get('message', ''))
+        return r
 
-class OAuth2(OAuth2Base, Parser):
+
+class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://graph.renren.com/oauth/')
 
@@ -55,5 +51,11 @@ class OAuth2(OAuth2Base, Parser):
         token = Token(access_token, refresh_token=refresh_token, uid=uid)
         token.expires_in = expires_in
         return token
+
+    def _parse_response(self, response):
+        r = super(OAuth2, self)._parse_response(response)
+        if 'error_code' in r:
+            raise ApiResponseError(response, r.error_code, r.get('error_description', r.get('error', '')))
+        return r
 
 

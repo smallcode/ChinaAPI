@@ -4,7 +4,8 @@ import hmac
 from hashlib import md5
 from datetime import datetime
 from urllib import unquote
-from chinaapi.utils.open import ClientBase, ParserBase, OAuthBase, OAuth2Base
+from chinaapi.utils.api import Response
+from chinaapi.utils.open import ClientBase, OAuthBase, OAuth2Base
 from chinaapi.utils.exceptions import ApiResponseError, ApiError
 
 
@@ -29,28 +30,7 @@ def join_dict(data):
     return ''.join(["%s%s" % (k, v) for k, v in sorted(data.iteritems())])
 
 
-class Parser(ParserBase):
-    def parse_response(self, response):
-        r = super(Parser, self).parse_response(response)
-        if 'error_response' in r:
-            error = r.error_response
-            raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
-                                   error.get('sub_code', ''), error.get('sub_msg', ''))
-        else:
-            keys = r.keys()
-            if keys and keys[0].endswith('_response'):
-                return r.get(keys[0])
-
-
-class OauthParser(ParserBase):
-    def parse_response(self, response):
-        r = super(OauthParser, self).parse_response(response)
-        if 'error' in r:
-            raise ApiResponseError(response, r.error, r.get('error_description', ''))
-        return r
-
-
-class Client(ClientBase, Parser):
+class Client(ClientBase):
     def __init__(self, app, retry_count=3):
         super(Client, self).__init__(app)
         self._retry_count = retry_count
@@ -98,7 +78,7 @@ class Client(ClientBase, Parser):
         for count in xrange(self._retry_count, 0, -1):
             try:
                 response = self._session.post(url, data=data, files=files)
-                return self.parse_response(response)
+                return self._parse_response(response)
             except ApiError, e:
                 if e.sub_message in RETRY_SUB_CODES and count > 1:
                     for f in files.values():
@@ -106,10 +86,35 @@ class Client(ClientBase, Parser):
                     continue
                 raise e
 
+    def _parse_response(self, response):
+        r = super(Client, self)._parse_response(response)
+        if 'error_response' in r:
+            error = r.error_response
+            raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
+                                   error.get('sub_code', ''), error.get('sub_msg', ''))
+        else:
+            keys = r.keys()
+            if keys and keys[0].endswith('_response'):
+                return r.get(keys[0])
 
-class OAuth2(OAuth2Base, OauthParser):
+
+class OAuthResponse(Response):
+    def __init__(self, response):
+        super(OAuthResponse, self).__init__(response)
+
+    def json(self):
+        r = super(OAuthResponse, self).json()
+        if 'error' in r:
+            raise ApiResponseError(self.response, r.error, r.get('error_description', ''))
+        return r
+
+
+class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://oauth.taobao.com/')
+
+    def _parse_response(self, response):
+        return OAuthResponse(response).json()
 
     def _get_access_token_url(self):
         return self._url + 'token'
@@ -125,7 +130,7 @@ class OAuth2(OAuth2Base, OauthParser):
         return self._url + 'logoff?client_id={0}&view={1}'.format(self.app.key, view)
 
 
-class OAuth(OAuthBase, OauthParser):
+class OAuth(OAuthBase):
     """
     基于TOP协议的登录授权方式
     """
@@ -133,18 +138,21 @@ class OAuth(OAuthBase, OauthParser):
     def __init__(self, app):
         super(OAuth, self).__init__(app, 'http://container.open.taobao.com/container')
 
-    def authorize(self):
-        return self._url + '?encode=utf-8&appkey={0}'.format(self.app.key)
+    def _parse_response(self, response):
+        return OAuthResponse(response).json()
 
     def _sign_by_md5(self, data):
         message = join_dict(data) + self.app.secret
         return md5(message).hexdigest().upper()
 
+    def authorize(self):
+        return self._url + '?encode=utf-8&appkey={0}'.format(self.app.key)
+
     def refresh_token(self, refresh_token, top_session):
         params = dict(appkey=self.app.key, refresh_token=refresh_token, sessionkey=top_session)
         params['sign'] = self._sign_by_md5(params)
         response = self._session.get(self._url + '/refresh', params=params)
-        return self.parse_response(response)
+        return self._parse_response(response)
 
     def validate_sign(self, top_parameters, top_sign, top_session):
         """  验证签名是否正确（用于淘宝帐号授权）（已测试成功，不要更改）

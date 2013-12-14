@@ -1,5 +1,6 @@
 # coding=utf-8
-from chinaapi.utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token
+from chinaapi.utils.api import Response
+from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token
 from chinaapi.utils.exceptions import InvalidApi, ApiResponseError
 
 IS_POST_METHOD = {
@@ -26,17 +27,20 @@ RET = {
 }
 
 
-class Parser(ParserBase):
-    def parse_response(self, response):
-        r = super(Parser, self).parse_response(response)
+class ApiResponse(Response):
+    def __init__(self, response):
+        super(ApiResponse, self).__init__(response)
+
+    def json(self):
+        r = super(ApiResponse, self).json()
         if 'ret' in r and r.ret != 0:
-            raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
+            raise ApiResponseError(self.response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
         if 'data' in r:
             return r.data
         return r
 
 
-class Client(ClientBase, Parser):
+class Client(ClientBase):
     #写接口
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
@@ -84,10 +88,16 @@ class Client(ClientBase, Parser):
         files = self._isolated_files(queries, ['pic'])
         return queries, files
 
+    def _parse_response(self, response):
+        return ApiResponse(response).json()
 
-class OAuth2(OAuth2Base, Parser):
+
+class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
+
+    def _parse_response(self, response):
+        return ApiResponse(response).json()
 
     def _parse_token(self, response):
         data = self.querystring_to_dict(response.text)
@@ -108,5 +118,5 @@ class OAuth2(OAuth2Base, Parser):
         """
         kwargs['format'] = 'json'
         response = self._session.get('http://open.t.qq.com/api/auth/revoke_auth', params=kwargs)
-        self.parse_response(response)
+        self._parse_response(response)
         return True  # 没有异常说明ret=0（ret: 0-成功，非0-失败）
