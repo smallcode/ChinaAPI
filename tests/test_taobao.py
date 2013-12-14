@@ -1,6 +1,6 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.taobao import ApiClient
+from chinaapi.taobao.open import Client
 from chinaapi.utils.exceptions import ApiError
 from chinaapi.utils.open import App
 
@@ -14,7 +14,7 @@ class TaobaoTest(TestCase):
 
     def setUp(self):
         app = App('21532233', '1d5f36785a0bfb84952a69c5dd3203fd')
-        self.client = ApiClient(app)
+        self.client = Client(app)
 
     def test_itemcats_get(self):
         r = self.client.itemcats.get(cids=14)

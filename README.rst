@@ -35,14 +35,14 @@ Client使用方法：
 
 .. code-block:: python
 
-        from chinaapi.sina_weibo import ApiClient
+        from chinaapi.sina.weibo.open import Client
         from chinaapi.utils.open import App, Token
 
 
         # 设置ApiClient
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
         token = Token('access_token')  # 填上取得的token（可通过OAuth2取得）
-        client = ApiClient(app)
+        client = Client(app)
         client.set_token(token)
 
         # 获取用户信息，对应的接口是：users/show
@@ -71,7 +71,7 @@ OAuth2使用方法：
 
 .. code-block:: python
 
-        from chinaapi.sina_weibo import ApiOAuth2
+        from chinaapi.sina.weibo.open import OAuth2
         from chinaapi.utils.open import App
 
 
@@ -79,7 +79,7 @@ OAuth2使用方法：
         app = App('app_key', 'app_secret', 'redirect_uri')
 
         # 获取授权链接
-        oauth2 = ApiOAuth2(app)
+        oauth2 = OAuth2(app)
         url = oauth2.authorize()  # 如果app中未设置redirect_uri，则此处必须传入
         print url # 显示授权链接（该url用于提供给用户进行登录授权，授权成功后会回调redirect_uri?code=****）
 
@@ -114,13 +114,13 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
 .. code-block:: python
 
-        from chinaapi.taobao import ApiClient
+        from chinaapi.taobao.open import Client
         from chinaapi.utils.open import App
 
 
         # client的设置
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        client = ApiClient(app)
+        client = Client(app)
 
         # 获取淘宝客店铺列表，对应的接口是：taobao.tbk.shops.get
         # 返回结果r是json中tbk_shops_get_response的值
@@ -152,7 +152,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
 .. code-block:: python
 
-        from chinaapi.qq_weibo import ApiClient
+        from chinaapi.qq.weibo.open import Client
         from chinaapi.utils.open import App, Token
 
 
@@ -160,7 +160,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
         token = Token('access_token')       # 填上取得的access_token
         openid = 'openid'                   # 填上取得的openid
-        client = ApiClient(app)
+        client = Client(app)
         client.set_token(token)
         client.set_openid(openid)
 
@@ -206,14 +206,14 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
 .. code-block:: python
 
-        from chinaapi.renren import ApiClient
+        from chinaapi.renren.open import Client
         from chinaapi.utils.open import App, Token
 
 
         # client的设置
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
         token = Token('access_token')  # 填上取得的access_token
-        client = ApiClient(app)
+        client = Client(app)
         client.set_token(token)
 
         # 获取用户信息，对应的接口是：/v2/user/get

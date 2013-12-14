@@ -4,8 +4,8 @@ import hmac
 from hashlib import md5
 from datetime import datetime
 from urllib import unquote
-from .utils.open import ClientBase, ParserBase, OAuthBase, OAuth2Base
-from .utils.exceptions import ApiResponseError, ApiError
+from chinaapi.utils.open import ClientBase, ParserBase, OAuthBase, OAuth2Base
+from chinaapi.utils.exceptions import ApiResponseError, ApiError
 
 
 VALUE_TO_STR = {
@@ -29,9 +29,9 @@ def join_dict(data):
     return ''.join(["%s%s" % (k, v) for k, v in sorted(data.iteritems())])
 
 
-class ApiParser(ParserBase):
+class Parser(ParserBase):
     def parse_response(self, response):
-        r = super(ApiParser, self).parse_response(response)
+        r = super(Parser, self).parse_response(response)
         if 'error_response' in r:
             error = r.error_response
             raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
@@ -42,17 +42,17 @@ class ApiParser(ParserBase):
                 return r.get(keys[0])
 
 
-class ApiOauthParser(ParserBase):
+class OauthParser(ParserBase):
     def parse_response(self, response):
-        r = super(ApiOauthParser, self).parse_response(response)
+        r = super(OauthParser, self).parse_response(response)
         if 'error' in r:
             raise ApiResponseError(response, r.error, r.get('error_description', ''))
         return r
 
 
-class ApiClient(ClientBase, ApiParser):
+class Client(ClientBase, Parser):
     def __init__(self, app, retry_count=3):
-        super(ApiClient, self).__init__(app)
+        super(Client, self).__init__(app)
         self._retry_count = retry_count
 
     @property
@@ -107,16 +107,16 @@ class ApiClient(ClientBase, ApiParser):
                 raise e
 
 
-class ApiOAuth2(OAuth2Base, ApiOauthParser):
+class OAuth2(OAuth2Base, OauthParser):
     def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app, 'https://oauth.taobao.com/')
+        super(OAuth2, self).__init__(app, 'https://oauth.taobao.com/')
 
     def _get_access_token_url(self):
         return self._url + 'token'
 
     def refresh_token(self, refresh_token, **kwargs):
         kwargs.update(refresh_token=refresh_token)
-        return super(ApiOAuth2, self).access_token(**kwargs)
+        return super(OAuth2, self).access_token(**kwargs)
 
     def logoff(self, view='web'):
         """ 退出登录帐号，目前只支持web访问，起到的作用是清除taobao.com的cookie，并不是取消用户的授权。在WAP上访问无效。
@@ -125,13 +125,13 @@ class ApiOAuth2(OAuth2Base, ApiOauthParser):
         return self._url + 'logoff?client_id={0}&view={1}'.format(self.app.key, view)
 
 
-class ApiOAuth(OAuthBase, ApiOauthParser):
+class OAuth(OAuthBase, OauthParser):
     """
     基于TOP协议的登录授权方式
     """
 
     def __init__(self, app):
-        super(ApiOAuth, self).__init__(app, 'http://container.open.taobao.com/container')
+        super(OAuth, self).__init__(app, 'http://container.open.taobao.com/container')
 
     def authorize(self):
         return self._url + '?encode=utf-8&appkey={0}'.format(self.app.key)

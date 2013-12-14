@@ -3,20 +3,20 @@ import base64
 import hashlib
 import hmac
 from urlparse import urlparse
-from .utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token, App
-from .utils.exceptions import ApiResponseError
-from .utils import jsonDict
+from chinaapi.utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token, App
+from chinaapi.utils.exceptions import ApiResponseError
+from chinaapi.utils import jsonDict
 
 
-class ApiParser(ParserBase):
+class Parser(ParserBase):
     def parse_response(self, response):
-        r = super(ApiParser, self).parse_response(response)
+        r = super(Parser, self).parse_response(response)
         if 'error_code' in r:
             raise ApiResponseError(response, r.error_code, r.get('error', ''))
         return r
 
 
-class ApiClient(ClientBase, ApiParser):
+class Client(ClientBase, Parser):
     #写入接口
     _post_methods = ['create', 'add', 'destroy', 'update', 'upload', 'repost', 'reply', 'send', 'post', 'invite',
                      'shield', 'order']
@@ -24,7 +24,7 @@ class ApiClient(ClientBase, ApiParser):
     _underlined_post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app)
+        super(Client, self).__init__(app)
 
     def _prepare_url(self, segments, queries):
         if 'pic' in queries:
@@ -56,12 +56,12 @@ class ApiClient(ClientBase, ApiParser):
         return queries, files
 
 
-class ApiOAuth2(OAuth2Base, ApiParser):
+class OAuth2(OAuth2Base, Parser):
     def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
+        super(OAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
 
     def _parse_token(self, response):
-        data = super(ApiOAuth2, self)._parse_token(response)
+        data = super(OAuth2, self)._parse_token(response)
         access_token = data.get('access_token', None)
         uid = data.get('uid', None)
         created_at = data.get('create_at', None)

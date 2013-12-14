@@ -1,6 +1,6 @@
 # coding=utf-8
-from .utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token
-from .utils.exceptions import InvalidApi, ApiResponseError
+from chinaapi.utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token
+from chinaapi.utils.exceptions import InvalidApi, ApiResponseError
 
 IS_POST_METHOD = {
     'user': lambda m: m in ['verify'],
@@ -26,9 +26,9 @@ RET = {
 }
 
 
-class ApiParser(ParserBase):
+class Parser(ParserBase):
     def parse_response(self, response):
-        r = super(ApiParser, self).parse_response(response)
+        r = super(Parser, self).parse_response(response)
         if 'ret' in r and r.ret != 0:
             raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
         if 'data' in r:
@@ -36,12 +36,12 @@ class ApiParser(ParserBase):
         return r
 
 
-class ApiClient(ClientBase, ApiParser):
+class Client(ClientBase, Parser):
     #写接口
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app)
+        super(Client, self).__init__(app)
         self.openid = None
         self.clientip = None
 
@@ -85,9 +85,9 @@ class ApiClient(ClientBase, ApiParser):
         return queries, files
 
 
-class ApiOAuth2(OAuth2Base, ApiParser):
+class OAuth2(OAuth2Base, Parser):
     def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
+        super(OAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
 
     def _parse_token(self, response):
         data = self.querystring_to_dict(response.text)

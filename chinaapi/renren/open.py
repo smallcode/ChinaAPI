@@ -1,11 +1,11 @@
 # coding=utf-8
-from .utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token
-from .utils.exceptions import ApiResponseError
+from chinaapi.utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token
+from chinaapi.utils.exceptions import ApiResponseError
 
 
-class ApiParser(ParserBase):
+class Parser(ParserBase):
     def parse_response(self, response):
-        r = super(ApiParser, self).parse_response(response)
+        r = super(Parser, self).parse_response(response)
         if 'error' in r and 'code' in r.error:
             raise ApiResponseError(response, r.error.get('code', ''), r.error.get('message', ''))
         elif 'error_code' in r:
@@ -13,12 +13,12 @@ class ApiParser(ParserBase):
         return r
 
 
-class ApiClient(ClientBase, ApiParser):
+class Client(ClientBase, Parser):
     #写入接口
     _post_methods = ['put', 'share', 'remove', 'upload']
 
     def __init__(self, app):
-        super(ApiClient, self).__init__(app)
+        super(Client, self).__init__(app)
 
     def _prepare_url(self, segments, queries):
         return 'https://api.renren.com/v2/{0}'.format('/'.join(segments))
@@ -37,15 +37,15 @@ class ApiClient(ClientBase, ApiParser):
         return queries, files
 
 
-class ApiOAuth2(OAuth2Base, ApiParser):
+class OAuth2(OAuth2Base, Parser):
     def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app, 'https://graph.renren.com/oauth/')
+        super(OAuth2, self).__init__(app, 'https://graph.renren.com/oauth/')
 
     def _get_access_token_url(self):
         return self._url + 'token'
 
     def _parse_token(self, response):
-        data = super(ApiOAuth2, self)._parse_token(response)
+        data = super(OAuth2, self)._parse_token(response)
         access_token = data.get('access_token', None)
         user = data.get('user', None)
         uid = user.get('id', None) if user is not None else None

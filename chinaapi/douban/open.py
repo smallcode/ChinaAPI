@@ -1,19 +1,19 @@
 # coding=utf-8
-from .utils.exceptions import ApiResponseError
-from .utils.open import OAuth2Base, ParserBase, Token
+from chinaapi.utils.exceptions import ApiResponseError
+from chinaapi.utils.open import OAuth2Base, ParserBase, Token
 
 
-class ApiParser(ParserBase):
+class Parser(ParserBase):
     def parse_response(self, response):
-        r = super(ApiParser, self).parse_response(response)
+        r = super(Parser, self).parse_response(response)
         if 'code' in r and 'msg' in r:
             raise ApiResponseError(response, r.code, r.msg)
         return r
 
 
-class ApiOAuth2(OAuth2Base, ApiParser):
+class OAuth2(OAuth2Base, Parser):
     def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app, 'https://www.douban.com/service/auth2/')
+        super(OAuth2, self).__init__(app, 'https://www.douban.com/service/auth2/')
 
     def _get_access_token_url(self):
         return self._url + 'token'
@@ -22,7 +22,7 @@ class ApiOAuth2(OAuth2Base, ApiParser):
         return self._url + 'auth'
 
     def _parse_token(self, response):
-        data = super(ApiOAuth2, self)._parse_token(response)
+        data = super(OAuth2, self)._parse_token(response)
         access_token = data.get('access_token', None)
         uid = data.get('douban_user_id', None)
         refresh_token = data.get('refresh_token', None)
