@@ -1,2 +1,2 @@
-requests==2.1.0
-httpretty==0.7.0
+requests>=2.1.0
+httpretty>=0.7.0
