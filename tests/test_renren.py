@@ -2,7 +2,7 @@
 from unittest import TestCase
 from chinaapi.renren import ApiClient
 from chinaapi.utils.exceptions import ApiError, NotExistApi
-from chinaapi.utils.models import App, Token
+from chinaapi.utils.open import Token, App
 
 
 class RenRenTest(TestCase):

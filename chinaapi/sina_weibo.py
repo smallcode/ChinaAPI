@@ -3,13 +3,12 @@ import base64
 import hashlib
 import hmac
 from urlparse import urlparse
-from .utils.models import Token, App
-from .utils.api import Client, Method, Parser, OAuth2
+from .utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token, App
 from .utils.exceptions import ApiResponseError
 from .utils import jsonDict
 
 
-class ApiParser(Parser):
+class ApiParser(ParserBase):
     def parse_response(self, response):
         r = super(ApiParser, self).parse_response(response)
         if 'error_code' in r:
@@ -17,7 +16,7 @@ class ApiParser(Parser):
         return r
 
 
-class ApiClient(Client, ApiParser):
+class ApiClient(ClientBase, ApiParser):
     #写入接口
     _post_methods = ['create', 'add', 'destroy', 'update', 'upload', 'repost', 'reply', 'send', 'post', 'invite',
                      'shield', 'order']
@@ -57,7 +56,7 @@ class ApiClient(Client, ApiParser):
         return queries, files
 
 
-class ApiOAuth2(OAuth2, ApiParser):
+class ApiOAuth2(OAuth2Base, ApiParser):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
 
@@ -76,14 +75,14 @@ class ApiOAuth2(OAuth2, ApiParser):
         """ 取消授权
         返回是否成功取消
         """
-        response = self._session.get(self.url + 'revokeoauth2', params={'access_token': access_token})
+        response = self._session.get(self._url + 'revokeoauth2', params={'access_token': access_token})
         return self.parse_response(response).result
 
     def get_token_info(self, access_token):
         """ 获取access_token详细信息
         返回Token
         """
-        response = self._session.post(self.url + 'get_token_info', data={'access_token': access_token})
+        response = self._session.post(self._url + 'get_token_info', data={'access_token': access_token})
         token = self._parse_token(response)
         token.access_token = access_token
         return token
@@ -118,9 +117,9 @@ class ApiOAuth2(OAuth2, ApiParser):
         }
 
         headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36",
-        "Host": "api.weibo.com",
-        "Referer": self.authorize()
+            "User-Agent": "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36",
+            "Host": "api.weibo.com",
+            "Referer": self.authorize()
         }
 
         url = self._get_authorize_url()

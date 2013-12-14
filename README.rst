@@ -2,10 +2,10 @@ ChinaAPI
 =========================
 
 .. image:: https://travis-ci.org/smallcode/ChinaAPI.png
-    :target: https://travis-ci.org/smallcode/ChinaAPI
+:target: https://travis-ci.org/smallcode/ChinaAPI
 
 .. image:: https://badge.fury.io/py/chinaapi.png
-    :target: http://badge.fury.io/py/chinaapi
+:target: http://badge.fury.io/py/chinaapi
 
 
 ChinaAPI是一个API库，使用Python编写。
@@ -36,7 +36,7 @@ Client使用方法：
 .. code-block:: python
 
         from chinaapi.sina_weibo import ApiClient
-        from chinaapi.utils.models import App, Token
+        from chinaapi.utils.open import App, Token
 
 
         # 设置ApiClient
@@ -72,7 +72,7 @@ OAuth2使用方法：
 .. code-block:: python
 
         from chinaapi.sina_weibo import ApiOAuth2
-        from chinaapi.utils.models import App
+        from chinaapi.utils.open import App
 
 
         # 设置App，填上自己的app_key，app_secret；redirect_uri可不填
@@ -115,7 +115,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 .. code-block:: python
 
         from chinaapi.taobao import ApiClient
-        from chinaapi.utils.models import App
+        from chinaapi.utils.open import App
 
 
         # client的设置
@@ -134,9 +134,9 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 ====================================== =========================================
                淘宝API                               调  用
 ====================================== =========================================
-  taobao.itemcats.get                  client.itemcats.get()  
+  taobao.itemcats.get                  client.itemcats.get()
                                        或者 client.taobao.itemcats.get()
-  taobao.tbk.shops.get                 client.tbk.shops.get()  
+  taobao.tbk.shops.get                 client.tbk.shops.get()
                                        或者 client.taobao.tbk.shops.get()
 
 ====================================== =========================================
@@ -153,7 +153,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 .. code-block:: python
 
         from chinaapi.qq_weibo import ApiClient
-        from chinaapi.utils.models import App, Token
+        from chinaapi.utils.open import App, Token
 
 
         # client的设置
@@ -185,7 +185,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
         client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')
 
 
-调用规则：**斜杠（/）映射为点（.），del映射为delete（因del是Python保留字，无法作为方法名）**   
+调用规则：**斜杠（/）映射为点（.），del映射为delete（因del是Python保留字，无法作为方法名）**
 
 ====================================== =========================================
             腾讯微博API                               调  用
@@ -207,7 +207,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 .. code-block:: python
 
         from chinaapi.renren import ApiClient
-        from chinaapi.utils.models import App, Token
+        from chinaapi.utils.open import App, Token
 
 
         # client的设置

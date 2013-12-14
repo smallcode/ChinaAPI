@@ -1,8 +1,8 @@
 # coding=utf-8
+import time
 import requests
 from requests.utils import default_user_agent
 from chinaapi.utils import jsonDict
-from chinaapi.utils.models import Token
 from chinaapi.utils.exceptions import NotExistApi, MissingRedirectUri, ApiResponseValueError
 from chinaapi import __version__, __title__
 
@@ -12,7 +12,47 @@ class Method(object):
     POST = 'POST'
 
 
-class Parser(object):
+class Token(object):
+    def __init__(self, access_token=None, expired_at=None, created_at=None, refresh_token=None, uid=None):
+        """
+        access_token：访问令牌
+        expired_at：令牌到期日期，为timestamp格式
+        created_at：令牌创建日期，为timestamp格式
+        expires_in：令牌剩余授权时间的秒数
+        refresh_token：用于刷新令牌
+        uid：授权用户的uid
+        """
+        self.access_token = access_token
+        self.expired_at = expired_at
+        self.created_at = created_at
+        self.refresh_token = refresh_token
+        self.uid = uid
+
+    def _get_expires_in(self):
+        if self.expired_at:
+            current = int(time.time())
+            return self.expired_at - current
+
+    def _set_expires_in(self, expires_in):
+        if expires_in:
+            current = int(time.time())
+            self.expired_at = int(expires_in) + current
+
+    expires_in = property(_get_expires_in, _set_expires_in)
+
+    @property
+    def is_expires(self):
+        return not self.access_token or (self.expired_at is not None and time.time() > self.expired_at)
+
+
+class App(object):
+    def __init__(self, key, secret, redirect_uri=''):
+        self.key = key
+        self.secret = secret
+        self.redirect_uri = redirect_uri
+
+
+class ParserBase(object):
     def parse_response(self, response):
         try:
             return jsonDict.loads(response.text)
@@ -49,7 +89,7 @@ class ClientWrapper(object):
         return self
 
 
-class Client(Parser):
+class ClientBase(ParserBase):
     def __init__(self, app):
         self.app = app
         self.token = Token()
@@ -100,25 +140,25 @@ class Client(Parser):
         return ClientWrapper(self, attr)
 
 
-class OAuth(Parser):
+class OAuthBase(ParserBase):
     def __init__(self, app, url):
         self.app = app
-        self.url = url
+        self._url = url
         self._session = requests.session()
 
 
-class OAuth2(OAuth):
+class OAuth2Base(OAuthBase):
     def __init__(self, app, url):
-        super(OAuth2, self).__init__(app, url)
+        super(OAuth2Base, self).__init__(app, url)
 
     def _parse_token(self, response):
         return self.parse_response(response)
 
     def _get_authorize_url(self):
-        return self.url + 'authorize'
+        return self._url + 'authorize'
 
     def _get_access_token_url(self):
-        return self.url + 'access_token'
+        return self._url + 'access_token'
 
     def authorize(self, **kwargs):
         """  授权

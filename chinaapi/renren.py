@@ -1,10 +1,9 @@
 # coding=utf-8
-from chinaapi.utils.models import Token
-from .utils.api import Client, Method, Parser, OAuth2
+from .utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token
 from .utils.exceptions import ApiResponseError
 
 
-class ApiParser(Parser):
+class ApiParser(ParserBase):
     def parse_response(self, response):
         r = super(ApiParser, self).parse_response(response)
         if 'error' in r and 'code' in r.error:
@@ -14,7 +13,7 @@ class ApiParser(Parser):
         return r
 
 
-class ApiClient(Client, ApiParser):
+class ApiClient(ClientBase, ApiParser):
     #写入接口
     _post_methods = ['put', 'share', 'remove', 'upload']
 
@@ -38,12 +37,12 @@ class ApiClient(Client, ApiParser):
         return queries, files
 
 
-class ApiOAuth2(OAuth2, ApiParser):
+class ApiOAuth2(OAuth2Base, ApiParser):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://graph.renren.com/oauth/')
 
     def _get_access_token_url(self):
-        return self.url + 'token'
+        return self._url + 'token'
 
     def _parse_token(self, response):
         data = super(ApiOAuth2, self)._parse_token(response)

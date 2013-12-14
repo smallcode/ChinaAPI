@@ -1,16 +1,16 @@
 # coding=utf-8
+import time
 from unittest import TestCase
 import httpretty
 import requests
-from chinaapi.utils.api import Client, OAuth2, Parser, Method
+from chinaapi.utils.open import ClientBase, OAuth2Base, ParserBase, Method, Token, App
 from chinaapi.utils.exceptions import MissingRedirectUri, ApiResponseError, NotExistApi
-from chinaapi.utils.models import App, Token
 
 
 BASE_URL = 'http://test/'
 
 
-class ApiClient(Client, Parser):
+class ApiClient(ClientBase, ParserBase):
     def __init__(self, app):
         super(ApiClient, self).__init__(app)
 
@@ -26,12 +26,12 @@ class ApiClient(Client, Parser):
         return response
 
 
-class NotImplementedClient(Client):
+class NotImplementedClient(ClientBase):
     def __init__(self, app):
         super(NotImplementedClient, self).__init__(app)
 
 
-class ApiOAuth2(OAuth2):
+class ApiOAuth2(OAuth2Base):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'http://test/oauth2/')
 
@@ -60,7 +60,7 @@ class ParserTest(TestBase):
     NOT_JSON_RESPONSE_URL = BASE_URL + 'empty_response_uri'
 
     def setUp(self):
-        self.parser = Parser()
+        self.parser = ParserBase()
 
     def register_not_json_response_uri(self):
         httpretty.register_uri(httpretty.POST, self.NOT_JSON_RESPONSE_URL, body='error_text',
@@ -209,3 +209,26 @@ class OAuth2Test(TestBase):
         token = self.oauth2.access_token()
         self.assertToken(token)
 
+
+class TokenTest(TestCase):
+    def test_access_token(self):
+        token = Token('token_string', time.time() + 60 * 60)
+        self.assertFalse(token.is_expires)
+
+    def test_access_token_without_expired_at(self):
+        token = Token('token_string')
+        self.assertFalse(token.is_expires)
+
+    def test_empty_access_token(self):
+        token = Token('')
+        self.assertTrue(token.is_expires)
+
+    def test_expired_access_token(self):
+        token = Token('token_string', time.time() - 60 * 60)
+        self.assertTrue(token.is_expires)
+
+    def test_set_expires_in(self):
+        expires_in = 60 * 60
+        token = Token('token_string')
+        token.expires_in = expires_in
+        self.assertAlmostEqual(expires_in, token.expires_in, -1)

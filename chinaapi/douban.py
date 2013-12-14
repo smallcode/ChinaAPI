@@ -1,10 +1,9 @@
 # coding=utf-8
-from .utils.models import Token
 from .utils.exceptions import ApiResponseError
-from .utils.api import OAuth2, Parser
+from .utils.open import OAuth2Base, ParserBase, Token
 
 
-class ApiParser(Parser):
+class ApiParser(ParserBase):
     def parse_response(self, response):
         r = super(ApiParser, self).parse_response(response)
         if 'code' in r and 'msg' in r:
@@ -12,15 +11,15 @@ class ApiParser(Parser):
         return r
 
 
-class ApiOAuth2(OAuth2, ApiParser):
+class ApiOAuth2(OAuth2Base, ApiParser):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://www.douban.com/service/auth2/')
 
     def _get_access_token_url(self):
-        return self.url + 'token'
+        return self._url + 'token'
 
     def _get_authorize_url(self):
-        return self.url + 'auth'
+        return self._url + 'auth'
 
     def _parse_token(self, response):
         data = super(ApiOAuth2, self)._parse_token(response)

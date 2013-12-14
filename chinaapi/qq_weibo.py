@@ -1,6 +1,5 @@
 # coding=utf-8
-from .utils.models import Token
-from .utils.api import Client, Method, Parser, OAuth2
+from .utils.open import ClientBase, Method, ParserBase, OAuth2Base, Token
 from .utils.exceptions import InvalidApi, ApiResponseError
 
 IS_POST_METHOD = {
@@ -27,7 +26,7 @@ RET = {
 }
 
 
-class ApiParser(Parser):
+class ApiParser(ParserBase):
     def parse_response(self, response):
         r = super(ApiParser, self).parse_response(response)
         if 'ret' in r and r.ret != 0:
@@ -37,7 +36,7 @@ class ApiParser(Parser):
         return r
 
 
-class ApiClient(Client, ApiParser):
+class ApiClient(ClientBase, ApiParser):
     #写接口
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
@@ -86,7 +85,7 @@ class ApiClient(Client, ApiParser):
         return queries, files
 
 
-class ApiOAuth2(OAuth2, ApiParser):
+class ApiOAuth2(OAuth2Base, ApiParser):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
 

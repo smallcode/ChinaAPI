@@ -2,7 +2,7 @@
 from unittest import TestCase
 from chinaapi.taobao import ApiClient
 from chinaapi.utils.exceptions import ApiError
-from chinaapi.utils.models import App
+from chinaapi.utils.open import App
 
 
 class TaobaoTest(TestCase):
@@ -11,6 +11,7 @@ class TaobaoTest(TestCase):
     https://github.com/jimboybo/itaobox/blob/083e66bdce899ff8b9ea8be5fd9280529c4ee216/u/system/config/app_config.php
     注意：不同的app会有不同的权限，所以测试如果不成功，有可能是权限不足（详细原因可以查看返回的ApiError错误信息）
     """
+
     def setUp(self):
         app = App('21532233', '1d5f36785a0bfb84952a69c5dd3203fd')
         self.client = ApiClient(app)

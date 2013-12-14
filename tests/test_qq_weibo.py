@@ -2,11 +2,11 @@
 from unittest import TestCase
 from chinaapi.qq_weibo import ApiClient
 from chinaapi.utils.exceptions import ApiError, NotExistApi, InvalidApi
-from chinaapi.utils.models import App, Token
 
 
 # 返回text是unicode，设置默认编码为utf8
 import sys
+from chinaapi.utils.open import Token, App
 
 reload(sys)
 sys.setdefaultencoding('utf8')

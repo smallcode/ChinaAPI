@@ -4,7 +4,7 @@ import hmac
 from hashlib import md5
 from datetime import datetime
 from urllib import unquote
-from .utils.api import Client, Parser, OAuth, OAuth2
+from .utils.open import ClientBase, ParserBase, OAuthBase, OAuth2Base
 from .utils.exceptions import ApiResponseError, ApiError
 
 
@@ -29,7 +29,7 @@ def join_dict(data):
     return ''.join(["%s%s" % (k, v) for k, v in sorted(data.iteritems())])
 
 
-class ApiParser(Parser):
+class ApiParser(ParserBase):
     def parse_response(self, response):
         r = super(ApiParser, self).parse_response(response)
         if 'error_response' in r:
@@ -42,7 +42,7 @@ class ApiParser(Parser):
                 return r.get(keys[0])
 
 
-class ApiOauthParser(Parser):
+class ApiOauthParser(ParserBase):
     def parse_response(self, response):
         r = super(ApiOauthParser, self).parse_response(response)
         if 'error' in r:
@@ -50,7 +50,7 @@ class ApiOauthParser(Parser):
         return r
 
 
-class ApiClient(Client, ApiParser):
+class ApiClient(ClientBase, ApiParser):
     def __init__(self, app, retry_count=3):
         super(ApiClient, self).__init__(app)
         self._retry_count = retry_count
@@ -107,12 +107,12 @@ class ApiClient(Client, ApiParser):
                 raise e
 
 
-class ApiOAuth2(OAuth2, ApiOauthParser):
+class ApiOAuth2(OAuth2Base, ApiOauthParser):
     def __init__(self, app):
         super(ApiOAuth2, self).__init__(app, 'https://oauth.taobao.com/')
 
     def _get_access_token_url(self):
-        return self.url + 'token'
+        return self._url + 'token'
 
     def refresh_token(self, refresh_token, **kwargs):
         kwargs.update(refresh_token=refresh_token)
@@ -122,10 +122,10 @@ class ApiOAuth2(OAuth2, ApiOauthParser):
         """ 退出登录帐号，目前只支持web访问，起到的作用是清除taobao.com的cookie，并不是取消用户的授权。在WAP上访问无效。
         返回：用于退出登录的链接
         """
-        return self.url + 'logoff?client_id={0}&view={1}'.format(self.app.key, view)
+        return self._url + 'logoff?client_id={0}&view={1}'.format(self.app.key, view)
 
 
-class ApiOAuth(OAuth, ApiOauthParser):
+class ApiOAuth(OAuthBase, ApiOauthParser):
     """
     基于TOP协议的登录授权方式
     """
@@ -134,7 +134,7 @@ class ApiOAuth(OAuth, ApiOauthParser):
         super(ApiOAuth, self).__init__(app, 'http://container.open.taobao.com/container')
 
     def authorize(self):
-        return self.url + '?encode=utf-8&appkey={0}'.format(self.app.key)
+        return self._url + '?encode=utf-8&appkey={0}'.format(self.app.key)
 
     def _sign_by_md5(self, data):
         message = join_dict(data) + self.app.secret
@@ -143,7 +143,7 @@ class ApiOAuth(OAuth, ApiOauthParser):
     def refresh_token(self, refresh_token, top_session):
         params = dict(appkey=self.app.key, refresh_token=refresh_token, sessionkey=top_session)
         params['sign'] = self._sign_by_md5(params)
-        response = self._session.get(self.url + '/refresh', params=params)
+        response = self._session.get(self._url + '/refresh', params=params)
         return self.parse_response(response)
 
     def validate_sign(self, top_parameters, top_sign, top_session):
