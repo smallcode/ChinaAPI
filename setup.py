@@ -9,6 +9,13 @@ except ImportError:
 packages = [
     'chinaapi',
     'chinaapi.utils',
+    'chinaapi.douban',
+    'chinaapi.qq',
+    'chinaapi.qq.weibo',
+    'chinaapi.renren',
+    'chinaapi.sina',
+    'chinaapi.sina.weibo',
+    'chinaapi.taobao',
 ]
 
 requires = [
