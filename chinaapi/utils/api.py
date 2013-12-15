@@ -21,8 +21,7 @@ class Response(object):
         try:
             return jsonDict.loads(response.text)
         except ValueError, e:
-            status_code = 200
-            if response.status_code == status_code:
+            if response.ok:
                 raise ApiResponseValueError(response, e)
             else:
                 raise NotExistApi(response)
