@@ -25,10 +25,10 @@ class Request(object):
     def _parse_response(self, response):
         return Response(response).json()
 
-    @staticmethod
-    def _parse_querystring(querystring):
+    @classmethod
+    def _parse_querystring(cls, querystring):
         return dict([item.split('=') for item in querystring.split('&')])
 
-    # @staticmethod
-    # def dict_to_querystring(params):
-    #     return '?' + '&'.join(['='.join([k, str(v)]) for k, v in params.items()])
+    @classmethod
+    def _request_url(cls, url, params=None):
+        return requests.Request('GET', url, params=params).prepare().url

@@ -149,7 +149,7 @@ class OAuth2Base(OAuthBase):
         if 'redirect_uri' not in kwargs:
             kwargs['redirect_uri'] = self.app.redirect_uri
         kwargs['client_id'] = self.app.key
-        url =  requests.Request('GET', self._get_authorize_url(), params=kwargs).prepare().url
+        url = self._request_url(self._get_authorize_url(), kwargs)
         if not kwargs['redirect_uri']:
             raise MissingRedirectUri(url)
         return url
