@@ -1,5 +1,6 @@
 # coding=utf-8
 import requests
+from requests.models import PreparedRequest
 from chinaapi.utils import jsonDict
 from chinaapi.utils.exceptions import ApiResponseValueError, NotExistApi
 
@@ -30,5 +31,7 @@ class Request(object):
         return dict([item.split('=') for item in querystring.split('&')])
 
     @classmethod
-    def _request_url(cls, url, params=None):
-        return requests.Request('GET', url, params=params).prepare().url
+    def _request_url(cls, url, params):
+        pre = PreparedRequest()
+        pre.prepare_url(url, params)
+        return pre.url
