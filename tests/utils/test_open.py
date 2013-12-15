@@ -106,7 +106,7 @@ class OAuth2Test(RequestBase):
     def setUp(self):
         super(OAuth2Test, self).setUp()
         self.oauth2 = ApiOAuth2(self.app)
-        self.oauth_url = 'http://test/oauth2/authorize?redirect_uri=http://redirect_uri&response_type=code&client_id=key'
+        self.oauth_url = 'http://test/oauth2/authorize?redirect_uri=http%3A%2F%2Fredirect_uri&response_type=code&client_id=key'
 
     def test_authorize(self):
         url = self.oauth2.authorize()

@@ -100,7 +100,7 @@ class OAuth2(OAuth2Base):
         return ApiResponse(response).json()
 
     def _parse_token(self, response):
-        data = self.querystring_to_dict(response.text)
+        data = self._parse_querystring(response.text)
         if 'errorCode' in data:
             raise ApiResponseError(response, data['errorCode'], data.get('errorMsg', '').strip("'"))
         access_token = data.get('access_token', None)

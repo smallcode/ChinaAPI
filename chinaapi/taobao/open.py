@@ -173,4 +173,4 @@ class OAuth(OAuthBase):
         """  将top_parameters字符串解码并转换为字典，（已测试成功，不要更改）
         """
         parameters = base64.decodestring(unquote(top_parameters))
-        return self.querystring_to_dict(parameters)
+        return self._parse_querystring(parameters)

@@ -138,7 +138,7 @@ class OAuth2(OAuth2Base):
             code_url = r.url
         else:
             code_url = r.headers['location']
-        code = self.querystring_to_dict((urlparse(code_url)).query)['code']
+        code = self._parse_querystring((urlparse(code_url)).query)['code']
         return self.access_token(code=code)
 
 

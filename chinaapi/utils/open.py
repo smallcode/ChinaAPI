@@ -1,5 +1,6 @@
 # coding=utf-8
 import time
+import requests
 from requests.utils import default_user_agent
 from chinaapi.utils.api import Request
 from chinaapi.utils.exceptions import MissingRedirectUri
@@ -148,7 +149,7 @@ class OAuth2Base(OAuthBase):
         if 'redirect_uri' not in kwargs:
             kwargs['redirect_uri'] = self.app.redirect_uri
         kwargs['client_id'] = self.app.key
-        url = self._get_authorize_url() + self.dict_to_querystring(kwargs)
+        url =  requests.Request('GET', self._get_authorize_url(), params=kwargs).prepare().url
         if not kwargs['redirect_uri']:
             raise MissingRedirectUri(url)
         return url

@@ -42,8 +42,6 @@ class ResponseTest(TestBase):
         response = requests.post(self.ACCESS_TOKEN_URL)
         r = Response(response)
         self.assertToken(r.json())
-        self.assertEqual(self.JSON_BODY, r.content)
-        self.assertEqual(self.JSON_BODY, r.text)
 
     @httpretty.activate
     def test_parse_not_json_response(self):
@@ -66,11 +64,7 @@ class RequestTest(TestBase):
         self.request = Request()
 
     def test_querystring_to_dict(self):
-        r = self.request.querystring_to_dict("a=a&b=b")
+        r = self.request._parse_querystring("a=a&b=b")
         self.assertEqual(2, len(r))
         self.assertEqual('a', r['a'])
         self.assertEqual('b', r['b'])
-
-    def test_dict_to_querystring(self):
-        r = self.request.dict_to_querystring(dict(id=1,name='name'))
-        self.assertEqual('?name=name&id=1', r)

@@ -8,14 +8,6 @@ class Response(object):
     def __init__(self, response):
         self.response = response
 
-    @property
-    def content(self):
-        return self.response.content
-
-    @property
-    def text(self):
-        return self.response.text
-
     def json(self):
         try:
             return jsonDict.loads(self.response.text)
@@ -34,9 +26,9 @@ class Request(object):
         return Response(response).json()
 
     @staticmethod
-    def querystring_to_dict(query_string):
-        return dict([item.split('=') for item in query_string.split('&')])
+    def _parse_querystring(querystring):
+        return dict([item.split('=') for item in querystring.split('&')])
 
-    @staticmethod
-    def dict_to_querystring(params):
-        return '?' + '&'.join(['='.join([k, str(v)]) for k, v in params.items()])
+    # @staticmethod
+    # def dict_to_querystring(params):
+    #     return '?' + '&'.join(['='.join([k, str(v)]) for k, v in params.items()])
