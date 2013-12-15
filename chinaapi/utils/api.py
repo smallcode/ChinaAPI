@@ -17,14 +17,13 @@ class Response(object):
         return self.response.text
 
     def json(self):
-        response = self.response
         try:
-            return jsonDict.loads(response.text)
+            return jsonDict.loads(self.response.text)
         except ValueError, e:
-            if response.ok:
-                raise ApiResponseValueError(response, e)
+            if self.response.ok:
+                raise ApiResponseValueError(self.response, e)
             else:
-                raise NotExistApi(response)
+                raise NotExistApi(self.response)
 
 
 class Request(object):
