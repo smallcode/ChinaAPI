@@ -18,12 +18,19 @@ VALUE_TO_STR = {
 
 DEFAULT_VALUE_TO_STR = lambda x: str(x)
 
-RETRY_SUB_CODES = {'isp.top-remote-unknown-error', 'isp.top-remote-connection-timeout',
-                   'isp.remote-connection-error', 'mz.emptybody',
-                   'isp.top-remote-service-unavailable', 'isp.top-remote-connection-timeout-tmall',
-                   'isp.item-update-service-error:GENERIC_FAILURE',
-                   'isp.item-update-service-error:IC_SYSTEM_NOT_READY_TRY_AGAIN_LATER',
-                   'ism.json-decode-error', 'ism.demo-error'}
+RETRY_SUB_CODES = {
+    'isp.top-remote-unknown-error',
+    'isp.top-remote-connection-timeout',
+    'isp.remote-connection-error',
+    'mz.emptybody',
+    'isp.top-remote-service-unavailable',
+    'isp.top-remote-connection-timeout-tmall',
+    'isp.item-update-service-error:GENERIC_FAILURE',
+    'isp.item-update-service-error:IC_SYSTEM_NOT_READY_TRY_AGAIN_LATER',
+    'ism.json-decode-error',
+    'ism.demo-error'
+    'isp.top-remote-service-unavailable-tmall',
+}
 
 
 def join_dict(data):
