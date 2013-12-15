@@ -1,6 +1,5 @@
 # coding=utf-8
 import time
-import requests
 from requests.utils import default_user_agent
 from chinaapi.utils.api import Request
 from chinaapi.utils.exceptions import MissingRedirectUri
