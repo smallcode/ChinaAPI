@@ -4,7 +4,7 @@ import hashlib
 import hmac
 from urlparse import urlparse
 from chinaapi.utils.api import Response
-from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token, App
+from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
 from chinaapi.utils.exceptions import ApiResponseError
 from chinaapi.utils import jsonDict
 
@@ -18,7 +18,6 @@ class ApiResponse(Response):
         if 'error_code' in r:
             raise ApiResponseError(self.response, r.error_code, r.get('error', ''))
         return r
-
 
 class Client(ClientBase):
     #写入接口
@@ -63,6 +62,17 @@ class Client(ClientBase):
         return ApiResponse(response).json()
 
 
+class Token(TokenBase):
+    """
+    uid：授权用户的uid
+    created_at：令牌创建日期，为timestamp格式
+    """
+    def __init__(self, access_token=None, expires_in=None, uid=None, created_at=None):
+        super(Token, self).__init__(access_token, expires_in, None)
+        self.uid = uid
+        self.created_at = created_at
+
+
 class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
@@ -72,13 +82,11 @@ class OAuth2(OAuth2Base):
 
     def _parse_token(self, response):
         data = super(OAuth2, self)._parse_token(response)
-        access_token = data.get('access_token', None)
-        uid = data.get('uid', None)
-        created_at = data.get('create_at', None)
-        expires_in = data.get('expires_in', data.get('expire_in', None))
-
-        token = Token(access_token, created_at=created_at, uid=uid)
-        token.expires_in = expires_in
+        token = Token()
+        token.access_token = data.get('access_token', None)
+        token.uid = data.get('uid', None)
+        token.created_at = data.get('create_at', None)
+        token.expires_in = data.get('expires_in', data.get('expire_in', None))
         return token
 
     def revoke(self, access_token):
@@ -110,7 +118,10 @@ class OAuth2(OAuth2Base):
         encoded_sign, encoded_data = signed_request.split('.', 1)
         sign = base64decode(encoded_sign)
         data = jsonDict.loads(base64decode(encoded_data))
-        token = Token(data.oauth_token, created_at=data.issued_at, uid=data.user_id)
+        token = Token()
+        token.access_token = data.oauth_token
+        token.created_at = data.issued_at
+        token.uid = data.user_id
         token.expires_in = data.expires
         is_valid = data.algorithm == u'HMAC-SHA256' and hmac.new(self.app.key, encoded_data,
                                                                  hashlib.sha256).digest() == sign

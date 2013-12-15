@@ -1,7 +1,6 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.sina.weibo.open import Client
-from chinaapi.utils.open import Token, App
+from chinaapi.sina.weibo.open import Client, App
 
 
 class SinaWeiboTest(TestCase):
@@ -11,9 +10,8 @@ class SinaWeiboTest(TestCase):
 
     def setUp(self):
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        token = Token('access_token')  # 填上取得的access_token
         self.client = Client(app)
-        self.client.set_token(token)
+        self.client.set_access_token('access_token')  # 填上取得的access_token
         self.uid = 3856184660
 
         # def test_users_show(self):

@@ -1,6 +1,19 @@
 # coding=utf-8
 from chinaapi.utils.exceptions import ApiResponseError
-from chinaapi.utils.open import OAuth2Base, Token
+from chinaapi.utils.open import OAuth2Base, Token as TokenBase, App
+
+
+App = App
+
+
+class Token(TokenBase):
+    """
+    douban_user_id：豆瓣用户ID
+    """
+
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, douban_user_id=None):
+        super(Token, self).__init__(access_token, expires_in, refresh_token)
+        self.douban_user_id = douban_user_id
 
 
 class OAuth2(OAuth2Base):
@@ -15,14 +28,7 @@ class OAuth2(OAuth2Base):
 
     def _parse_token(self, response):
         data = super(OAuth2, self)._parse_token(response)
-        access_token = data.get('access_token', None)
-        uid = data.get('douban_user_id', None)
-        refresh_token = data.get('refresh_token', None)
-        expires_in = data.get('expires_in', None)
-
-        token = Token(access_token, refresh_token=refresh_token, uid=uid)
-        token.expires_in = expires_in
-        return token
+        return Token(**data)
 
     def _parse_response(self, response):
         r = super(OAuth2, self)._parse_response(response)

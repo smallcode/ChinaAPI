@@ -12,20 +12,17 @@ class Method(object):
 
 
 class Token(object):
-    def __init__(self, access_token=None, expired_at=None, created_at=None, refresh_token=None, uid=None):
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None):
         """
         access_token：访问令牌
         expired_at：令牌到期日期，为timestamp格式
-        created_at：令牌创建日期，为timestamp格式
         expires_in：令牌剩余授权时间的秒数
         refresh_token：用于刷新令牌
-        uid：授权用户的uid
         """
         self.access_token = access_token
-        self.expired_at = expired_at
-        self.created_at = created_at
+        self.expired_at = None
         self.refresh_token = refresh_token
-        self.uid = uid
+        self.expires_in = expires_in
 
     def _get_expires_in(self):
         if self.expired_at:
@@ -69,14 +66,14 @@ class ClientWrapper(object):
 
 
 class ClientBase(Request):
-    def __init__(self, app):
+    def __init__(self, app, token=Token()):
         super(ClientBase, self).__init__()
         self.app = app
-        self.token = Token()
+        self.token = token
         self._session.headers['User-Agent'] = default_user_agent('%s/%s requests' % (__title__, __version__))
 
-    def set_token(self, token):
-        self.token = token
+    def set_access_token(self, access_token, expires_in=None):
+        self.token = Token(access_token, expires_in)
 
     @staticmethod
     def _isolated_files(queries, file_keys):

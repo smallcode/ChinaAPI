@@ -5,9 +5,11 @@ from hashlib import md5
 from datetime import datetime
 from urllib import unquote
 from chinaapi.utils.api import Response
-from chinaapi.utils.open import ClientBase, OAuthBase, OAuth2Base
+from chinaapi.utils.open import ClientBase, OAuthBase, OAuth2Base, App, Token as TokenBase
 from chinaapi.utils.exceptions import ApiResponseError, ApiError
 
+
+App = App
 
 VALUE_TO_STR = {
     type(datetime.now()): lambda v: v.strftime('%Y-%m-%d %H:%M:%S'),
@@ -28,7 +30,7 @@ RETRY_SUB_CODES = {
     'isp.item-update-service-error:GENERIC_FAILURE',
     'isp.item-update-service-error:IC_SYSTEM_NOT_READY_TRY_AGAIN_LATER',
     'ism.json-decode-error',
-    'ism.demo-error'
+    'ism.demo-error',
     'isp.top-remote-service-unavailable-tmall',
 }
 
@@ -87,7 +89,7 @@ class Client(ClientBase):
                 response = self._session.post(url, data=data, files=files)
                 return self._parse_response(response)
             except ApiError, e:
-                if e.sub_message in RETRY_SUB_CODES and count > 1:
+                if e.sub_code in RETRY_SUB_CODES and count > 1:
                     for f in files.values():
                         f.seek(0)
                     continue
@@ -116,12 +118,46 @@ class OAuthResponse(Response):
         return r
 
 
+class Token(TokenBase):
+    """
+    taobao_user_nick：淘宝账号
+    taobao_user_id：淘宝帐号对应id
+    sub_taobao_user_nick：淘宝子账号
+    sub_taobao_user_id：淘宝子账号对应id
+    token_type：Access token的类型目前只支持bearer
+    re_expires_in：Refresh token过期时间
+    r1_expires_in：r1级别API或字段的访问过期时间
+    r2_expires_in：r2级别API或字段的访问过期时间
+    w1_expires_in：w1级别API或字段的访问过期时间
+    w2_expires_in：w2级别API或字段的访问过期时间
+    """
+
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, taobao_user_nick=None, taobao_user_id=None,
+                 sub_taobao_user_nick=None, sub_taobao_user_id=None, token_type=None, re_expires_in=None,
+                 r1_expires_in=None, r2_expires_in=None, w1_expires_in=None, w2_expires_in=None):
+        super(Token, self).__init__(access_token, expires_in, refresh_token)
+        self.taobao_user_nick = taobao_user_nick
+        self.taobao_user_id = taobao_user_id
+        self.sub_taobao_user_nick = sub_taobao_user_nick
+        self.sub_taobao_user_id = sub_taobao_user_id
+        self.token_type = token_type
+        self.re_expires_in = re_expires_in
+        self.r1_expires_in = r1_expires_in
+        self.r2_expires_in = r2_expires_in
+        self.w1_expires_in = w1_expires_in
+        self.w2_expires_in = w2_expires_in
+
+
 class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://oauth.taobao.com/')
 
     def _parse_response(self, response):
         return OAuthResponse(response).json()
+
+    def _parse_token(self, response):
+        data = super(OAuth2, self)._parse_token(response)
+        return Token(**data)
 
     def _get_access_token_url(self):
         return self._url + 'token'

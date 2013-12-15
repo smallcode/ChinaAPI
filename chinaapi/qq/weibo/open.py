@@ -1,7 +1,9 @@
 # coding=utf-8
 from chinaapi.utils.api import Response
-from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token
+from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
 from chinaapi.utils.exceptions import InvalidApi, ApiResponseError
+
+App = App
 
 IS_POST_METHOD = {
     'user': lambda m: m in ['verify'],
@@ -92,6 +94,19 @@ class Client(ClientBase):
         return ApiResponse(response).json()
 
 
+class Token(TokenBase):
+    """
+    openid：用户统一标识，可以唯一标识一个用户
+    openkey：与openid对应的用户key，是验证openid身份的验证密钥
+    """
+
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, openid=None, openkey=None, name=None):
+        super(Token, self).__init__(access_token, expires_in, refresh_token)
+        self.openid = openid
+        self.openkey = openkey
+        self.name = name
+
+
 class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
@@ -103,13 +118,7 @@ class OAuth2(OAuth2Base):
         data = self._parse_querystring(response.text)
         if 'errorCode' in data:
             raise ApiResponseError(response, data['errorCode'], data.get('errorMsg', '').strip("'"))
-        access_token = data.get('access_token', None)
-        expires_in = data.get('expires_in', None)
-        refresh_token = data.get('refresh_token', None)
-
-        token = Token(access_token, refresh_token=refresh_token)
-        token.expires_in = expires_in
-        return token
+        return Token(**data)
 
     def revoke(self, **kwargs):
         """ 取消授权

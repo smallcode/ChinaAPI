@@ -1,6 +1,9 @@
 # coding=utf-8
-from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token
+from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
 from chinaapi.utils.exceptions import ApiResponseError
+
+
+App = App
 
 
 class Client(ClientBase):
@@ -33,6 +36,32 @@ class Client(ClientBase):
         return r
 
 
+class Token(TokenBase):
+    """
+    token_type：Token类型，bearer或者mac
+    scope：Access Token最终的访问范围，既用户实际授予的权限列表
+    user：用户的个人信息，包含用户id，名称“name”，头像“avatar”（
+          包含四种大小不同的尺寸“type”，大小依次为：“tiny”，“avatar”，“main”，“large”）
+    mac_algorithm：当token_type参数为mac时返回该值
+    mac_key：当token_type参数为mac时返回该值
+    """
+
+    class User(object):
+        def __init__(self, id=None, name=None, avatar=None):
+            self.id = id
+            self.name = name
+            self.avatar = avatar
+
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, token_type=None, scope=None, user=None,
+                 mac_algorithm=None, mac_key=None):
+        super(Token, self).__init__(access_token, expires_in, refresh_token)
+        self.token_type = token_type
+        self.scope = scope
+        self.user = user
+        self.mac_algorithm = mac_algorithm
+        self.mac_key = mac_key
+
+
 class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://graph.renren.com/oauth/')
@@ -42,15 +71,8 @@ class OAuth2(OAuth2Base):
 
     def _parse_token(self, response):
         data = super(OAuth2, self)._parse_token(response)
-        access_token = data.get('access_token', None)
-        user = data.get('user', None)
-        uid = user.get('id', None) if user is not None else None
-        refresh_token = data.get('refresh_token', None)
-        expires_in = data.get('expires_in', None)
-
-        token = Token(access_token, refresh_token=refresh_token, uid=uid)
-        token.expires_in = expires_in
-        return token
+        data['user'] = Token.User(**data.pop('user'))
+        return Token(**data)
 
     def _parse_response(self, response):
         r = super(OAuth2, self)._parse_response(response)

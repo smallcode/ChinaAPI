@@ -1,5 +1,4 @@
 # coding=utf-8
-import time
 from unittest import TestCase
 import httpretty
 from chinaapi.utils.open import ClientBase, OAuth2Base, Method, Token, App
@@ -44,9 +43,8 @@ class ClientTest(RequestBase):
 
     def setUp(self):
         super(ClientTest, self).setUp()
-        self.token = Token('access_token', 1390850926, uid=123)
         self.client = ApiClient(self.app)
-        self.client.set_token(self.token)
+        self.client.set_access_token('access_token', 60*60)
 
     def register_get_uri(self):
         httpretty.register_uri(httpretty.GET, self.GET_URL, body=self.JSON_BODY, content_type=self.CONTENT_TYPE)
@@ -147,7 +145,7 @@ class OAuth2Test(RequestBase):
 
 class TokenTest(TestCase):
     def test_access_token(self):
-        token = Token('token_string', time.time() + 60 * 60)
+        token = Token('token_string', 60 * 60)
         self.assertFalse(token.is_expires)
 
     def test_access_token_without_expired_at(self):
@@ -159,7 +157,7 @@ class TokenTest(TestCase):
         self.assertTrue(token.is_expires)
 
     def test_expired_access_token(self):
-        token = Token('token_string', time.time() - 60 * 60)
+        token = Token('token_string', - 60 * 60)
         self.assertTrue(token.is_expires)
 
     def test_set_expires_in(self):

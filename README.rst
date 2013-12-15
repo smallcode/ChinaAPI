@@ -35,15 +35,13 @@ Client使用方法：
 
 .. code-block:: python
 
-        from chinaapi.sina.weibo.open import Client
-        from chinaapi.utils.open import App, Token
+        from chinaapi.sina.weibo.open import Client, App
 
 
-        # 设置ApiClient
+        # 设置Client
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        token = Token('access_token')  # 填上取得的token（可通过OAuth2取得）
         client = Client(app)
-        client.set_token(token)
+        client.set_access_token('access_token')  # 填上取得的token（可通过OAuth2取得）
 
         # 获取用户信息，对应的接口是：users/show
         r = client.users.show(uid=1904178193)
@@ -71,8 +69,7 @@ OAuth2使用方法：
 
 .. code-block:: python
 
-        from chinaapi.sina.weibo.open import OAuth2
-        from chinaapi.utils.open import App
+        from chinaapi.sina.weibo.open import OAuth2, App
 
 
         # 设置App，填上自己的app_key，app_secret；redirect_uri可不填
@@ -114,8 +111,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
 .. code-block:: python
 
-        from chinaapi.taobao.open import Client
-        from chinaapi.utils.open import App
+        from chinaapi.taobao.open import Client, App
 
 
         # client的设置
@@ -152,17 +148,14 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
 .. code-block:: python
 
-        from chinaapi.qq.weibo.open import Client
-        from chinaapi.utils.open import App, Token
+        from chinaapi.qq.weibo.open import Client, App
 
 
         # client的设置
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        token = Token('access_token')       # 填上取得的access_token
-        openid = 'openid'                   # 填上取得的openid
         client = Client(app)
-        client.set_token(token)
-        client.set_openid(openid)
+        client.set_access_token('access_token')  # 填上取得的access_token
+        client.set_openid('openid')  # 填上取得的openid
 
         # 获取当前登录用户的信息，对应的接口是：user/info
         # 返回结果r是json中的data值
@@ -206,15 +199,13 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
 .. code-block:: python
 
-        from chinaapi.renren.open import Client
-        from chinaapi.utils.open import App, Token
+        from chinaapi.renren.open import Client, App
 
 
         # client的设置
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        token = Token('access_token')  # 填上取得的access_token
         client = Client(app)
-        client.set_token(token)
+        client.set_access_token('access_token')  # 填上取得的access_token
 
         # 获取用户信息，对应的接口是：/v2/user/get
         r = client.user.get(userId=334258249)

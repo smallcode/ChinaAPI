@@ -1,8 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.taobao.open import Client
+from chinaapi.taobao.open import Client, App
 from chinaapi.utils.exceptions import ApiError
-from chinaapi.utils.open import App
 
 
 class TaobaoTest(TestCase):
