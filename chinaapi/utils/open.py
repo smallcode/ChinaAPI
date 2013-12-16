@@ -12,7 +12,7 @@ class Method(object):
 
 
 class Token(object):
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None):
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
         """
         access_token：访问令牌
         expired_at：令牌到期日期，为timestamp格式
@@ -23,6 +23,7 @@ class Token(object):
         self.expired_at = None
         self.refresh_token = refresh_token
         self.expires_in = expires_in
+        self.data = kwargs
 
     def _get_expires_in(self):
         if self.expired_at:
@@ -39,6 +40,9 @@ class Token(object):
     @property
     def is_expires(self):
         return not self.access_token or (self.expired_at is not None and time.time() > self.expired_at)
+
+    def __getattr__(self, item):
+        return self.data[item]
 
 
 class App(object):
@@ -175,3 +179,7 @@ class OAuth2Base(OAuthBase):
         kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type=grant_type)
         response = self._session.post(self._get_access_token_url(), data=kwargs)
         return self._parse_token(response)
+
+    def refresh_token(self, refresh_token, **kwargs):
+        kwargs.update(refresh_token=refresh_token)
+        return self.access_token(**kwargs)

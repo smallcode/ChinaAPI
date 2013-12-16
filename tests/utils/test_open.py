@@ -44,7 +44,7 @@ class ClientTest(RequestBase):
     def setUp(self):
         super(ClientTest, self).setUp()
         self.client = ApiClient(self.app)
-        self.client.set_access_token('access_token', 60*60)
+        self.client.set_access_token('access_token', 60 * 60)
 
     def register_get_uri(self):
         httpretty.register_uri(httpretty.GET, self.GET_URL, body=self.JSON_BODY, content_type=self.CONTENT_TYPE)
@@ -162,6 +162,15 @@ class TokenTest(TestCase):
 
     def test_set_expires_in(self):
         expires_in = 60 * 60
-        token = Token('token_string')
-        token.expires_in = expires_in
+        token = Token('token_string', expires_in)
         self.assertAlmostEqual(expires_in, token.expires_in, -1)
+
+    def test_get_attr(self):
+        uid = 123
+        token = Token(uid=uid)
+        self.assertEqual(uid, token.uid)
+
+    def test_get_not_exist_attr(self):
+        token = Token()
+        with self.assertRaises(KeyError):
+            _ = token.not_exist_attr

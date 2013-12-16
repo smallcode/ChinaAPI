@@ -11,9 +11,9 @@ class Token(TokenBase):
     douban_user_id：豆瓣用户ID
     """
 
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, douban_user_id=None):
-        super(Token, self).__init__(access_token, expires_in, refresh_token)
-        self.douban_user_id = douban_user_id
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
+        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
+        self.douban_user_id = kwargs.pop('douban_user_id', None)
 
 
 class OAuth2(OAuth2Base):

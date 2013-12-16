@@ -132,20 +132,18 @@ class Token(TokenBase):
     w2_expires_in：w2级别API或字段的访问过期时间
     """
 
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, taobao_user_nick=None, taobao_user_id=None,
-                 sub_taobao_user_nick=None, sub_taobao_user_id=None, token_type=None, re_expires_in=None,
-                 r1_expires_in=None, r2_expires_in=None, w1_expires_in=None, w2_expires_in=None):
-        super(Token, self).__init__(access_token, expires_in, refresh_token)
-        self.taobao_user_nick = taobao_user_nick
-        self.taobao_user_id = taobao_user_id
-        self.sub_taobao_user_nick = sub_taobao_user_nick
-        self.sub_taobao_user_id = sub_taobao_user_id
-        self.token_type = token_type
-        self.re_expires_in = re_expires_in
-        self.r1_expires_in = r1_expires_in
-        self.r2_expires_in = r2_expires_in
-        self.w1_expires_in = w1_expires_in
-        self.w2_expires_in = w2_expires_in
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
+        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
+        self.taobao_user_nick = kwargs.pop('taobao_user_nick', None)
+        self.taobao_user_id = kwargs.pop('taobao_user_id', None)
+        self.sub_taobao_user_nick = kwargs.pop('sub_taobao_user_nick', None)
+        self.sub_taobao_user_id = kwargs.pop('sub_taobao_user_id', None)
+        self.token_type = kwargs.pop('token_type', None)
+        self.re_expires_in = kwargs.pop('re_expires_in', None)
+        self.r1_expires_in = kwargs.pop('r1_expires_in', None)
+        self.r2_expires_in = kwargs.pop('r2_expires_in', None)
+        self.w1_expires_in = kwargs.pop('w1_expires_in', None)
+        self.w2_expires_in = kwargs.pop('w2_expires_in', None)
 
 
 class OAuth2(OAuth2Base):
@@ -161,10 +159,6 @@ class OAuth2(OAuth2Base):
 
     def _get_access_token_url(self):
         return self._url + 'token'
-
-    def refresh_token(self, refresh_token, **kwargs):
-        kwargs.update(refresh_token=refresh_token)
-        return super(OAuth2, self).access_token(**kwargs)
 
     def logoff(self, view='web'):
         """ 退出登录帐号，目前只支持web访问，起到的作用是清除taobao.com的cookie，并不是取消用户的授权。在WAP上访问无效。

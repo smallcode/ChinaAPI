@@ -67,10 +67,10 @@ class Token(TokenBase):
     uid：授权用户的uid
     created_at：令牌创建日期，为timestamp格式
     """
-    def __init__(self, access_token=None, expires_in=None, uid=None, created_at=None):
-        super(Token, self).__init__(access_token, expires_in, None)
-        self.uid = uid
-        self.created_at = created_at
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
+        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
+        self.uid = kwargs.pop('uid', None)
+        self.created_at = kwargs.pop('created_at', None)
 
 
 class OAuth2(OAuth2Base):
@@ -82,12 +82,10 @@ class OAuth2(OAuth2Base):
 
     def _parse_token(self, response):
         data = super(OAuth2, self)._parse_token(response)
-        token = Token()
-        token.access_token = data.get('access_token', None)
-        token.uid = data.get('uid', None)
-        token.created_at = data.get('create_at', None)
-        token.expires_in = data.get('expires_in', data.get('expire_in', None))
-        return token
+        data['created_at'] = data.pop('create_at', None)
+        if 'expires_in' not in data:
+            data['expires_in'] = data.pop('expire_in', None)
+        return Token(**data)
 
     def revoke(self, access_token):
         """ 取消授权

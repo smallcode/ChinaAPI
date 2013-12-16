@@ -52,14 +52,13 @@ class Token(TokenBase):
             self.name = name
             self.avatar = avatar
 
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, token_type=None, scope=None, user=None,
-                 mac_algorithm=None, mac_key=None):
-        super(Token, self).__init__(access_token, expires_in, refresh_token)
-        self.token_type = token_type
-        self.scope = scope
-        self.user = user
-        self.mac_algorithm = mac_algorithm
-        self.mac_key = mac_key
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
+        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
+        self.token_type = kwargs.pop('token_type', None)
+        self.scope = kwargs.pop('scope', None)
+        self.user = kwargs.pop('user', None)
+        self.mac_algorithm = kwargs.pop('mac_algorithm', None)
+        self.mac_key = kwargs.pop('mac_key', None)
 
 
 class OAuth2(OAuth2Base):

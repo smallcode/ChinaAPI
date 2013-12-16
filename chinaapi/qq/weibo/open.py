@@ -100,11 +100,11 @@ class Token(TokenBase):
     openkey：与openid对应的用户key，是验证openid身份的验证密钥
     """
 
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, openid=None, openkey=None, name=None):
-        super(Token, self).__init__(access_token, expires_in, refresh_token)
-        self.openid = openid
-        self.openkey = openkey
-        self.name = name
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
+        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
+        self.openid = kwargs.pop('openid', None)
+        self.openkey = kwargs.pop('openkey', None)
+        self.name = kwargs.pop('name', None)
 
 
 class OAuth2(OAuth2Base):
