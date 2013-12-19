@@ -108,9 +108,6 @@ class Client(ClientBase):
 
 
 class OAuthResponse(Response):
-    def __init__(self, response):
-        super(OAuthResponse, self).__init__(response)
-
     def json(self):
         r = super(OAuthResponse, self).json()
         if 'error' in r:

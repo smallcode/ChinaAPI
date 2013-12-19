@@ -12,9 +12,6 @@ from chinaapi.utils import jsonDict
 App = App
 
 class ApiResponse(Response):
-    def __init__(self, response):
-        super(ApiResponse, self).__init__(response)
-
     def json(self):
         r = super(ApiResponse, self).json()
         if 'error_code' in r:

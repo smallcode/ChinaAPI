@@ -30,9 +30,6 @@ RET = {
 
 
 class ApiResponse(Response):
-    def __init__(self, response):
-        super(ApiResponse, self).__init__(response)
-
     def json(self):
         r = super(ApiResponse, self).json()
         if 'ret' in r and r.ret != 0:
