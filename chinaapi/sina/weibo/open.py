@@ -32,7 +32,7 @@ class Client(ClientBase):
     def _prepare_url(self, segments, queries):
         if 'pic' in queries:
             prefix = 'upload.'
-        elif 'remind' in segments:
+        elif 'remind' == segments[0]:
             prefix = 'rm.'
         else:
             prefix = ''
