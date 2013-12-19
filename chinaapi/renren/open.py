@@ -32,7 +32,7 @@ class Client(ClientBase):
     def _parse_response(self, response):
         r = super(Client, self)._parse_response(response)
         if 'error' in r and 'code' in r.error:
-            raise ApiResponseError(response, r.error.get('code', ''), r.error.get('message', ''))
+            raise ApiResponseError(response, r.error.code, r.error.get('message', ''))
         return r
 
 
