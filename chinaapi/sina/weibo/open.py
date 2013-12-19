@@ -9,6 +9,8 @@ from chinaapi.utils.exceptions import ApiResponseError
 from chinaapi.utils import jsonDict
 
 
+App = App
+
 class ApiResponse(Response):
     def __init__(self, response):
         super(ApiResponse, self).__init__(response)
@@ -149,13 +151,3 @@ class OAuth2(OAuth2Base):
             code_url = r.headers['location']
         code = self._parse_querystring((urlparse(code_url)).query)['code']
         return self.access_token(code=code)
-
-
-class WeicoAndroidApp(App):
-    def __init__(self):
-        super(WeicoAndroidApp, self).__init__('211160679', '63b64d531b98c2dbff2443816f274dd3')
-
-
-class WeicoIphoneApp(App):
-    def __init__(self):
-        super(WeicoIphoneApp, self).__init__('82966982', '72d4545a28a46a6f329c4f2b1e949e6a')
