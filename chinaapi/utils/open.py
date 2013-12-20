@@ -144,10 +144,8 @@ class OAuth2Base(OAuthBase):
         """  授权
         返回授权链接
         """
-        if 'response_type' not in kwargs:
-            kwargs['response_type'] = 'code'
-        if 'redirect_uri' not in kwargs:
-            kwargs['redirect_uri'] = self.app.redirect_uri
+        kwargs.setdefault('response_type', 'code')
+        kwargs.setdefault('redirect_uri', self.app.redirect_uri)
         kwargs['client_id'] = self.app.key
         url = self._request_url(self._get_authorize_url(), kwargs)
         if not kwargs['redirect_uri']:
@@ -166,8 +164,7 @@ class OAuth2Base(OAuthBase):
         """
         if 'code' in kwargs:
             grant_type = 'authorization_code'
-            if 'redirect_uri' not in kwargs:
-                kwargs['redirect_uri'] = self.app.redirect_uri
+            kwargs.setdefault('redirect_uri', self.app.redirect_uri)
             if not kwargs['redirect_uri']:
                 raise MissingRedirectUri(self._get_access_token_url())
         elif 'refresh_token' in kwargs:
@@ -181,5 +178,5 @@ class OAuth2Base(OAuthBase):
         return self._parse_token(response)
 
     def refresh_token(self, refresh_token, **kwargs):
-        kwargs.update(refresh_token=refresh_token)
+        kwargs['refresh_token'] = refresh_token
         return self.access_token(**kwargs)
