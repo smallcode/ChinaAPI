@@ -9,8 +9,6 @@ from chinaapi.utils.open import ClientBase, OAuthBase, OAuth2Base, App, Token as
 from chinaapi.utils.exceptions import ApiResponseError, ApiError
 
 
-App = App
-
 VALUE_TO_STR = {
     type(datetime.now()): lambda v: v.strftime('%Y-%m-%d %H:%M:%S'),
     type(u'a'): lambda v: v.encode('utf-8'),
@@ -41,7 +39,7 @@ def join_dict(data):
 
 
 class Client(ClientBase):
-    def __init__(self, app, retry_count=3):
+    def __init__(self, app=App(), retry_count=3):
         super(Client, self).__init__(app)
         self._retry_count = retry_count
 

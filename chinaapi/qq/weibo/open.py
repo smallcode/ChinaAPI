@@ -3,7 +3,6 @@ from chinaapi.utils.api import Response
 from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
 from chinaapi.utils.exceptions import InvalidApi, ApiResponseError
 
-App = App
 
 IS_POST_METHOD = {
     'user': lambda m: m in ['verify'],
@@ -43,7 +42,7 @@ class Client(ClientBase):
     #写接口
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
-    def __init__(self, app):
+    def __init__(self, app=App()):
         super(Client, self).__init__(app)
         self.openid = None
         self.clientip = None

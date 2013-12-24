@@ -3,9 +3,6 @@ from chinaapi.utils.exceptions import ApiResponseError
 from chinaapi.utils.open import OAuth2Base, Token as TokenBase, App
 
 
-App = App
-
-
 class Token(TokenBase):
     """
     douban_user_id：豆瓣用户ID
@@ -17,7 +14,7 @@ class Token(TokenBase):
 
 
 class OAuth2(OAuth2Base):
-    def __init__(self, app):
+    def __init__(self, app=App()):
         super(OAuth2, self).__init__(app, 'https://www.douban.com/service/auth2/')
 
     def _prepare_access_token_url(self):

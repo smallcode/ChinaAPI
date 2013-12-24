@@ -3,14 +3,11 @@ from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBa
 from chinaapi.utils.exceptions import ApiResponseError
 
 
-App = App
-
-
 class Client(ClientBase):
     #写入接口
     _post_methods = ['put', 'share', 'remove', 'upload']
 
-    def __init__(self, app):
+    def __init__(self, app=App()):
         super(Client, self).__init__(app)
 
     def _prepare_url(self, segments, queries):
