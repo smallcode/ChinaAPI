@@ -24,9 +24,6 @@ class Client(ClientBase):
     #含下划线的写入接口，如：statuses/upload_url_text
     _underlined_post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
 
-    def __init__(self, app=App()):
-        super(Client, self).__init__(app, Token())
-
     def _prepare_url(self, segments, queries):
         if 'pic' in queries:
             prefix = 'upload.'

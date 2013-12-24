@@ -7,9 +7,6 @@ class Client(ClientBase):
     #写入接口
     _post_methods = ['put', 'share', 'remove', 'upload']
 
-    def __init__(self, app=App()):
-        super(Client, self).__init__(app)
-
     def _prepare_url(self, segments, queries):
         return 'https://api.renren.com/v2/{0}'.format('/'.join(segments))
 

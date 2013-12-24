@@ -43,7 +43,7 @@ class Client(ClientBase):
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
     def __init__(self, app=App()):
-        super(Client, self).__init__(app)
+        super(Client, self).__init__(app, Token())
         self.openid = None
         self.clientip = None
 

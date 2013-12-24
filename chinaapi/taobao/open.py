@@ -40,7 +40,7 @@ def join_dict(data):
 
 class Client(ClientBase):
     def __init__(self, app=App(), retry_count=3):
-        super(Client, self).__init__(app)
+        super(Client, self).__init__(app, Token())
         self._retry_count = retry_count
 
     @property
