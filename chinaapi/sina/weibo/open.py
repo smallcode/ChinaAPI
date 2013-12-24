@@ -9,14 +9,13 @@ from chinaapi.utils.exceptions import ApiResponseError
 from chinaapi.utils import jsonDict
 
 
-App = App
-
 class ApiResponse(Response):
     def json(self):
         r = super(ApiResponse, self).json()
         if 'error_code' in r:
             raise ApiResponseError(self.response, r.error_code, r.get('error', ''))
         return r
+
 
 class Client(ClientBase):
     #写入接口
@@ -25,8 +24,8 @@ class Client(ClientBase):
     #含下划线的写入接口，如：statuses/upload_url_text
     _underlined_post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
 
-    def __init__(self, app):
-        super(Client, self).__init__(app)
+    def __init__(self, app_key=''):
+        super(Client, self).__init__(App(app_key), Token())
 
     def _prepare_url(self, segments, queries):
         if 'pic' in queries:
@@ -66,6 +65,7 @@ class Token(TokenBase):
     uid：授权用户的uid
     created_at：令牌创建日期，为timestamp格式
     """
+
     def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
         super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
         self.uid = kwargs.pop('uid', None)

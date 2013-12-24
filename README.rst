@@ -35,21 +35,19 @@ Client使用方法：
 
 .. code-block:: python
 
-        from chinaapi.sina.weibo.open import Client, App
+        from chinaapi.sina.weibo.open import Client
 
 
-        # 设置Client
-        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        client = Client(app)
+        client = Client()
         client.set_access_token('access_token')  # 填上取得的token（可通过OAuth2取得）
 
         # 获取用户信息，对应的接口是：users/show
-        r = client.users.show(uid=1904178193)
+        r = client.users.show(uid=123456)
         print r.name  # 显示用户名
 
         # 发布带图片的微博，对应的接口是：statuses/upload
-        pic = open('pic.jpg', 'rb')
-        r = client.statuses.upload(status=u'发布的内容', pic=pic)
+        with open('pic.jpg', 'rb') as pic:
+            r = client.statuses.upload(status=u'发布的内容', pic=pic)
         print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 
 

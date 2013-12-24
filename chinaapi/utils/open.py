@@ -46,7 +46,7 @@ class Token(object):
 
 
 class App(object):
-    def __init__(self, key, secret='', redirect_uri=''):
+    def __init__(self, key='', secret='', redirect_uri=''):
         self.key = key
         self.secret = secret
         self.redirect_uri = redirect_uri
@@ -70,7 +70,7 @@ class ClientWrapper(object):
 
 
 class ClientBase(Request):
-    def __init__(self, app, token=Token()):
+    def __init__(self, app=App(), token=Token()):
         super(ClientBase, self).__init__()
         self.app = app
         self.token = token
