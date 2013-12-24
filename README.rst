@@ -161,8 +161,8 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
         print r.name  # 显示用户名
 
         # 发布一条带图片的微博，对应的接口是：t/add_pic
-        pic = open('pic.jpg', 'rb')
-        r = client.t.add_pic(content=u'发布的内容', pic=pic)
+        with open('pic.jpg', 'rb') as pic:
+            r = client.t.add_pic(content=u'发布的内容', pic=pic)
         print r.id  # 显示微博的ID
 
         # 删除一条微博，对应的接口是：t/del
