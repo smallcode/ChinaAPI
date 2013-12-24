@@ -23,7 +23,7 @@ class Token(object):
         self.expired_at = None
         self.refresh_token = refresh_token
         self.expires_in = expires_in
-        self.data = kwargs
+        self._data = kwargs
 
     def _get_expires_in(self):
         if self.expired_at:
@@ -42,11 +42,11 @@ class Token(object):
         return not self.access_token or (self.expired_at is not None and time.time() > self.expired_at)
 
     def __getattr__(self, item):
-        return self.data[item]
+        return self._data[item]
 
 
 class App(object):
-    def __init__(self, key, secret, redirect_uri=''):
+    def __init__(self, key, secret='', redirect_uri=''):
         self.key = key
         self.secret = secret
         self.redirect_uri = redirect_uri
@@ -134,10 +134,10 @@ class OAuth2Base(OAuthBase):
     def _parse_token(self, response):
         return self._parse_response(response)
 
-    def _get_authorize_url(self):
+    def _prepare_authorize_url(self):
         return self._url + 'authorize'
 
-    def _get_access_token_url(self):
+    def _prepare_access_token_url(self):
         return self._url + 'access_token'
 
     def authorize(self, **kwargs):
@@ -147,7 +147,7 @@ class OAuth2Base(OAuthBase):
         kwargs.setdefault('response_type', 'code')
         kwargs.setdefault('redirect_uri', self.app.redirect_uri)
         kwargs['client_id'] = self.app.key
-        url = self._request_url(self._get_authorize_url(), kwargs)
+        url = self._request_url(self._prepare_authorize_url(), kwargs)
         if not kwargs['redirect_uri']:
             raise MissingRedirectUri(url)
         return url
@@ -166,7 +166,7 @@ class OAuth2Base(OAuthBase):
             grant_type = 'authorization_code'
             kwargs.setdefault('redirect_uri', self.app.redirect_uri)
             if not kwargs['redirect_uri']:
-                raise MissingRedirectUri(self._get_access_token_url())
+                raise MissingRedirectUri(self._prepare_access_token_url())
         elif 'refresh_token' in kwargs:
             grant_type = 'refresh_token'
         elif 'username' in kwargs and 'password' in kwargs:
@@ -174,7 +174,7 @@ class OAuth2Base(OAuthBase):
         else:
             grant_type = 'client_credentials'
         kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type=grant_type)
-        response = self._session.post(self._get_access_token_url(), data=kwargs)
+        response = self._session.post(self._prepare_access_token_url(), data=kwargs)
         return self._parse_token(response)
 
     def refresh_token(self, refresh_token, **kwargs):

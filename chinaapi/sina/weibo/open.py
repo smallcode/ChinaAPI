@@ -140,7 +140,7 @@ class OAuth2(OAuth2Base):
             "Referer": self.authorize()
         }
 
-        url = self._get_authorize_url()
+        url = self._prepare_authorize_url()
         r = self._session.post(url, data=data, headers=headers, allow_redirects=allow_redirects)
         if allow_redirects:
             code_url = r.url

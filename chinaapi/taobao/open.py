@@ -155,7 +155,7 @@ class OAuth2(OAuth2Base):
         data = super(OAuth2, self)._parse_token(response)
         return Token(**data)
 
-    def _get_access_token_url(self):
+    def _prepare_access_token_url(self):
         return self._url + 'token'
 
     def logoff(self, view='web'):

@@ -20,10 +20,10 @@ class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://www.douban.com/service/auth2/')
 
-    def _get_access_token_url(self):
+    def _prepare_access_token_url(self):
         return self._url + 'token'
 
-    def _get_authorize_url(self):
+    def _prepare_authorize_url(self):
         return self._url + 'auth'
 
     def _parse_token(self, response):
