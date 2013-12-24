@@ -197,7 +197,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
 .. code-block:: python
 
-        from chinaapi.renren.open import Client, App
+        from chinaapi.renren.open import Client
 
 
         client = Client()
