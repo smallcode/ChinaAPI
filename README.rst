@@ -200,9 +200,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
         from chinaapi.renren.open import Client, App
 
 
-        # client的设置
-        app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        client = Client(app)
+        client = Client()
         client.set_access_token('access_token')  # 填上取得的access_token
 
         # 获取用户信息，对应的接口是：/v2/user/get
@@ -210,8 +208,8 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
         print r.name  # 显示用户名
 
         # 上传照片至用户相册，对应的接口是：/v2/photo/upload
-        file = open('pic.jpg', 'rb')
-        r = client.photo.upload(file=file)
+        with open('pic.jpg', 'rb') as pic:
+            r = client.photo.upload(file=pic)
         print r.id  # 显示照片的ID
 
 
