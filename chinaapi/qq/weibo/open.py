@@ -82,10 +82,6 @@ class Client(ClientBase):
         if 'clientip' not in queries and self.clientip:
             queries['clientip'] = self.clientip
 
-    def _prepare_body(self, queries):
-        files = self._isolated_files(queries, ['pic'])
-        return queries, files
-
     def _parse_response(self, response):
         return ApiResponse(response).json()
 

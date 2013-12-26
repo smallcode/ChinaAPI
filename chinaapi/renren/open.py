@@ -19,10 +19,6 @@ class Client(ClientBase):
         if not self.token.is_expires:
             queries['access_token'] = self.token.access_token
 
-    def _prepare_body(self, queries):
-        files = self._isolated_files(queries, ['file'])
-        return queries, files
-
     def _parse_response(self, response):
         r = super(Client, self)._parse_response(response)
         if 'error' in r and 'code' in r.error:

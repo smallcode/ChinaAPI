@@ -49,10 +49,6 @@ class Client(ClientBase):
         else:
             self._session.headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
 
-    def _prepare_body(self, queries):
-        files = self._isolated_files(queries, ['pic', 'image'])
-        return queries, files
-
     def _parse_response(self, response):
         return ApiResponse(response).json()
 

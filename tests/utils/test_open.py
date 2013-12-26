@@ -80,15 +80,6 @@ class ClientTest(RequestBase):
             self.assertPost(response)
             self.assertTrue('multipart/form-data' in response.request.headers['Content-Type'])
 
-    def test_isolated_files(self):
-        with open('images/pic.jpg', 'rb') as pic:
-            queries = dict(pic=pic, id=123)
-            files = self.client._isolated_files(queries, ['pic'])
-            self.assertEqual(1, len(files))
-            self.assertEqual(pic, files['pic'])
-            self.assertEqual(1, len(queries))
-            self.assertEqual(123, queries['id'])
-
 
 class NotImplementedClientTest(RequestBase):
     def setUp(self):

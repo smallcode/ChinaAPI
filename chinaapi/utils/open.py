@@ -79,12 +79,6 @@ class ClientBase(Request):
     def set_access_token(self, access_token, expires_in=None):
         self.token = Token(access_token, expires_in)
 
-    @staticmethod
-    def _isolated_files(queries, file_keys):
-        for key in file_keys:
-            if key in queries:
-                return {key: queries.pop(key)}
-
     def _prepare_method(self, segments):
         return Method.POST
 
@@ -95,13 +89,10 @@ class ClientBase(Request):
         pass
 
     def _prepare_body(self, queries):
-        data, files = {}, {}
+        results = ({}, {})
         for k, v in queries.items():
-            if hasattr(v, 'read'):  # 判断是否为文件
-                files[k] = v
-            else:
-                data[k] = v
-        return data, files
+            results[hasattr(v, 'read')][k] = v
+        return results
 
     def request(self, segments, **queries):
         url = self._prepare_url(segments, queries)
