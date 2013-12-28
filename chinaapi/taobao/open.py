@@ -8,16 +8,14 @@ from chinaapi.utils.api import Response
 from chinaapi.utils.open import ClientBase, OAuthBase, OAuth2Base, App, Token as TokenBase
 from chinaapi.utils.exceptions import ApiResponseError, ApiError
 
-
+DEFAULT_RETRIES = 3
+DEFAULT_VALUE_TO_STR = lambda x: str(x)
 VALUE_TO_STR = {
     type(datetime.now()): lambda v: v.strftime('%Y-%m-%d %H:%M:%S'),
     type(u'a'): lambda v: v.encode('utf-8'),
     type(0.1): lambda v: "%.2f" % v,
     type(True): lambda v: str(v).lower(),
 }
-
-DEFAULT_VALUE_TO_STR = lambda x: str(x)
-
 RETRY_SUB_CODES = {
     'isp.top-remote-connection-timeout',
     'isp.top-remote-connection-timeout-tmall',
@@ -39,9 +37,9 @@ def join_dict(data):
 
 
 class Client(ClientBase):
-    def __init__(self, app=App(), retry_count=3):
+    def __init__(self, app=App(), retries=DEFAULT_RETRIES):
         super(Client, self).__init__(app, Token())
-        self._retry_count = retry_count
+        self._retry_count = retries
 
     @property
     def session(self):
