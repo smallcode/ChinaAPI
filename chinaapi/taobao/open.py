@@ -39,7 +39,7 @@ def join_dict(data):
 class Client(ClientBase):
     def __init__(self, app=App(), retries=DEFAULT_RETRIES):
         super(Client, self).__init__(app, Token())
-        self._retry_count = retries
+        self._retries = retries
 
     @property
     def session(self):
@@ -81,7 +81,7 @@ class Client(ClientBase):
         url = self._prepare_url(segments, queries)
         self._prepare_queries(queries)
         data, files = self._prepare_body(queries)
-        for count in xrange(self._retry_count, 0, -1):
+        for count in xrange(self._retries, 0, -1):
             try:
                 response = self._session.post(url, data=data, files=files)
                 return self._parse_response(response)
