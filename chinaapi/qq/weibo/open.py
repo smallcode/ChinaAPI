@@ -72,9 +72,7 @@ class Client(ClientBase):
         return Method.GET
 
     def _prepare_queries(self, queries):
-        queries['oauth_version'] = '2.a'
-        queries['format'] = 'json'
-        queries['oauth_consumer_key'] = self.app.key
+        queries.update(oauth_version='2.a', format='json', oauth_consumer_key=self.app.key)
         if not self.token.is_expires:
             queries['access_token'] = self.token.access_token
         if self.openid:
