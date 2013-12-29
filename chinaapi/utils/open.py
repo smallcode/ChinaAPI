@@ -25,21 +25,23 @@ class Token(object):
         self.expires_in = expires_in
         self._data = kwargs
 
+    @classmethod
+    def _now(cls):
+        return int(time.time())
+
     def _get_expires_in(self):
         if self.expired_at:
-            current = int(time.time())
-            return self.expired_at - current
+            return self.expired_at - self._now()
 
     def _set_expires_in(self, expires_in):
         if expires_in:
-            current = int(time.time())
-            self.expired_at = int(expires_in) + current
+            self.expired_at = int(expires_in) + self._now()
 
     expires_in = property(_get_expires_in, _set_expires_in)
 
     @property
     def is_expires(self):
-        return not self.access_token or (self.expired_at is not None and time.time() > self.expired_at)
+        return not self.access_token or (self.expired_at is not None and self._now() > self.expired_at)
 
     def __getattr__(self, item):
         return self._data[item]
