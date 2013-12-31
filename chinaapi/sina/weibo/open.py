@@ -31,7 +31,14 @@ class Client(ClientBase):
             prefix = 'rm.'
         else:
             prefix = ''
-        return 'https://{0}api.weibo.com/2/{1}.json'.format(prefix, '/'.join(segments))
+        url = 'https://{0}api.weibo.com/2/{1}.json'.format(prefix, '/'.join(segments))
+        if 'like' in segments:
+            # like操作需source和access_token参数，否则无法执行
+            queries['source'] = self.app.key
+            if not self.token.is_expires:
+                queries['access_token'] = self.token.access_token
+            return url.replace('weibo.com', 'weibo.cn')
+        return url
 
     def _prepare_method(self, segments):
         segment = segments[-1].lower()
