@@ -1,5 +1,5 @@
 # coding=utf-8
-from chinaapi.utils.api import Request
+from .request import Request
 
 
 class ClientBase(Request):

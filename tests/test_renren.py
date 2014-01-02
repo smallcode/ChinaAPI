@@ -1,7 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
 from chinaapi.renren.open import Client, App
-from chinaapi.utils.exceptions import ApiError, NotExistApi
+from chinaapi.exceptions import ApiError, NotExistApi
 
 
 class RenRenTest(TestCase):

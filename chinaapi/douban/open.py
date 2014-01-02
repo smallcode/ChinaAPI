@@ -1,6 +1,6 @@
 # coding=utf-8
-from chinaapi.utils.exceptions import ApiResponseError
-from chinaapi.utils.open import OAuth2Base, Token as TokenBase, App
+from chinaapi.exceptions import ApiResponseError
+from chinaapi.open import OAuth2Base, Token as TokenBase, App
 
 
 class Token(TokenBase):

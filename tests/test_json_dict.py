@@ -1,6 +1,6 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.utils.jsonDict import JsonDict, loads
+from chinaapi.jsonDict import JsonDict, loads
 
 
 class JsonDictTest(TestCase):

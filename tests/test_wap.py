@@ -1,6 +1,6 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.utils.web import ClientBase
+from chinaapi.wap import ClientBase
 
 
 class ApiClient(ClientBase):

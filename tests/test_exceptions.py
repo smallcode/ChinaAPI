@@ -1,6 +1,6 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.utils.exceptions import ApiError, MutexApiParameters
+from chinaapi.exceptions import ApiError, MutexApiParameters
 
 
 class ExceptionTest(TestCase):

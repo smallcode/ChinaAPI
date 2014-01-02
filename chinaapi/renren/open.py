@@ -1,6 +1,9 @@
 # coding=utf-8
-from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
-from chinaapi.utils.exceptions import ApiResponseError
+from chinaapi.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
+from chinaapi.exceptions import ApiResponseError
+
+
+App = App
 
 
 class Client(ClientBase):

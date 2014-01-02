@@ -3,9 +3,13 @@ import base64
 import hashlib
 import hmac
 from urlparse import urlparse
-from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
-from chinaapi.utils.exceptions import ApiResponseError
-from chinaapi.utils import jsonDict
+from chinaapi.utils import parse_querystring
+from chinaapi.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
+from chinaapi.exceptions import ApiResponseError
+from chinaapi.jsonDict import loads
+
+
+App = App
 
 
 def parse(response):
@@ -112,7 +116,7 @@ class OAuth2(OAuth2Base):
 
         encoded_sign, encoded_data = signed_request.split('.', 1)
         sign = base64decode(encoded_sign)
-        data = jsonDict.loads(base64decode(encoded_data))
+        data = loads(base64decode(encoded_data))
         token = Token()
         token.access_token = data.oauth_token
         token.created_at = data.issued_at
@@ -144,5 +148,5 @@ class OAuth2(OAuth2Base):
             code_url = r.url
         else:
             code_url = r.headers['location']
-        code = self._parse_querystring((urlparse(code_url)).query)['code']
+        code = parse_querystring((urlparse(code_url)).query)['code']
         return self.access_token(code=code)

@@ -1,8 +1,11 @@
 # coding=utf-8
-import httpretty
 from unittest import TestCase
-from chinaapi.utils.api import Request
-from chinaapi.utils.exceptions import ApiResponseError, NotExistApi
+
+import httpretty
+
+from chinaapi.request import Request
+from chinaapi.exceptions import ApiResponseError, NotExistApi
+
 
 BASE_URL = 'http://test/'
 
@@ -23,7 +26,7 @@ class TestBase(TestCase):
                                content_type=self.CONTENT_TYPE)
 
 
-class ResponseTest(TestBase):
+class RequestTest(TestBase):
     HTTP404URL = BASE_URL + '404'
     NOT_JSON_RESPONSE_URL = BASE_URL + 'empty_response_uri'
 
@@ -59,14 +62,3 @@ class ResponseTest(TestBase):
         response = self.session.post(self.HTTP404URL)
         with self.assertRaises(NotExistApi):
             response.json_dict()
-
-
-class RequestTest(TestBase):
-    def setUp(self):
-        self.request = Request()
-
-    def test_querystring_to_dict(self):
-        r = self.request._parse_querystring("a=a&b=b")
-        self.assertEqual(2, len(r))
-        self.assertEqual('a', r['a'])
-        self.assertEqual('b', r['b'])

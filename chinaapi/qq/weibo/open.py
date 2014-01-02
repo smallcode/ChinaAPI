@@ -1,6 +1,7 @@
 # coding=utf-8
-from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
-from chinaapi.utils.exceptions import InvalidApi, ApiResponseError
+from chinaapi.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
+from chinaapi.exceptions import InvalidApi, ApiResponseError
+from chinaapi.utils import parse_querystring
 
 
 IS_POST_METHOD = {
@@ -103,7 +104,7 @@ class OAuth2(OAuth2Base):
         return parse(response)
 
     def _parse_token(self, response):
-        data = self._parse_querystring(response.text)
+        data = parse_querystring(response.text)
         if 'errorCode' in data:
             raise ApiResponseError(response, data['errorCode'], data.get('errorMsg', '').strip("'"))
         return Token(**data)

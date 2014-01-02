@@ -8,7 +8,6 @@ except ImportError:
 
 packages = [
     'chinaapi',
-    'chinaapi.utils',
     'chinaapi.douban',
     'chinaapi.qq',
     'chinaapi.qq.weibo',

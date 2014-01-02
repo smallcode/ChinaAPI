@@ -4,8 +4,9 @@ import hmac
 from hashlib import md5
 from datetime import datetime
 from urllib import unquote
-from chinaapi.utils.open import ClientBase, OAuthBase, OAuth2Base, App, Token as TokenBase
-from chinaapi.utils.exceptions import ApiResponseError, ApiError
+from chinaapi.open import ClientBase, OAuthBase, OAuth2Base, App, Token as TokenBase
+from chinaapi.exceptions import ApiResponseError, ApiError
+from chinaapi.utils import parse_querystring
 
 DEFAULT_RETRIES = 3
 DEFAULT_VALUE_TO_STR = lambda x: str(x)
@@ -191,8 +192,9 @@ class OAuth(OAuthBase):
         sign = base64.b64encode(md5(self.app.key + top_parameters + top_session + self.app.secret).digest())
         return top_sign == sign
 
-    def decode_parameters(self, top_parameters):
+    @staticmethod
+    def decode_parameters(top_parameters):
         """  将top_parameters字符串解码并转换为字典，（已测试成功，不要更改）
         """
         parameters = base64.decodestring(unquote(top_parameters))
-        return self._parse_querystring(parameters)
+        return parse_querystring(parameters)

@@ -1,9 +1,9 @@
 # coding=utf-8
 from unittest import TestCase
 import httpretty
-from chinaapi.utils.open import ClientBase, OAuth2Base, Method, Token, App
-from chinaapi.utils.exceptions import MissingRedirectUri
-from test_api import BASE_URL, TestBase
+from chinaapi.open import ClientBase, OAuth2Base, Method, Token, App
+from chinaapi.exceptions import MissingRedirectUri
+from test_request import BASE_URL, TestBase
 
 
 class ApiClient(ClientBase):

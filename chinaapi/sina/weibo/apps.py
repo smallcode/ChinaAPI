@@ -1,5 +1,5 @@
 # coding=utf-8
-from chinaapi.utils.open import App
+from chinaapi.open import App
 
 
 class WeicoAndroidApp(App):
