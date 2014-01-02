@@ -3,18 +3,16 @@ import base64
 import hashlib
 import hmac
 from urlparse import urlparse
-from chinaapi.utils.api import Response
 from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
 from chinaapi.utils.exceptions import ApiResponseError
 from chinaapi.utils import jsonDict
 
 
-class ApiResponse(Response):
-    def json(self):
-        r = super(ApiResponse, self).json()
-        if 'error_code' in r:
-            raise ApiResponseError(self.response, r.error_code, r.get('error', ''))
-        return r
+def parse(response):
+    r = response.json_dict()
+    if 'error_code' in r:
+        raise ApiResponseError(response, r.error_code, r.get('error', ''))
+    return r
 
 
 class Client(ClientBase):
@@ -23,6 +21,9 @@ class Client(ClientBase):
                      'shield', 'order']
     #含下划线的写入接口，如：statuses/upload_url_text
     _underlined_post_methods = ['add', 'upload', 'destroy', 'update', 'set', 'cancel', 'not']
+
+    def _parse_response(self, response):
+        return parse(response)
 
     def _prepare_url(self, segments, queries):
         if 'pic' in queries:
@@ -56,9 +57,6 @@ class Client(ClientBase):
         else:
             self._session.headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
 
-    def _parse_response(self, response):
-        return ApiResponse(response).json()
-
 
 class Token(TokenBase):
     """
@@ -77,7 +75,7 @@ class OAuth2(OAuth2Base):
         super(OAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
 
     def _parse_response(self, response):
-        return ApiResponse(response).json()
+        return parse(response)
 
     def _parse_token(self, response):
         data = super(OAuth2, self)._parse_token(response)

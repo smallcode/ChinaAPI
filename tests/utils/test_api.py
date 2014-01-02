@@ -1,8 +1,7 @@
 # coding=utf-8
 import httpretty
-import requests
 from unittest import TestCase
-from chinaapi.utils.api import Response, Request
+from chinaapi.utils.api import Request
 from chinaapi.utils.exceptions import ApiResponseError, NotExistApi
 
 BASE_URL = 'http://test/'
@@ -28,6 +27,10 @@ class ResponseTest(TestBase):
     HTTP404URL = BASE_URL + '404'
     NOT_JSON_RESPONSE_URL = BASE_URL + 'empty_response_uri'
 
+    def setUp(self):
+        self.request = Request()
+        self.session = self.request._session
+
     def register_not_json_response_uri(self):
         httpretty.register_uri(httpretty.POST, self.NOT_JSON_RESPONSE_URL, body='error_text',
                                content_type=self.CONTENT_TYPE)
@@ -39,24 +42,23 @@ class ResponseTest(TestBase):
     @httpretty.activate
     def test_parse_response(self):
         self.register_access_token_uri()
-        response = requests.post(self.ACCESS_TOKEN_URL)
-        r = Response(response)
-        self.assertToken(r.json())
+        response = self.session.post(self.ACCESS_TOKEN_URL)
+        self.assertToken(response.json_dict())
 
     @httpretty.activate
     def test_parse_not_json_response(self):
         self.register_not_json_response_uri()
-        response = requests.post(self.NOT_JSON_RESPONSE_URL)
+        response = self.session.post(self.NOT_JSON_RESPONSE_URL)
         with self.assertRaises(ApiResponseError) as cm:
-            Response(response).json()
+            response.json_dict()
         self.assertEqual('error_text', cm.exception.message)
 
     @httpretty.activate
     def test_parse_404_response(self):
         self.register_404_uri()
-        response = requests.post(self.HTTP404URL)
+        response = self.session.post(self.HTTP404URL)
         with self.assertRaises(NotExistApi):
-            Response(response).json()
+            response.json_dict()
 
 
 class RequestTest(TestBase):

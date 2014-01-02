@@ -1,5 +1,4 @@
 # coding=utf-8
-from chinaapi.utils.api import Response
 from chinaapi.utils.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
 from chinaapi.utils.exceptions import InvalidApi, ApiResponseError
 
@@ -28,14 +27,13 @@ RET = {
 }
 
 
-class ApiResponse(Response):
-    def json(self):
-        r = super(ApiResponse, self).json()
-        if 'ret' in r and r.ret != 0:
-            raise ApiResponseError(self.response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
-        if 'data' in r:
-            return r.data
-        return r
+def parse(response):
+    r = response.json_dict()
+    if 'ret' in r and r.ret != 0:
+        raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
+    if 'data' in r:
+        return r.data
+    return r
 
 
 class Client(ClientBase):
@@ -52,6 +50,9 @@ class Client(ClientBase):
 
     def set_clientip(self, clientip):
         self.clientip = clientip
+
+    def _parse_response(self, response):
+        return parse(response)
 
     def _prepare_url(self, segments, queries):
         """
@@ -80,9 +81,6 @@ class Client(ClientBase):
         if 'clientip' not in queries and self.clientip:
             queries['clientip'] = self.clientip
 
-    def _parse_response(self, response):
-        return ApiResponse(response).json()
-
 
 class Token(TokenBase):
     """
@@ -102,7 +100,7 @@ class OAuth2(OAuth2Base):
         super(OAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
 
     def _parse_response(self, response):
-        return ApiResponse(response).json()
+        return parse(response)
 
     def _parse_token(self, response):
         data = self._parse_querystring(response.text)

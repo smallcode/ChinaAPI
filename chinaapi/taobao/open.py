@@ -4,7 +4,6 @@ import hmac
 from hashlib import md5
 from datetime import datetime
 from urllib import unquote
-from chinaapi.utils.api import Response
 from chinaapi.utils.open import ClientBase, OAuthBase, OAuth2Base, App, Token as TokenBase
 from chinaapi.utils.exceptions import ApiResponseError, ApiError
 
@@ -93,7 +92,7 @@ class Client(ClientBase):
                 raise e
 
     def _parse_response(self, response):
-        r = super(Client, self)._parse_response(response)
+        r = response.json_dict()
         if 'error_response' in r:
             error = r.error_response
             raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
@@ -104,12 +103,11 @@ class Client(ClientBase):
                 return r.get(keys[0])
 
 
-class OAuthResponse(Response):
-    def json(self):
-        r = super(OAuthResponse, self).json()
-        if 'error' in r:
-            raise ApiResponseError(self.response, r.error, r.get('error_description', ''))
-        return r
+def parse(response):
+    r = response.json_dict()
+    if 'error' in r:
+        raise ApiResponseError(response, r.error, r.get('error_description', ''))
+    return r
 
 
 class Token(TokenBase):
@@ -145,7 +143,7 @@ class OAuth2(OAuth2Base):
         super(OAuth2, self).__init__(app, 'https://oauth.taobao.com/')
 
     def _parse_response(self, response):
-        return OAuthResponse(response).json()
+        return parse(response)
 
     def _parse_token(self, response):
         data = super(OAuth2, self)._parse_token(response)
@@ -170,7 +168,7 @@ class OAuth(OAuthBase):
         super(OAuth, self).__init__(app, 'http://container.open.taobao.com/container')
 
     def _parse_response(self, response):
-        return OAuthResponse(response).json()
+        return parse(response)
 
     def _sign_by_md5(self, data):
         message = join_dict(data) + self.app.secret
