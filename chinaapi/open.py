@@ -121,7 +121,6 @@ class OAuthBase(Request):
     def __init__(self, app):
         super(OAuthBase, self).__init__()
         self.app = app
-        # self._url = url
 
 
 class OAuth2Base(OAuthBase):
