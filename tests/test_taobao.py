@@ -12,8 +12,14 @@ class TaobaoTest(TestCase):
     """
 
     def setUp(self):
-        app = App('21532233', '1d5f36785a0bfb84952a69c5dd3203fd')
-        self.client = Client(app)
+        self.app = App('21532233', '1d5f36785a0bfb84952a69c5dd3203fd')
+        self.client = Client(self.app)
+
+    def test_session(self):
+        self.client = Client(self.app, 'session')
+        self.assertEqual(self.client.session, 'session')
+        self.client.session = 'session2'
+        self.assertEqual(self.client.session, 'session2')
 
     def test_itemcats_get(self):
         r = self.client.itemcats.get(cids=14)
