@@ -97,8 +97,11 @@ class Token(TokenBase):
 
 
 class OAuth2(OAuth2Base):
+    AUTH_URL = 'https://open.t.qq.com/cgi-bin/oauth2/authorize'
+    TOKEN_URL = 'https://open.t.qq.com/cgi-bin/oauth2/access_token'
+
     def __init__(self, app):
-        super(OAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
+        super(OAuth2, self).__init__(app)
 
     def _parse_token(self, response):
         data = parse_querystring(response.text)

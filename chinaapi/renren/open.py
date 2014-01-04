@@ -55,11 +55,11 @@ class Token(TokenBase):
 
 
 class OAuth2(OAuth2Base):
-    def __init__(self, app):
-        super(OAuth2, self).__init__(app, 'https://graph.renren.com/oauth/')
+    AUTH_URL = 'https://graph.renren.com/oauth/authorize'
+    TOKEN_URL = 'https://graph.renren.com/oauth/token'
 
-    def _prepare_access_token_url(self):
-        return self._url + 'token'
+    def __init__(self, app):
+        super(OAuth2, self).__init__(app)
 
     def _parse_token(self, response):
         r = response.json_dict()

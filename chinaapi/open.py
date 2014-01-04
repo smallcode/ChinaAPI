@@ -118,24 +118,21 @@ class ClientBase(Request):
 
 
 class OAuthBase(Request):
-    def __init__(self, app, url):
+    def __init__(self, app):
         super(OAuthBase, self).__init__()
         self.app = app
-        self._url = url
+        # self._url = url
 
 
 class OAuth2Base(OAuthBase):
-    def __init__(self, app, url):
-        super(OAuth2Base, self).__init__(app, url)
+    AUTH_URL = ''
+    TOKEN_URL = ''
+
+    def __init__(self, app):
+        super(OAuth2Base, self).__init__(app)
 
     def _parse_token(self, response):
         return response.json_dict()
-
-    def _prepare_authorize_url(self):
-        return self._url + 'authorize'
-
-    def _prepare_access_token_url(self):
-        return self._url + 'access_token'
 
     def authorize(self, **kwargs):
         """  授权
@@ -144,26 +141,25 @@ class OAuth2Base(OAuthBase):
         kwargs.setdefault('response_type', 'code')
         kwargs.setdefault('redirect_uri', self.app.redirect_uri)
         kwargs['client_id'] = self.app.key
-        url = request_url(self._prepare_authorize_url(), kwargs)
+        url = request_url(self.AUTH_URL, kwargs)
         if not kwargs['redirect_uri']:
             raise MissingRedirectUri(url)
         return url
 
     def access_token(self, **kwargs):
-        """ 用code换取access_token
-        请求参数说明：
-            授权模式             所需参数
-            authorization_code:  code 和 redirect_uri（可选）
-            refresh_token:       refresh_token
-            password:            username 和 password
-            client_credentials:  无
-        返回Token
+        """ 用code换取access_token，请求参数说明：
+        授权模式             所需参数
+        authorization_code:  code 和 redirect_uri（可选）
+        refresh_token:       refresh_token
+        password:            username 和 password
+        client_credentials:  无
+        @返回Token
         """
         if 'code' in kwargs:
             grant_type = 'authorization_code'
             kwargs.setdefault('redirect_uri', self.app.redirect_uri)
             if not kwargs['redirect_uri']:
-                raise MissingRedirectUri(self._prepare_access_token_url())
+                raise MissingRedirectUri(self.TOKEN_URL)
         elif 'refresh_token' in kwargs:
             grant_type = 'refresh_token'
         elif 'username' in kwargs and 'password' in kwargs:
@@ -171,7 +167,7 @@ class OAuth2Base(OAuthBase):
         else:
             grant_type = 'client_credentials'
         kwargs.update(client_id=self.app.key, client_secret=self.app.secret, grant_type=grant_type)
-        response = self._session.post(self._prepare_access_token_url(), data=kwargs)
+        response = self._session.post(self.TOKEN_URL, data=kwargs)
         return self._parse_token(response)
 
     def refresh_token(self, refresh_token, **kwargs):

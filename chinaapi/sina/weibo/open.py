@@ -75,8 +75,12 @@ class Token(TokenBase):
 
 
 class OAuth2(OAuth2Base):
+    BASE_URL = 'https://api.weibo.com/oauth2/'
+    AUTH_URL = BASE_URL + 'authorize'
+    TOKEN_URL = BASE_URL + 'access_token'
+
     def __init__(self, app):
-        super(OAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
+        super(OAuth2, self).__init__(app)
 
     def _parse_token(self, response):
         data = parse(response)
@@ -89,14 +93,14 @@ class OAuth2(OAuth2Base):
         """ 取消授权
         返回是否成功取消
         """
-        response = self._session.get(self._url + 'revokeoauth2', params={'access_token': access_token})
+        response = self._session.get(self.BASE_URL + 'revokeoauth2', params={'access_token': access_token})
         return parse(response).result
 
     def get_token_info(self, access_token):
         """ 获取access_token详细信息
         返回Token
         """
-        response = self._session.post(self._url + 'get_token_info', data={'access_token': access_token})
+        response = self._session.post(self.BASE_URL + 'get_token_info', data={'access_token': access_token})
         token = self._parse_token(response)
         token.access_token = access_token
         return token
@@ -139,8 +143,7 @@ class OAuth2(OAuth2Base):
             "Referer": self.authorize()
         }
 
-        url = self._prepare_authorize_url()
-        r = self._session.post(url, data=data, headers=headers, allow_redirects=allow_redirects)
+        r = self._session.post(self.AUTH_URL, data=data, headers=headers, allow_redirects=allow_redirects)
         if allow_redirects:
             code_url = r.url
         else:

@@ -25,8 +25,11 @@ class NotImplementedClient(ClientBase):
 
 
 class ApiOAuth2(OAuth2Base):
+    AUTH_URL = 'http://test/oauth2/authorize'
+    TOKEN_URL = 'http://test/oauth2/access_token'
+
     def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app, 'http://test/oauth2/')
+        super(ApiOAuth2, self).__init__(app)
 
 
 class RequestBase(TestBase):

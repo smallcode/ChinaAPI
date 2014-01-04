@@ -140,42 +140,43 @@ class Token(TokenBase):
 
 
 class OAuth2(OAuth2Base):
+    AUTH_URL = 'https://oauth.taobao.com/authorize'
+    TOKEN_URL = 'https://oauth.taobao.com/token'
+
     def __init__(self, app):
-        super(OAuth2, self).__init__(app, 'https://oauth.taobao.com/')
+        super(OAuth2, self).__init__(app)
 
     def _parse_token(self, response):
         data = parse(response)
         return Token(**data)
 
-    def _prepare_access_token_url(self):
-        return self._url + 'token'
-
     def logoff(self, view='web'):
         """ 退出登录帐号，目前只支持web访问，起到的作用是清除taobao.com的cookie，并不是取消用户的授权。在WAP上访问无效。
         返回：用于退出登录的链接
         """
-        return self._url + 'logoff?client_id={0}&view={1}'.format(self.app.key, view)
+        return 'https://oauth.taobao.com/logoff?client_id={0}&view={1}'.format(self.app.key, view)
 
 
 class OAuth(OAuthBase):
     """
     基于TOP协议的登录授权方式
     """
+    URL = 'http://container.open.taobao.com/container'
 
     def __init__(self, app):
-        super(OAuth, self).__init__(app, 'http://container.open.taobao.com/container')
+        super(OAuth, self).__init__(app)
 
     def _sign_by_md5(self, data):
         message = join_dict(data) + self.app.secret
         return md5(message).hexdigest().upper()
 
     def authorize(self):
-        return self._url + '?encode=utf-8&appkey={0}'.format(self.app.key)
+        return self.URL + '?encode=utf-8&appkey={0}'.format(self.app.key)
 
     def refresh_token(self, refresh_token, top_session):
         params = dict(appkey=self.app.key, refresh_token=refresh_token, sessionkey=top_session)
         params['sign'] = self._sign_by_md5(params)
-        response = self._session.get(self._url + '/refresh', params=params)
+        response = self._session.get(self.URL + '/refresh', params=params)
         return parse(response)
 
     def validate_sign(self, top_parameters, top_sign, top_session):

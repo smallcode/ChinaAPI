@@ -14,14 +14,11 @@ class Token(TokenBase):
 
 
 class OAuth2(OAuth2Base):
+    AUTH_URL = 'https://www.douban.com/service/auth2/auth'
+    TOKEN_URL = 'https://www.douban.com/service/auth2/token'
+
     def __init__(self, app=App()):
-        super(OAuth2, self).__init__(app, 'https://www.douban.com/service/auth2/')
-
-    def _prepare_access_token_url(self):
-        return self._url + 'token'
-
-    def _prepare_authorize_url(self):
-        return self._url + 'auth'
+        super(OAuth2, self).__init__(app)
 
     def _parse_token(self, response):
         r = response.json_dict()
