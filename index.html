@@ -4,7 +4,7 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Chinaapi : 集成国内一些主流的API" />
+    <meta name="description" content="Chinaapi : 微博，腾讯微博，淘宝，人人，豆瓣" />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -19,7 +19,7 @@
           <a id="forkme_banner" href="https://github.com/smallcode/ChinaAPI">View on GitHub</a>
 
           <h1 id="project_title">Chinaapi</h1>
-          <h2 id="project_tagline">集成国内一些主流的API</h2>
+          <h2 id="project_tagline">微博，腾讯微博，淘宝，人人，豆瓣</h2>
 
             <section id="downloads">
               <a class="zip_download_link" href="https://github.com/smallcode/ChinaAPI/zipball/master">Download this project as a .zip file</a>
@@ -66,23 +66,19 @@ ChinaAPI就是为此目的而存在。</p>
 
 <p>.. code-block:: python</p>
 
-<pre><code>    from chinaapi.sina_weibo import ApiClient
-    from chinaapi.utils.models import App, Token
+<pre><code>    from chinaapi.sina.weibo.open import Client
 
 
-    # 设置ApiClient
-    app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-    token = Token('access_token')  # 填上取得的token（可通过OAuth2取得）
-    client = ApiClient(app)
-    client.set_token(token)
+    client = Client()
+    client.set_access_token('access_token')  # 填上取得的token（可通过OAuth2取得）
 
     # 获取用户信息，对应的接口是：users/show
-    r = client.users.show(uid=1904178193)
+    r = client.users.show(uid=123456)
     print r.name  # 显示用户名
 
     # 发布带图片的微博，对应的接口是：statuses/upload
-    pic = open('pic.jpg', 'rb')
-    r = client.statuses.upload(status=u'发布的内容', pic=pic)
+    with open('pic.jpg', 'rb') as pic:
+        r = client.statuses.upload(status=u'发布的内容', pic=pic)
     print r.id  # 显示发布成功的微博的编号（即mid）：1234567890123456
 </code></pre>
 
@@ -102,15 +98,14 @@ ChinaAPI就是为此目的而存在。</p>
 
 <p>.. code-block:: python</p>
 
-<pre><code>    from chinaapi.sina_weibo import ApiOAuth2
-    from chinaapi.utils.models import App
+<pre><code>    from chinaapi.sina.weibo.open import OAuth2, App
 
 
     # 设置App，填上自己的app_key，app_secret；redirect_uri可不填
     app = App('app_key', 'app_secret', 'redirect_uri')
 
     # 获取授权链接
-    oauth2 = ApiOAuth2(app)
+    oauth2 = OAuth2(app)
     url = oauth2.authorize()  # 如果app中未设置redirect_uri，则此处必须传入
     print url # 显示授权链接（该url用于提供给用户进行登录授权，授权成功后会回调redirect_uri?code=****）
 
@@ -143,13 +138,12 @@ ChinaAPI就是为此目的而存在。</p>
 
 <p>.. code-block:: python</p>
 
-<pre><code>    from chinaapi.taobao import ApiClient
-    from chinaapi.utils.models import App
+<pre><code>    from chinaapi.taobao.open import Client, App
 
 
     # client的设置
     app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-    client = ApiClient(app)
+    client = Client(app)
 
     # 获取淘宝客店铺列表，对应的接口是：taobao.tbk.shops.get
     # 返回结果r是json中tbk_shops_get_response的值
@@ -163,9 +157,9 @@ ChinaAPI就是为此目的而存在。</p>
 <p>====================================== =========================================
                淘宝API                               调  用
 ====================================== =========================================
-  taobao.itemcats.get                  client.itemcats.get()<br>
+  taobao.itemcats.get                  client.itemcats.get()
                                        或者 client.taobao.itemcats.get()
-  taobao.tbk.shops.get                 client.tbk.shops.get()<br>
+  taobao.tbk.shops.get                 client.tbk.shops.get()
                                        或者 client.taobao.tbk.shops.get()</p>
 
 <p>====================================== =========================================</p>
@@ -179,17 +173,14 @@ ChinaAPI就是为此目的而存在。</p>
 
 <p>.. code-block:: python</p>
 
-<pre><code>    from chinaapi.qq_weibo import ApiClient
-    from chinaapi.utils.models import App, Token
+<pre><code>    from chinaapi.qq.weibo.open import Client, App
 
 
     # client的设置
     app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-    token = Token('access_token')       # 填上取得的access_token
-    openid = 'openid'                   # 填上取得的openid
-    client = ApiClient(app)
-    client.set_token(token)
-    client.set_openid(openid)
+    client = Client(app)
+    client.set_access_token('access_token')  # 填上取得的access_token
+    client.set_openid('openid')  # 填上取得的openid
 
     # 获取当前登录用户的信息，对应的接口是：user/info
     # 返回结果r是json中的data值
@@ -197,8 +188,8 @@ ChinaAPI就是为此目的而存在。</p>
     print r.name  # 显示用户名
 
     # 发布一条带图片的微博，对应的接口是：t/add_pic
-    pic = open('pic.jpg', 'rb')
-    r = client.t.add_pic(content=u'发布的内容', pic=pic)
+    with open('pic.jpg', 'rb') as pic:
+        r = client.t.add_pic(content=u'发布的内容', pic=pic)
     print r.id  # 显示微博的ID
 
     # 删除一条微博，对应的接口是：t/del
@@ -212,7 +203,7 @@ ChinaAPI就是为此目的而存在。</p>
     client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')
 </code></pre>
 
-<p>调用规则：<strong>斜杠（/）映射为点（.），del映射为delete（因del是Python保留字，无法作为方法名）</strong>   </p>
+<p>调用规则：<strong>斜杠（/）映射为点（.），del映射为delete（因del是Python保留字，无法作为方法名）</strong></p>
 
 <p>====================================== =========================================
             腾讯微博API                               调  用
@@ -231,23 +222,19 @@ ChinaAPI就是为此目的而存在。</p>
 
 <p>.. code-block:: python</p>
 
-<pre><code>    from chinaapi.renren import ApiClient
-    from chinaapi.utils.models import App, Token
+<pre><code>    from chinaapi.renren.open import Client
 
 
-    # client的设置
-    app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-    token = Token('access_token')  # 填上取得的access_token
-    client = ApiClient(app)
-    client.set_token(token)
+    client = Client()
+    client.set_access_token('access_token')  # 填上取得的access_token
 
     # 获取用户信息，对应的接口是：/v2/user/get
     r = client.user.get(userId=334258249)
     print r.name  # 显示用户名
 
     # 上传照片至用户相册，对应的接口是：/v2/photo/upload
-    file = open('pic.jpg', 'rb')
-    r = client.photo.upload(file=file)
+    with open('pic.jpg', 'rb') as pic:
+        r = client.photo.upload(file=pic)
     print r.id  # 显示照片的ID
 </code></pre>
 
