@@ -15,7 +15,7 @@ def json_dict(self):
             raise NotExistApi(self)
 
 
-def override_json(response, *args, **kwargs):
+def add_method(response, *args, **kwargs):
     response.json_dict = types.MethodType(json_dict, response)
     return response
 
@@ -23,7 +23,7 @@ def override_json(response, *args, **kwargs):
 class Request(object):
     def __init__(self):
         self._session = requests.session()
-        self._session.hooks = dict(response=override_json)
+        self._session.hooks = dict(response=add_method)
 
     def _parse_response(self, response):
         return response.json_dict()
