@@ -37,13 +37,17 @@ def join_dict(data):
 
 
 class Client(ClientBase):
-    def __init__(self, app=App(), retries=DEFAULT_RETRIES):
-        super(Client, self).__init__(app, Token())
+    def __init__(self, app=App(), session=None, retries=DEFAULT_RETRIES):
+        super(Client, self).__init__(app, Token(session))
         self._retries = retries
 
-    @property
-    def session(self):
+    def _get_session(self):
         return self.token.access_token
+
+    def _set_session(self, session):
+        self.token.access_token = session
+
+    session = property(_get_session, _set_session)
 
     def _sign_by_hmac(self, data):
         message = join_dict(data)
@@ -59,7 +63,7 @@ class Client(ClientBase):
 
     def _prepare_queries(self, queries):
         if not self.token.is_expires:
-            queries['session'] = self.session
+            queries['session'] = self.token.access_token
         queries.update({'app_key': self.app.key, 'sign_method': 'hmac', 'format': 'json', 'v': '2.0',
                         'timestamp': datetime.now()})
 
@@ -104,13 +108,6 @@ class Client(ClientBase):
                 return r.get(keys[0])
 
 
-def parse(response):
-    r = response.json_dict()
-    if 'error' in r:
-        raise ApiResponseError(response, r.error, r.get('error_description', ''))
-    return r
-
-
 class Token(TokenBase):
     """
     taobao_user_nick：淘宝账号
@@ -137,6 +134,13 @@ class Token(TokenBase):
         self.r2_expires_in = kwargs.pop('r2_expires_in', None)
         self.w1_expires_in = kwargs.pop('w1_expires_in', None)
         self.w2_expires_in = kwargs.pop('w2_expires_in', None)
+
+
+def parse(response):
+    r = response.json_dict()
+    if 'error' in r:
+        raise ApiResponseError(response, r.error, r.get('error_description', ''))
+    return r
 
 
 class OAuth2(OAuth2Base):
