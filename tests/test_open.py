@@ -2,7 +2,7 @@
 from unittest import TestCase
 import httpretty
 from chinaapi.open import ClientBase, OAuth2Base, Method, Token, App
-from chinaapi.exceptions import MissingRedirectUri
+from chinaapi.exceptions import MissingRedirectUri, ApiError
 from test_request import BASE_URL, TestBase
 
 
@@ -17,6 +17,15 @@ class ApiClient(ClientBase):
         if segments[-1] == 'get':
             return Method.GET
         return super(ApiClient, self)._prepare_method(segments)
+
+    def _parse_response(self, response):
+        data = response.json_dict()
+        if 'code' in data:
+            raise ApiError(response, data.code, data.message)
+        return super(ApiClient, self)._parse_response(response)
+
+    def _is_retry_error(self, e):
+        return super(ApiClient, self)._is_retry_error(e) or e.code == 10001
 
 
 class NotImplementedClient(ClientBase):
@@ -40,6 +49,7 @@ class RequestBase(TestBase):
 class ClientTest(RequestBase):
     GET_URL = BASE_URL + 'get'
     POST_URL = BASE_URL + 'post'
+    ERROR_URL = BASE_URL + 'error'
 
     def setUp(self):
         super(ClientTest, self).setUp()
@@ -51,6 +61,10 @@ class ClientTest(RequestBase):
 
     def register_post_uri(self):
         httpretty.register_uri(httpretty.POST, self.POST_URL, body=self.JSON_BODY, content_type=self.CONTENT_TYPE)
+
+    def register_error_uri(self):
+        body = '{"code": 10001, "message": "system error"}'
+        httpretty.register_uri(httpretty.POST, self.ERROR_URL, body=body, content_type=self.CONTENT_TYPE)
 
     def assertPost(self, response):
         self.assertEqual(self.POST_URL, response.url)
@@ -79,6 +93,13 @@ class ClientTest(RequestBase):
             response = self.client.post(pic=pic, id=123)
             self.assertPost(response)
             self.assertTrue('multipart/form-data' in response.request.headers['Content-Type'])
+
+    @httpretty.activate
+    def test_retry(self):
+        self.register_error_uri()
+        with self.assertRaises(ApiError):
+            with open('images/pic.jpg', 'rb') as pic:
+                self.client.error(img=pic)
 
 
 class NotImplementedClientTest(RequestBase):
@@ -118,7 +139,7 @@ class OAuth2Test(RequestBase):
     @httpretty.activate
     def test_refresh_token(self):
         self.register_access_token_uri()
-        token = self.oauth2.access_token(refresh_token='code')
+        token = self.oauth2.refresh_token('refresh_token')
         self.assertToken(token)
 
     @httpretty.activate
