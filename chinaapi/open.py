@@ -2,9 +2,11 @@
 import time
 from requests.utils import default_user_agent
 from .request import Request
-from .exceptions import MissingRedirectUri
+from .exceptions import ApiError, MissingRedirectUri
 from .utils import request_url
 from . import __version__, __title__
+
+DEFAULT_RETRIES = 3
 
 
 class Method(object):
@@ -100,18 +102,35 @@ class ClientBase(Request):
     def _parse_response(self, response):
         return response
 
-    def request(self, segments, **queries):
+    def _is_retry_error(self, e):
+        return False
+
+    def _try_request(self, method, url, params, data, files, retries):
+        try:
+            response = self._session.request(method, url, params=params, data=data, files=files)
+            return self._parse_response(response)
+        except ApiError, e:
+            if self._is_retry_error(e) and retries > 0:
+                if files:
+                    for f in files.values():
+                        f.seek(0)
+                self._try_request(method, url, params, data, files, retries-1)
+            raise e
+
+    def prepare_request(self, segments, queries):
         url = self._prepare_url(segments, queries)
         method = self._prepare_method(segments)
         self._prepare_queries(queries)
-
+        params, data, files = None, None, None
         if method == Method.POST:
             data, files = self._prepare_body(queries)
-            response = self._session.post(url, data=data, files=files)
         else:
-            response = self._session.get(url, params=queries)
+            params = queries
+        return method, url, params, data, files
 
-        return self._parse_response(response)
+    def request(self, segments, **queries):
+        method, url, params, data, files = self.prepare_request(segments, queries)
+        return self._try_request(method, url, params, data, files, DEFAULT_RETRIES)
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)

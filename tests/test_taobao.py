@@ -21,6 +21,10 @@ class TaobaoTest(TestCase):
         self.client.session = 'session2'
         self.assertEqual(self.client.session, 'session2')
 
+    def test_is_retry_error(self):
+        self.assertTrue(self.client._is_retry_error(ApiError('', 0, '', 'ism.demo-error')))
+        self.assertFalse(self.client._is_retry_error(ApiError('', 0, '', 'other_error')))
+
     def test_itemcats_get(self):
         r = self.client.itemcats.get(cids=14)
         self.assertEqual(14, r.item_cats.item_cat[0].cid)

@@ -29,3 +29,7 @@ class SinaWeiboTest(TestCase):
         with self.assertRaises(ApiError) as cm:
             self.client.not_exist_api.get()
         self.assertEqual('Request Api not found!', cm.exception.message)
+
+    def test_is_retry_error(self):
+        self.assertTrue(self.client._is_retry_error(ApiError('', 10001, '')))
+        self.assertFalse(self.client._is_retry_error(ApiError('', 10002, '')))

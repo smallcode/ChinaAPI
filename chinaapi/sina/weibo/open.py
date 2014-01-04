@@ -8,8 +8,14 @@ from chinaapi.open import ClientBase, Method, OAuth2Base, Token as TokenBase, Ap
 from chinaapi.exceptions import ApiResponseError
 from chinaapi.jsonDict import loads
 
-
 App = App
+
+RETRY_CODES = {
+    10001: 'system error',
+    20205: 'in block',
+    21405: "couldn't connect to host",
+    23201: 'Backend Service Connect Timeout',
+}
 
 
 def parse(response):
@@ -60,6 +66,9 @@ class Client(ClientBase):
             queries['source'] = self.app.key  # 对于不需要授权的API操作需追加source参数
         else:
             self._session.headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
+
+    def _is_retry_error(self, e):
+        return e.code in RETRY_CODES
 
 
 class Token(TokenBase):

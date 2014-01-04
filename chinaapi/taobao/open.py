@@ -5,10 +5,9 @@ from hashlib import md5
 from datetime import datetime
 from urllib import unquote
 from chinaapi.open import ClientBase, OAuthBase, OAuth2Base, App, Token as TokenBase
-from chinaapi.exceptions import ApiResponseError, ApiError
+from chinaapi.exceptions import ApiResponseError
 from chinaapi.utils import parse_querystring
 
-DEFAULT_RETRIES = 3
 DEFAULT_VALUE_TO_STR = lambda x: str(x)
 VALUE_TO_STR = {
     type(datetime.now()): lambda v: v.strftime('%Y-%m-%d %H:%M:%S'),
@@ -16,7 +15,7 @@ VALUE_TO_STR = {
     type(0.1): lambda v: "%.2f" % v,
     type(True): lambda v: str(v).lower(),
 }
-RETRY_SUB_CODES = {
+RETRY_SUB_CODES = (
     'isp.top-remote-connection-timeout',
     'isp.top-remote-connection-timeout-tmall',
     'isp.top-remote-service-unavailable',
@@ -29,7 +28,7 @@ RETRY_SUB_CODES = {
     'isp.item-update-service-error:IC_SYSTEM_NOT_READY_TRY_AGAIN_LATER',
     'ism.json-decode-error',
     'ism.demo-error',
-}
+)
 
 
 def join_dict(data):
@@ -37,9 +36,8 @@ def join_dict(data):
 
 
 class Client(ClientBase):
-    def __init__(self, app=App(), session=None, retries=DEFAULT_RETRIES):
+    def __init__(self, app=App(), session=None):
         super(Client, self).__init__(app, Token(session))
-        self._retries = retries
 
     def _get_session(self):
         return self.token.access_token
@@ -81,21 +79,6 @@ class Client(ClientBase):
         data['sign'] = self._sign_by_hmac(data)
         return data, files
 
-    def request(self, segments, **queries):
-        url = self._prepare_url(segments, queries)
-        self._prepare_queries(queries)
-        data, files = self._prepare_body(queries)
-        for count in xrange(self._retries, 0, -1):
-            try:
-                response = self._session.post(url, data=data, files=files)
-                return self._parse_response(response)
-            except ApiError, e:
-                if e.sub_code in RETRY_SUB_CODES and count > 1:
-                    for f in files.values():
-                        f.seek(0)
-                    continue
-                raise e
-
     def _parse_response(self, response):
         r = response.json_dict()
         if 'error_response' in r:
@@ -106,6 +89,9 @@ class Client(ClientBase):
             keys = r.keys()
             if keys and keys[0].endswith('_response'):
                 return r.get(keys[0])
+
+    def _is_retry_error(self, e):
+        return e.sub_code in RETRY_SUB_CODES
 
 
 class Token(TokenBase):
