@@ -78,11 +78,8 @@ class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://api.weibo.com/oauth2/')
 
-    def _parse_response(self, response):
-        return parse(response)
-
     def _parse_token(self, response):
-        data = super(OAuth2, self)._parse_token(response)
+        data = parse(response)
         data['created_at'] = data.pop('create_at', None)
         if 'expires_in' not in data:
             data['expires_in'] = data.pop('expire_in', None)
@@ -93,7 +90,7 @@ class OAuth2(OAuth2Base):
         返回是否成功取消
         """
         response = self._session.get(self._url + 'revokeoauth2', params={'access_token': access_token})
-        return self._parse_response(response).result
+        return parse(response).result
 
     def get_token_info(self, access_token):
         """ 获取access_token详细信息

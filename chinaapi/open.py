@@ -97,6 +97,9 @@ class ClientBase(Request):
             results[hasattr(v, 'read')][k] = v
         return results
 
+    def _parse_response(self, response):
+        return response
+
     def request(self, segments, **queries):
         url = self._prepare_url(segments, queries)
         method = self._prepare_method(segments)
@@ -126,7 +129,7 @@ class OAuth2Base(OAuthBase):
         super(OAuth2Base, self).__init__(app, url)
 
     def _parse_token(self, response):
-        return self._parse_response(response)
+        return response.json_dict()
 
     def _prepare_authorize_url(self):
         return self._url + 'authorize'

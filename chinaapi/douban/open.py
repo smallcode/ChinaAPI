@@ -24,11 +24,7 @@ class OAuth2(OAuth2Base):
         return self._url + 'auth'
 
     def _parse_token(self, response):
-        data = super(OAuth2, self)._parse_token(response)
-        return Token(**data)
-
-    def _parse_response(self, response):
-        r = super(OAuth2, self)._parse_response(response)
+        r = response.json_dict()
         if 'code' in r and 'msg' in r:
             raise ApiResponseError(response, r.code, r.msg)
-        return r
+        return Token(**r)

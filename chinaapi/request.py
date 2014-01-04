@@ -24,6 +24,3 @@ class Request(object):
     def __init__(self):
         self._session = requests.session()
         self._session.hooks = dict(response=add_method)
-
-    def _parse_response(self, response):
-        return response.json_dict()

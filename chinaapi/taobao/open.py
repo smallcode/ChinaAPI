@@ -143,11 +143,8 @@ class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://oauth.taobao.com/')
 
-    def _parse_response(self, response):
-        return parse(response)
-
     def _parse_token(self, response):
-        data = super(OAuth2, self)._parse_token(response)
+        data = parse(response)
         return Token(**data)
 
     def _prepare_access_token_url(self):
@@ -168,9 +165,6 @@ class OAuth(OAuthBase):
     def __init__(self, app):
         super(OAuth, self).__init__(app, 'http://container.open.taobao.com/container')
 
-    def _parse_response(self, response):
-        return parse(response)
-
     def _sign_by_md5(self, data):
         message = join_dict(data) + self.app.secret
         return md5(message).hexdigest().upper()
@@ -182,7 +176,7 @@ class OAuth(OAuthBase):
         params = dict(appkey=self.app.key, refresh_token=refresh_token, sessionkey=top_session)
         params['sign'] = self._sign_by_md5(params)
         response = self._session.get(self._url + '/refresh', params=params)
-        return self._parse_response(response)
+        return parse(response)
 
     def validate_sign(self, top_parameters, top_sign, top_session):
         """  验证签名是否正确（用于淘宝帐号授权）（已测试成功，不要更改）

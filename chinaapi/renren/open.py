@@ -23,7 +23,7 @@ class Client(ClientBase):
             queries['access_token'] = self.token.access_token
 
     def _parse_response(self, response):
-        r = super(Client, self)._parse_response(response)
+        r = response.json_dict()
         if 'error' in r and 'code' in r.error:
             raise ApiResponseError(response, r.error.code, r.error.get('message', ''))
         return r
@@ -62,14 +62,10 @@ class OAuth2(OAuth2Base):
         return self._url + 'token'
 
     def _parse_token(self, response):
-        data = super(OAuth2, self)._parse_token(response)
-        data['user'] = Token.User(**data.pop('user'))
-        return Token(**data)
-
-    def _parse_response(self, response):
-        r = super(OAuth2, self)._parse_response(response)
+        r = response.json_dict()
         if 'error_code' in r:
             raise ApiResponseError(response, r.error_code, r.get('error_description', r.get('error', '')))
-        return r
+        r['user'] = Token.User(**r.pop('user'))
+        return Token(**r)
 
 

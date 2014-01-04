@@ -100,9 +100,6 @@ class OAuth2(OAuth2Base):
     def __init__(self, app):
         super(OAuth2, self).__init__(app, 'https://open.t.qq.com/cgi-bin/oauth2/')
 
-    def _parse_response(self, response):
-        return parse(response)
-
     def _parse_token(self, response):
         data = parse_querystring(response.text)
         if 'errorCode' in data:
@@ -116,5 +113,5 @@ class OAuth2(OAuth2Base):
         """
         kwargs['format'] = 'json'
         response = self._session.get('http://open.t.qq.com/api/auth/revoke_auth', params=kwargs)
-        self._parse_response(response)
+        parse(response)
         return True  # 没有异常说明ret=0（ret: 0-成功，非0-失败）
