@@ -152,9 +152,8 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
         # client的设置
         app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-        client = Client(app)
+        client = Client(app, openid='openid')  # 填上取得的openid
         client.set_access_token('access_token')  # 填上取得的access_token
-        client.set_openid('openid')  # 填上取得的openid
 
         # 获取当前登录用户的信息，对应的接口是：user/info
         # 返回结果r是json中的data值
@@ -172,7 +171,7 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 
         # 有两种设置clientip的方法：
         # 1.全局设置，在该client所发起的所有调用中有效
-        client.set_clientip('220.181.111.85')
+        client.clientip = '220.181.111.85'
         # 2.临时设置，只在此次调用中有效，会覆盖全局设置
         client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')
 
