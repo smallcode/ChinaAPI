@@ -37,19 +37,26 @@ def parse(response):
     return r
 
 
+class Token(TokenBase):
+    """
+    openid：用户统一标识，可以唯一标识一个用户
+    openkey：与openid对应的用户key，是验证openid身份的验证密钥
+    """
+
+    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
+        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
+        self.openid = kwargs.pop('openid', None)
+        self.openkey = kwargs.pop('openkey', None)
+        self.name = kwargs.pop('name', None)
+
+
 class Client(ClientBase):
     #写接口
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
-    def __init__(self, app=App()):
-        super(Client, self).__init__(app, Token())
-        self.openid = None
-        self.clientip = None
-
-    def set_openid(self, openid):
+    def __init__(self, app=App(), token=Token(), openid=None, clientip=None):
+        super(Client, self).__init__(app, token)
         self.openid = openid
-
-    def set_clientip(self, clientip):
         self.clientip = clientip
 
     def _parse_response(self, response):
@@ -81,19 +88,6 @@ class Client(ClientBase):
             queries['openid'] = self.openid
         if 'clientip' not in queries and self.clientip:
             queries['clientip'] = self.clientip
-
-
-class Token(TokenBase):
-    """
-    openid：用户统一标识，可以唯一标识一个用户
-    openkey：与openid对应的用户key，是验证openid身份的验证密钥
-    """
-
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
-        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
-        self.openid = kwargs.pop('openid', None)
-        self.openkey = kwargs.pop('openkey', None)
-        self.name = kwargs.pop('name', None)
 
 
 class OAuth2(OAuth2Base):

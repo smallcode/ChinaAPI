@@ -21,7 +21,7 @@ class QqWeiboTest(TestCase):
         self.openid = 'openid'  # 填上取得的openid
         self.client = Client(app)
         self.client.set_access_token('access_token')  # 填上取得的access_token
-        self.client.set_openid(self.openid)
+        self.client.openid = self.openid
 
     # def test_user_info(self):
     #     r = self.client.user.info()
