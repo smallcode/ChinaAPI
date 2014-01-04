@@ -18,9 +18,6 @@ class ApiClient(ClientBase):
             return Method.GET
         return super(ApiClient, self)._prepare_method(segments)
 
-    def _parse_response(self, response):
-        return response
-
 
 class NotImplementedClient(ClientBase):
     def __init__(self, app):
