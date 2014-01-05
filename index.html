@@ -42,13 +42,15 @@
 
 <p>ChinaAPI是一个API库，使用Python编写。</p>
 
-<p>目前国内的几大开放平台，有新浪微博，腾讯微博，淘宝、人人、豆瓣等。
+<p>目前国内的几大开放平台，有新浪微博，腾讯微博，淘宝，人人，豆瓣等。
 针对这几个平台，用Python语言编写的API库都比较独立，各具特色。
 但仔细分析，不难发现这些库存在大量可通用的模块，并可抽象出统一的调用接口。
 ChinaAPI就是为此目的而存在。</p>
 
 <h2>
 <a name="%E5%AE%89%E8%A3%85" class="anchor" href="#%E5%AE%89%E8%A3%85"><span class="octicon octicon-link"></span></a>安装</h2>
+
+<p>项目地址：<a href="https://github.com/smallcode/ChinaAPI">https://github.com/smallcode/ChinaAPI</a></p>
 
 <p>安装 ChinaAPI，最简单的方法:</p>
 
@@ -178,9 +180,8 @@ ChinaAPI就是为此目的而存在。</p>
 
     # client的设置
     app = App('app_key', 'app_secret')  # 填上自己的app_key，app_secret
-    client = Client(app)
+    client = Client(app, openid='openid')  # 填上取得的openid
     client.set_access_token('access_token')  # 填上取得的access_token
-    client.set_openid('openid')  # 填上取得的openid
 
     # 获取当前登录用户的信息，对应的接口是：user/info
     # 返回结果r是json中的data值
@@ -198,7 +199,7 @@ ChinaAPI就是为此目的而存在。</p>
 
     # 有两种设置clientip的方法：
     # 1.全局设置，在该client所发起的所有调用中有效
-    client.set_clientip('220.181.111.85')
+    client.clientip = '220.181.111.85'
     # 2.临时设置，只在此次调用中有效，会覆盖全局设置
     client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')
 </code></pre>
