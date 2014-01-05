@@ -13,7 +13,7 @@ App = App
 RETRY_CODES = {
     10001: 'system error',
     20205: 'in block',
-    21405: "couldn't connect to host",
+    21405: "couldn't connect to host | Operation timed out after 2000 milliseconds",
     23201: 'Backend Service Connect Timeout',
 }
 
