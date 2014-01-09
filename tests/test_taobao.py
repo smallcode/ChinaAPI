@@ -25,11 +25,11 @@ class TaobaoTest(TestCase):
         self.assertTrue(self.client._is_retry_error(ApiError('', 0, '', 'ism.demo-error')))
         self.assertFalse(self.client._is_retry_error(ApiError('', 0, '', 'other_error')))
 
-    def test_itemcats_get(self):
+    def test_item_cats_get(self):
         r = self.client.itemcats.get(cids=14)
         self.assertEqual(14, r.item_cats.item_cat[0].cid)
 
-    def test_shopcats_list_get(self):
+    def test_shop_cats_list_get(self):
         r = self.client.shopcats.list.get(cids=14)
         self.assertEqual(68, len(r.shop_cats.shop_cat))
 
