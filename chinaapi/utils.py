@@ -1,9 +1,12 @@
 # coding=utf-8
+from urlparse import urlparse
 from requests import PreparedRequest
 
 
 def parse_querystring(querystring):
-    return dict([item.split('=') for item in querystring.split('&')])
+    if '?' in querystring:
+        querystring = urlparse(querystring).query
+    return dict([item.split('=', 1) for item in querystring.split('&')])
 
 
 def request_url(url, params):

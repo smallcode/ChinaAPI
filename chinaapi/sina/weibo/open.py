@@ -2,7 +2,6 @@
 import base64
 import hashlib
 import hmac
-from urlparse import urlparse
 from chinaapi.utils import parse_querystring
 from chinaapi.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
 from chinaapi.exceptions import ApiResponseError
@@ -157,5 +156,5 @@ class OAuth2(OAuth2Base):
             code_url = r.url
         else:
             code_url = r.headers['location']
-        code = parse_querystring((urlparse(code_url)).query)['code']
+        code = parse_querystring(code_url)['code']
         return self.access_token(code=code)
