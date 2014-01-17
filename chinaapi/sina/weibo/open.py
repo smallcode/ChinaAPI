@@ -126,16 +126,12 @@ class OAuth2(OAuth2Base):
         encoded_sign, encoded_data = signed_request.split('.', 1)
         sign = base64decode(encoded_sign)
         data = loads(base64decode(encoded_data))
-        token = Token()
-        token.access_token = data.oauth_token
-        token.created_at = data.issued_at
-        token.uid = data.user_id
-        token.expires_in = data.expires
+        token = Token(data.oauth_token, data.expires, uid=data.user_id, created_at=data.issued_at)
         is_valid = data.algorithm == u'HMAC-SHA256' and hmac.new(self.app.key, encoded_data,
                                                                  hashlib.sha256).digest() == sign
         return token, is_valid
 
-    def login(self, username, password, allow_redirects=True):
+    def get_code(self, username, password, allow_redirects=True):
         data = {"client_id": self.app.key,
                 "redirect_uri": self.app.redirect_uri,
                 "userId": username,
@@ -156,5 +152,5 @@ class OAuth2(OAuth2Base):
             code_url = r.url
         else:
             code_url = r.headers['location']
-        code = parse_querystring(code_url)['code']
-        return self.access_token(code=code)
+        query = parse_querystring(code_url)
+        return query['code']
