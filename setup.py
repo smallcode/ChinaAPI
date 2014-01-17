@@ -19,6 +19,7 @@ packages = [
 
 requires = [
     'requests >= 2.1.0',
+    'rsa >= 3.1.2',
 ]
 
 with open('README.rst') as f:
