@@ -108,7 +108,7 @@ class NotImplementedClientTest(RequestBase):
         self.client = NotImplementedClient(self.app)
 
     def test_not_implemented_error(self):
-        with self.assertRaises(NotImplementedError) as cm:
+        with self.assertRaises(NotImplementedError):
             self.client.not_implemented_error.get()
 
 
@@ -117,6 +117,9 @@ class OAuth2Test(RequestBase):
         super(OAuth2Test, self).setUp()
         self.oauth2 = ApiOAuth2(self.app)
         self.oauth_url = 'http://test/oauth2/authorize?redirect_uri=http%3A%2F%2Fredirect_uri&response_type=code&client_id=key'
+
+    def _register_access_token_uri(self):
+        self._register_response(self.JSON_BODY)
 
     def test_authorize(self):
         url = self.oauth2.authorize()
@@ -128,7 +131,7 @@ class OAuth2Test(RequestBase):
 
     @httpretty.activate
     def test_access_token(self):
-        self.register_access_token_uri()
+        self._register_access_token_uri()
         token = self.oauth2.access_token(code='code')
         self.assertToken(token)
 
@@ -138,19 +141,19 @@ class OAuth2Test(RequestBase):
 
     @httpretty.activate
     def test_refresh_token(self):
-        self.register_access_token_uri()
+        self._register_access_token_uri()
         token = self.oauth2.refresh_token('refresh_token')
         self.assertToken(token)
 
     @httpretty.activate
     def test_password(self):
-        self.register_access_token_uri()
+        self._register_access_token_uri()
         token = self.oauth2.access_token(username='username', password='password')
         self.assertToken(token)
 
     @httpretty.activate
     def test_credentials(self):
-        self.register_access_token_uri()
+        self._register_access_token_uri()
         token = self.oauth2.access_token()
         self.assertToken(token)
 
