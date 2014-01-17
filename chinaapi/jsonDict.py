@@ -32,7 +32,7 @@ class JsonDict(dict):
         self[attr] = value
 
 
-def loads(s):
+def loads(string):
     """
     Parse json string into JsonDict.
 
@@ -42,4 +42,4 @@ def loads(s):
     >>> r['score']
     95
     """
-    return json.loads(s, object_hook=lambda pairs: JsonDict(pairs.iteritems()))
+    return json.loads(string, object_hook=lambda pairs: JsonDict(pairs.iteritems()))
