@@ -62,10 +62,10 @@ class Client(ClientBase):
             '_rtk': result.group(2)
         }
 
-    def login(self, email, pwd):
+    def login(self, username, password):
             key = self.get_encrypt_key()
 
-            if self.get_show_captcha(email) == 1:
+            if self.get_show_captcha(username) == 1:
                 fn = 'icode.%s.jpg' % os.getpid()
                 self.get_icode(fn)
                 print "Please input the code in file '%s':" % fn
@@ -75,20 +75,20 @@ class Client(ClientBase):
                 icode = ''
 
             data = {
-                'email': email,
+                'email': username,
                 'origURL': 'http://www.renren.com/home',
                 'icode': icode,
                 'domain': 'renren.com',
                 'key_id': 1,
                 'captcha_type': 'web_login',
-                'password': self.encrypt_password(key['e'], key['n'], pwd) if key['isEncrypt'] else pwd,
+                'password': self.encrypt_password(key['e'], key['n'], password) if key['isEncrypt'] else password,
                 'rkey': key.get('rkey', '')
             }
             url = 'http://www.renren.com/ajaxLogin/login?1=1&uniqueTimestamp=%f' % random.random()
             r = self._session.post(url, data)
             result = r.json()
             if result['code']:
-                self.email = email
+                self.email = username
                 r = self._session.get(result['homeUrl'])
                 return self.get_token(r.text)
             else:
