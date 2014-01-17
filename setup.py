@@ -15,6 +15,7 @@ packages = [
     'chinaapi.sina',
     'chinaapi.sina.weibo',
     'chinaapi.taobao',
+    'chinaapi.sohu',
 ]
 
 requires = [
