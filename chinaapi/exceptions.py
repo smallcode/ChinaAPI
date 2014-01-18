@@ -25,8 +25,9 @@ class ApiResponseError(ApiError):
         super(ApiResponseError, self).__init__(self.get_url(), code, message, sub_code, sub_message)
 
     def get_url(self):
-        if self.response.request.body:
-            return '{0}?{1}'.format(self.response.url, self.response.request.body)
+        request = self.response.request
+        if 'multipart/form-data' not in request.headers.get('Content-Type', '') and request.body:
+            return u'{0}?{1}'.format(self.response.url, self.response.request.body)
         return self.response.url
 
 
