@@ -110,7 +110,7 @@ class ClientBase(Request):
             response = self._session.request(method, url, params=params, data=data, files=files)
             return self._parse_response(response)
         except ApiError, e:
-            if self._is_retry_error(e) and retries > 0:
+            if retries > 0 and self._is_retry_error(e):
                 if files:
                     for f in files.values():
                         f.seek(0)
