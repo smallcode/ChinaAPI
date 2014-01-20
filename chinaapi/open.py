@@ -114,8 +114,9 @@ class ClientBase(Request):
                 if files:
                     for f in files.values():
                         f.seek(0)
-                self._try_request(method, url, params, data, files, retries-1)
-            raise e
+                return self._try_request(method, url, params, data, files, retries-1)
+            else:
+                raise
 
     def prepare_request(self, segments, queries):
         url = self._prepare_url(segments, queries)
