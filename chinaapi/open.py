@@ -4,6 +4,7 @@ from requests.utils import default_user_agent
 from .request import Request
 from .exceptions import ApiError, MissingRedirectUri
 from .utils import request_url
+from .decorators import retry
 from . import __version__, __title__
 
 DEFAULT_RETRIES = 3
@@ -105,19 +106,6 @@ class ClientBase(Request):
     def _is_retry_error(self, e):
         return False
 
-    def _try_request(self, method, url, params, data, files, retries):
-        try:
-            response = self._session.request(method, url, params=params, data=data, files=files)
-            return self._parse_response(response)
-        except ApiError, e:
-            if retries > 0 and self._is_retry_error(e):
-                if files:
-                    for f in files.values():
-                        f.seek(0)
-                return self._try_request(method, url, params, data, files, retries-1)
-            else:
-                raise
-
     def prepare_request(self, segments, queries):
         url = self._prepare_url(segments, queries)
         method = self._prepare_method(segments)
@@ -131,7 +119,21 @@ class ClientBase(Request):
 
     def request(self, segments, **queries):
         method, url, params, data, files = self.prepare_request(segments, queries)
-        return self._try_request(method, url, params, data, files, DEFAULT_RETRIES)
+
+        def handle_error(e):
+            if self._is_retry_error(e):
+                if files:
+                    for f in files.values():
+                        f.seek(0)
+            else:
+                raise e
+
+        @retry(DEFAULT_RETRIES, ApiError, handle_error)
+        def try_request():
+            response = self._session.request(method, url, params=params, data=data, files=files)
+            return self._parse_response(response)
+
+        return try_request()
 
     def __getattr__(self, attr):
         return ClientWrapper(self, attr)
