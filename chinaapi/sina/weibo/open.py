@@ -11,6 +11,7 @@ App = App
 
 RETRY_CODES = {
     10001: 'system error',
+    10011: 'RPC error',
     20205: 'in block',
     21405: "couldn't connect to host | Operation timed out after 2000 milliseconds",
     23201: 'Backend Service Connect Timeout',
@@ -61,7 +62,7 @@ class Client(ClientBase):
         return Method.GET
 
     def _prepare_queries(self, queries):
-        if self.token.is_expires:
+        if self.token.access_token is None:
             queries['source'] = self.app.key  # 对于不需要授权的API操作需追加source参数
         else:
             self._session.headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
