@@ -19,7 +19,7 @@ ChinaAPI就是为此目的而存在。
 ----
 项目地址：https://github.com/smallcode/ChinaAPI
 
-安装 ChinaAPI，最简单的方法:
+最简单的安装方法:
 
 .. code-block:: bash
 
