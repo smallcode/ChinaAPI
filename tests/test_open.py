@@ -187,5 +187,5 @@ class TokenTest(TestCase):
 
     def test_get_not_exist_attr(self):
         token = Token()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(AttributeError):
             _ = token.not_exist_attr

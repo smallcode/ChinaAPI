@@ -48,7 +48,9 @@ class Token(object):
         return not self.access_token or (self.expired_at is not None and self._now() > self.expired_at)
 
     def __getattr__(self, item):
-        return self._data[item]
+        if item in self._data:
+            return self._data[item]
+        raise AttributeError
 
 
 class App(object):
@@ -136,7 +138,9 @@ class ClientBase(Request):
         return try_request()
 
     def __getattr__(self, attr):
-        return ClientWrapper(self, attr)
+        if not attr.startswith('__'):
+            return ClientWrapper(self, attr)
+        raise AttributeError
 
 
 class OAuthBase(Request):
