@@ -1,3 +1,4 @@
+# coding=utf-8
 import chinaapi
 
 
@@ -24,9 +25,9 @@ requires = [
     'rsa >= 3.1.2',
 ]
 
-with open('README.rst', encoding='utf-8') as f:
+with open('README.rst') as f:
     readme = f.read()
-with open('HISTORY.rst', encoding='utf-8') as f:
+with open('HISTORY.rst') as f:
     history = f.read()
 
 setup(
