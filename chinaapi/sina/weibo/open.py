@@ -64,7 +64,7 @@ class Client(ClientBase):
     def _prepare_queries(self, queries):
         if self.token.access_token is None:
             queries['source'] = self.app.key  # 对于不需要授权的API操作需追加source参数
-        else:
+        if not self.token.is_expires:
             self._session.headers['Authorization'] = 'OAuth2 %s' % self.token.access_token
 
     def _is_retry_error(self, e):
