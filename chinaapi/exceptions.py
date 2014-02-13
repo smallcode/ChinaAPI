@@ -1,6 +1,6 @@
 # coding=utf-8
 class ApiError(IOError):
-    """API异常。"""
+    """ API异常 """
 
     def __init__(self, url, code, message, sub_code='', sub_message=''):
         self.url = url
@@ -18,7 +18,7 @@ class ApiError(IOError):
 
 
 class ApiResponseError(ApiError):
-    """响应结果中包含的异常。"""
+    """ 响应结果中包含的异常 """
 
     def __init__(self, response, code, message, sub_code='', sub_message=''):
         self.response = response
@@ -32,7 +32,7 @@ class ApiResponseError(ApiError):
 
 
 class ApiResponseValueError(ApiResponseError, ValueError):
-    """解析响应结果时抛出的异常。"""
+    """ 解析响应结果时抛出的异常 """
 
     def __init__(self, response, value_error):
         super(ApiResponseValueError, self).__init__(response, response.status_code,
@@ -40,14 +40,14 @@ class ApiResponseValueError(ApiResponseError, ValueError):
 
 
 class InvalidApi(ApiError, ValueError):
-    """无效的API。"""
+    """ 无效API """
 
     def __init__(self, url, code=0, message='Invalid Api!'):
         super(InvalidApi, self).__init__(url, code, message)
 
 
 class NotExistApi(ApiResponseError, ValueError):
-    """该API不存在。"""
+    """ 不存在API """
 
     def __init__(self, response, code=0, message='Request Api not found!'):
         if response.text:
@@ -58,21 +58,21 @@ class NotExistApi(ApiResponseError, ValueError):
 
 
 class MutexApiParameters(ApiError, ValueError):
-    """同时存在两个或两个以上互相排斥的参数"""
+    """ 同时存在两个或两个以上互相排斥的参数 """
 
     def __init__(self, key_list):
         super(MutexApiParameters, self).__init__('', '', u'{0}参数只能选择其一'.format(','.join(key_list)))
 
 
 class OAuth2Error(ApiError):
-    """OAuth2异常。"""
+    """ OAuth2异常 """
 
     def __init__(self, url, code, message):
         super(OAuth2Error, self).__init__(url, code, message)
 
 
 class MissingRedirectUri(OAuth2Error, ValueError):
-    """缺少 redirect_uri。"""
+    """ 缺少 redirect_uri """
 
     def __init__(self, url):
         super(MissingRedirectUri, self).__init__(url, 'OAuth2 request', 'Parameter absent: redirect_uri')
