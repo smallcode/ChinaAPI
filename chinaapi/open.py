@@ -31,22 +31,22 @@ class Token(object):
             setattr(self, key, value)
 
     @staticmethod
-    def _now():
+    def _get_now():
         return int(time.time())
 
     def _get_expires_in(self):
         if self.expired_at:
-            return self.expired_at - self._now()
+            return self.expired_at - self._get_now()
 
     def _set_expires_in(self, expires_in):
         if expires_in:
-            self.expired_at = int(expires_in) + self._now()
+            self.expired_at = int(expires_in) + self._get_now()
 
     expires_in = property(_get_expires_in, _set_expires_in)
 
     @property
     def is_expires(self):
-        return not self.access_token or (self.expired_at is not None and self._now() > self.expired_at)
+        return not self.access_token or (self.expired_at is not None and self._get_now() > self.expired_at)
 
 
 class App(object):
