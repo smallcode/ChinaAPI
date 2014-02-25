@@ -1,16 +1,6 @@
 # coding=utf-8
 from chinaapi.exceptions import ApiResponseError
-from chinaapi.open import OAuth2Base, Token as TokenBase, App
-
-
-class Token(TokenBase):
-    """
-    douban_user_id：豆瓣用户ID
-    """
-
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
-        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
-        self.douban_user_id = kwargs.pop('douban_user_id', None)
+from chinaapi.open import OAuth2Base, Token, App
 
 
 class OAuth2(OAuth2Base):

@@ -3,7 +3,7 @@ import base64
 import hashlib
 import hmac
 from chinaapi.utils import parse_querystring
-from chinaapi.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
+from chinaapi.open import ClientBase, Method, OAuth2Base, Token, App
 from chinaapi.exceptions import ApiResponseError
 from chinaapi.jsonDict import loads
 
@@ -71,18 +71,6 @@ class Client(ClientBase):
         return e.code in RETRY_CODES
 
 
-class Token(TokenBase):
-    """
-    uid：授权用户的uid
-    created_at：令牌创建日期，为timestamp格式
-    """
-
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
-        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
-        self.uid = kwargs.pop('uid', None)
-        self.created_at = kwargs.pop('created_at', None)
-
-
 class OAuth2(OAuth2Base):
     BASE_URL = 'https://api.weibo.com/oauth2/'
     AUTH_URL = BASE_URL + 'authorize'
@@ -93,9 +81,9 @@ class OAuth2(OAuth2Base):
 
     def _parse_token(self, response):
         data = parse(response)
-        data['created_at'] = data.pop('create_at', None)
+        data['created_at'] = data.get('create_at', None)
         if 'expires_in' not in data:
-            data['expires_in'] = data.pop('expire_in', None)
+            data['expires_in'] = data.get('expire_in', None)
         return Token(**data)
 
     def revoke(self, access_token):
@@ -127,7 +115,7 @@ class OAuth2(OAuth2Base):
         encoded_sign, encoded_data = signed_request.split('.', 1)
         sign = base64decode(encoded_sign)
         data = loads(base64decode(encoded_data))
-        token = Token(data.oauth_token, data.expires, uid=data.user_id, created_at=data.issued_at)
+        token = Token(data.oauth_token, data.expires, uid=data.user_id, created_at=data.issued_at, **data)
         is_valid = data.algorithm == u'HMAC-SHA256' and hmac.new(self.app.key, encoded_data,
                                                                  hashlib.sha256).digest() == sign
         return token, is_valid

@@ -4,7 +4,7 @@ import hmac
 from hashlib import md5
 from datetime import datetime
 from urllib import unquote
-from chinaapi.open import ClientBase, OAuthBase, OAuth2Base, App, Token as TokenBase
+from chinaapi.open import ClientBase, OAuthBase, OAuth2Base, App, Token
 from chinaapi.exceptions import ApiResponseError
 from chinaapi.utils import parse_querystring
 
@@ -92,34 +92,6 @@ class Client(ClientBase):
 
     def _is_retry_error(self, e):
         return e.sub_code in RETRY_SUB_CODES
-
-
-class Token(TokenBase):
-    """
-    taobao_user_nick：淘宝账号
-    taobao_user_id：淘宝帐号对应id
-    sub_taobao_user_nick：淘宝子账号
-    sub_taobao_user_id：淘宝子账号对应id
-    token_type：Access token的类型目前只支持bearer
-    re_expires_in：Refresh token过期时间
-    r1_expires_in：r1级别API或字段的访问过期时间
-    r2_expires_in：r2级别API或字段的访问过期时间
-    w1_expires_in：w1级别API或字段的访问过期时间
-    w2_expires_in：w2级别API或字段的访问过期时间
-    """
-
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
-        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
-        self.taobao_user_nick = kwargs.pop('taobao_user_nick', None)
-        self.taobao_user_id = kwargs.pop('taobao_user_id', None)
-        self.sub_taobao_user_nick = kwargs.pop('sub_taobao_user_nick', None)
-        self.sub_taobao_user_id = kwargs.pop('sub_taobao_user_id', None)
-        self.token_type = kwargs.pop('token_type', None)
-        self.re_expires_in = kwargs.pop('re_expires_in', None)
-        self.r1_expires_in = kwargs.pop('r1_expires_in', None)
-        self.r2_expires_in = kwargs.pop('r2_expires_in', None)
-        self.w1_expires_in = kwargs.pop('w1_expires_in', None)
-        self.w2_expires_in = kwargs.pop('w2_expires_in', None)
 
 
 def parse(response):

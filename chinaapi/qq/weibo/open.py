@@ -1,5 +1,5 @@
 # coding=utf-8
-from chinaapi.open import ClientBase, Method, OAuth2Base, Token as TokenBase, App
+from chinaapi.open import ClientBase, Method, OAuth2Base, Token, App
 from chinaapi.exceptions import InvalidApi, ApiResponseError
 from chinaapi.utils import parse_querystring
 
@@ -35,19 +35,6 @@ def parse(response):
     if 'data' in r:
         return r.data
     return r
-
-
-class Token(TokenBase):
-    """
-    openid：用户统一标识，可以唯一标识一个用户
-    openkey：与openid对应的用户key，是验证openid身份的验证密钥
-    """
-
-    def __init__(self, access_token=None, expires_in=None, refresh_token=None, **kwargs):
-        super(Token, self).__init__(access_token, expires_in, refresh_token, **kwargs)
-        self.openid = kwargs.pop('openid', None)
-        self.openkey = kwargs.pop('openkey', None)
-        self.name = kwargs.pop('name', None)
 
 
 class Client(ClientBase):
