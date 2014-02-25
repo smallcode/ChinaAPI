@@ -25,12 +25,13 @@ class Token(object):
         """
         self.access_token = access_token
         self.expired_at = None
-        self.refresh_token = refresh_token
         self.expires_in = expires_in
-        self._data = kwargs
+        self.refresh_token = refresh_token
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
-    @classmethod
-    def _now(cls):
+    @staticmethod
+    def _now():
         return int(time.time())
 
     def _get_expires_in(self):
@@ -46,11 +47,6 @@ class Token(object):
     @property
     def is_expires(self):
         return not self.access_token or (self.expired_at is not None and self._now() > self.expired_at)
-
-    def __getattr__(self, item):
-        if item in self._data:
-            return self._data[item]
-        raise AttributeError
 
 
 class App(object):
