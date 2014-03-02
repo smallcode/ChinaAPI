@@ -45,13 +45,6 @@ class ApiResponseError(ApiRequestError):
                                                sub_message)
 
 
-class MutexApiParameters(ApiError, ValueError):
-    """ 同时存在两个或两个以上互相排斥的参数 """
-
-    def __init__(self, key_list):
-        super(MutexApiParameters, self).__init__('', '', u'{0}参数只能选择其一'.format(','.join(key_list)))
-
-
 class OAuth2Error(ApiError):
     """ OAuth2异常 """
 

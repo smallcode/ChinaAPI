@@ -1,6 +1,6 @@
 # coding=utf-8
 from unittest import TestCase
-from chinaapi.exceptions import ApiError, MutexApiParameters
+from chinaapi.exceptions import ApiError
 
 
 class ExceptionTest(TestCase):
@@ -12,7 +12,3 @@ class ExceptionTest(TestCase):
         error = ApiError('http://request_url', 404, 'Request Api not found!', 1000, 'sub error msg')
         self.assertEqual('[404]: Request Api not found!, [1000]: sub error msg, request: http://request_url',
                          str(error))
-
-    def test_mutex_api_parameters(self):
-        error = MutexApiParameters(['pic', 'pic_url'])
-        self.assertEqual(error.message, u'pic,pic_url参数只能选择其一')
