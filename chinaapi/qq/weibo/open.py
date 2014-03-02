@@ -1,6 +1,6 @@
 # coding=utf-8
 from chinaapi.open import ClientBase, Method, OAuth2Base, Token, App
-from chinaapi.exceptions import InvalidApi, ApiResponseError
+from chinaapi.exceptions import ApiResponseError
 from chinaapi.utils import parse_querystring
 
 
@@ -53,13 +53,11 @@ class Client(ClientBase):
         """
         因del为Python保留字，无法作为方法名，需将del替换为delete，并在此处进行反向转换。
         """
-        if segments[-1] == 'delete' and segments[-2] != 'list':  # list本身有delete方法，需排除
-            segments[-1] = 'del'
+        if len(segments) == 2 and segments[0] != 'list' and segments[1] == 'delete':  # list本身有delete方法，需排除
+            segments[1] = segments[1].replace('delete', 'del')
         return 'https://open.t.qq.com/api/{0}'.format('/'.join(segments))
 
     def _prepare_method(self, segments):
-        if len(segments) != 2:
-            raise InvalidApi(self._prepare_url(segments, None))
         model, method = tuple([segment.lower() for segment in segments])
         if method.split('_')[0] in self._post_methods:
             return Method.POST

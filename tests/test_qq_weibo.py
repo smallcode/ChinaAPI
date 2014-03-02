@@ -1,14 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
 from chinaapi.qq.weibo.open import Client, App
-from chinaapi.exceptions import ApiError, NotExistApi, InvalidApi
-
-
-# 返回text是unicode，设置默认编码为utf8
-import sys
-
-reload(sys)
-sys.setdefaultencoding('utf8')
+from chinaapi.exceptions import ApiError, NotExistApi
 
 
 class QqWeiboTest(TestCase):
@@ -35,10 +28,6 @@ class QqWeiboTest(TestCase):
     def test_not_exist_api(self):
         with self.assertRaises(NotExistApi):
             self.client.not_exist_api.get()
-
-    def test_invalid_api(self):
-        with self.assertRaises(InvalidApi):
-            self.client.too.many.segments.get()
 
     def test_api_error(self):
         self.client.openid = ''
