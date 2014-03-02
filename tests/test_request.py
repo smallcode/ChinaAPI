@@ -1,8 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
-from requests import HTTPError
 from chinaapi.request import Request
-from chinaapi.exceptions import NotExistApi, ApiResponseValueError
+from chinaapi.exceptions import ApiResponseError
 import httpretty
 
 
@@ -44,20 +43,20 @@ class RequestTest(TestBase):
     @httpretty.activate
     def test_ApiResponseValueError(self):
         self._register_response('not json')
-        with self.assertRaises(ApiResponseValueError):
+        with self.assertRaises(ApiResponseError):
             response = self.session.post(self.URL)
             response.json_dict()
 
     @httpretty.activate
     def test_NotExistApi(self):
         self._register_response(status=404)
-        with self.assertRaises(NotExistApi):
+        with self.assertRaises(ApiResponseError):
             response = self.session.post(self.URL)
             response.json_dict()
 
     @httpretty.activate
     def test_HTTPError(self):
         self._register_response(status=500)
-        with self.assertRaises(HTTPError):
+        with self.assertRaises(ApiResponseError):
             response = self.session.post(self.URL)
             response.json_dict()

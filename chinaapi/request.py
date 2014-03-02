@@ -1,21 +1,23 @@
 # coding=utf-8
 import types
-import requests
 import re
+
+import requests
+
 from .jsonDict import JsonDict, loads
-from .exceptions import ApiResponseValueError, NotExistApi
+from .exceptions import ApiResponseError
 
 
 def json_dict(self):
     try:
         return self.json(object_hook=lambda pairs: JsonDict(pairs.iteritems()))
     except ValueError, e:
-        if self.status_code == 200:
-            raise ApiResponseValueError(self, e)
-        elif 400 <= self.status_code < 500:
-            raise NotExistApi(self)
-        else:
+        try:
             self.raise_for_status()
+        except requests.RequestException, e:
+            raise ApiResponseError(self, message=u'%s, response: %s' % (e, self.text))
+        else:
+            raise ApiResponseError(self, e.__class__.__name__, u'%s, value: %s' % (e, self.text))
 
 
 def jsonp_dict(self):

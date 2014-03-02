@@ -1,7 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
 from chinaapi.renren.open import Client, App
-from chinaapi.exceptions import ApiError, NotExistApi
+from chinaapi.exceptions import ApiError
 
 
 class RenRenTest(TestCase):
@@ -24,7 +24,3 @@ class RenRenTest(TestCase):
         with self.assertRaises(ApiError) as cm:
             self.client.user.get(userId=self.uid)
         self.assertEqual(u'验证参数错误。', cm.exception.message)
-
-    def test_not_exist_api(self):
-        with self.assertRaises(NotExistApi):
-            self.client.not_exist_api.get()

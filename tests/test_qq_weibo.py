@@ -1,7 +1,7 @@
 # coding=utf-8
 from unittest import TestCase
 from chinaapi.qq.weibo.open import Client, App
-from chinaapi.exceptions import ApiError, NotExistApi
+from chinaapi.exceptions import ApiError
 
 
 class QqWeiboTest(TestCase):
@@ -24,10 +24,6 @@ class QqWeiboTest(TestCase):
     #     with open('images/pic.jpg', 'rb') as pic:
     #         r = self.client.t.upload_pic(pic=pic, pic_type=2, clientip='220.181.111.85')  # clientip必填
     #     self.assertIsNotNone(r.imgurl)
-
-    def test_not_exist_api(self):
-        with self.assertRaises(NotExistApi):
-            self.client.not_exist_api.get()
 
     def test_api_error(self):
         self.client.openid = ''
