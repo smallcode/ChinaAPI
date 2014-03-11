@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.8.6 (2014-03-12)
+++++++++++++++++++
+- 添加：ApiRequestError
+- 移除：InvalidApiError，NotExistApi，MutexApiParametersError
+
 0.8.0 (2014-01-20)
 ++++++++++++++++++
 - 添加新浪微博web登录函数
