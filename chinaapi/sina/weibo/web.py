@@ -12,7 +12,7 @@ import binascii
 class Client(ClientBase):
     JS_CLIENT = 'ssologin.js(v1.4.11)'
     LOGIN_URL = 'http://login.sina.com.cn/sso/login.php'
-    URL_REGEX = re.compile('replace\("(.*)"\)')
+    URL_REGEX = re.compile("replace\('(.*)'\)")
 
     @staticmethod
     def encrypt_password(password, pre_data):
