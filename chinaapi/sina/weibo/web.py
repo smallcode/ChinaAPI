@@ -12,6 +12,7 @@ import binascii
 class Client(ClientBase):
     JS_CLIENT = 'ssologin.js(v1.4.11)'
     LOGIN_URL = 'http://login.sina.com.cn/sso/login.php'
+    PRE_LOGIN_URL = 'http://login.sina.com.cn/sso/prelogin.php'
     URL_REGEX = re.compile(r"replace\(['\"]+(.*)['\"]+\)")
 
     @staticmethod
@@ -30,7 +31,7 @@ class Client(ClientBase):
             'rsakt': 'mod',
             # '_': time.time(),
         }
-        r = self._session.get('http://login.sina.com.cn/sso/prelogin.php', params=params)
+        r = self._session.get(self.PRE_LOGIN_URL, params=params)
         return r.jsonp_dict()
 
     def login(self, username, password):
