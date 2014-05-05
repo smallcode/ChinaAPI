@@ -1,25 +1,27 @@
 ChinaAPI
 ========
 
+ChinaAPI是一个API库，使用Python语言编写。
+
 .. image:: https://travis-ci.org/smallcode/ChinaAPI.png
     :target: https://travis-ci.org/smallcode/ChinaAPI
 
 .. image:: https://badge.fury.io/py/chinaapi.png
     :target: http://badge.fury.io/py/chinaapi
 
-
-ChinaAPI是一个API库，使用Python编写。
-
-目前国内的几大开放平台，有新浪微博，腾讯微博，淘宝，人人，豆瓣等。
-针对这几个平台，用Python语言编写的API库都比较独立，各具特色。
-但仔细分析，不难发现这些库存在大量可通用的模块，并可抽象出统一的调用接口。
-ChinaAPI就是为此目的而存在。
+支持
+----
+- 新浪微博
+- 腾讯微博
+- 淘宝
+- 人人
+- 豆瓣（OAuth2）
 
 安装
----
-项目地址：https://github.com/smallcode/ChinaAPI
+----
+可以到项目所在地址下载：https://github.com/smallcode/ChinaAPI
 
-最简单的安装方法:
+或者直接用pip安装:
 
 .. code-block:: bash
 
@@ -226,11 +228,6 @@ OAuth2调用规则：**斜杠（/）映射为点（.）**
 更多API请参见：`人人API文档`_
 
 ----
-
-TODO：
------
-
-- 添加OAuth2说明
 
 感谢以下Python SDK的开发者们的贡献：
 -----------------------
