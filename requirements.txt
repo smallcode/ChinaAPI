@@ -1,5 +1,5 @@
 rsa
 requests
-httpretty==0.7.1
+httpretty
 vcrpy==0.6.0
 fake-factory
