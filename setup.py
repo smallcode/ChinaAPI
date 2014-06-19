@@ -20,9 +20,15 @@ packages = [
     'chinaapi.netease',
 ]
 
-requires = [
+install_requires = [
     'requests >= 2.1.0',
     'rsa >= 3.1.2',
+]
+
+tests_require = [
+    'httpretty == 0.7.1',
+    'vcrpy >= 0.6.0',
+    'fake-factory',
 ]
 
 with open('README.rst') as f:
@@ -41,7 +47,9 @@ setup(
     packages=packages,
     package_dir={'chinaapi': 'chinaapi'},
     include_package_data=True,
-    install_requires=requires,
+    install_requires=install_requires,
+    tests_require=tests_require,
+    test_suite="tests.get_tests",
     license=chinaapi.__license__,
     zip_safe=False,
     classifiers=[
