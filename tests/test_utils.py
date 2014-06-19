@@ -2,6 +2,7 @@
 from unittest import TestCase
 from chinaapi.utils import parse_querystring
 
+
 class UtilsTest(TestCase):
     def test_parse_querystring(self):
         r = parse_querystring("a=a&b=b")
