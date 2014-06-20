@@ -26,7 +26,7 @@ install_requires = [
 ]
 
 tests_require = [
-    'httpretty == 0.8.3',
+    'httpretty >= 0.8.3',
     'vcrpy >= 0.6.0',
     'fake-factory',
 ]
