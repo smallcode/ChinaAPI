@@ -27,8 +27,7 @@ class Token(object):
         self.expired_at = None
         self.expires_in = expires_in
         self.refresh_token = refresh_token
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        self._data = kwargs
 
     @staticmethod
     def _get_now():
@@ -47,6 +46,11 @@ class Token(object):
     @property
     def is_expires(self):
         return not self.access_token or (self.expired_at is not None and self._get_now() > self.expired_at)
+
+    def __getattr__(self, item):
+        if item in self._data:
+            return self._data[item]
+        raise AttributeError
 
 
 class App(object):
@@ -134,9 +138,7 @@ class ClientBase(Request):
         return try_request()
 
     def __getattr__(self, attr):
-        if not attr.startswith('__'):
-            return ClientWrapper(self, attr)
-        raise AttributeError
+        return ClientWrapper(self, attr)
 
 
 class OAuthBase(Request):
