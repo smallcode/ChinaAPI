@@ -10,7 +10,7 @@ IS_POST_METHOD = {
     't': lambda m: m in ['re_add', 'reply', 'comment', 'like', 'unlike'],
     'fav': lambda m: m in ['addht', 'addt', 'delht', 'delt'],
     'vote': lambda m: m in ['createvote', 'vote'],
-    'list': lambda m: m != 'timeline', # 只有timeline接口是读接口，其他全是写接口
+    'list': lambda m: m != 'timeline',  # 只有timeline接口是读接口，其他全是写接口
     'lbs': lambda m: True  # 全是写接口
 }
 
@@ -38,7 +38,7 @@ def parse(response):
 
 
 class Client(ClientBase):
-    #写接口
+    # 写接口
     _post_methods = ['add', 'del', 'create', 'delete', 'update', 'upload']
 
     def __init__(self, app=App(), token=Token(), openid=None, clientip=None):
