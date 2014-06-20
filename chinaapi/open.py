@@ -142,7 +142,7 @@ class ClientBase(Request):
 
 
 class OAuthBase(Request):
-    def __init__(self, app):
+    def __init__(self, app=App()):
         super(OAuthBase, self).__init__()
         self.app = app
 
@@ -150,9 +150,6 @@ class OAuthBase(Request):
 class OAuth2Base(OAuthBase):
     AUTH_URL = ''
     TOKEN_URL = ''
-
-    def __init__(self, app):
-        super(OAuth2Base, self).__init__(app)
 
     def _parse_token(self, response):
         return response.json_dict()

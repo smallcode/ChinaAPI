@@ -7,9 +7,6 @@ from test_request import BASE_URL, TestBase
 
 
 class ApiClient(ClientBase):
-    def __init__(self, app):
-        super(ApiClient, self).__init__(app)
-
     def _prepare_url(self, segments, queries):
         return BASE_URL + '/'.join(segments)
 
@@ -29,16 +26,12 @@ class ApiClient(ClientBase):
 
 
 class NotImplementedClient(ClientBase):
-    def __init__(self, app):
-        super(NotImplementedClient, self).__init__(app)
+    pass
 
 
 class ApiOAuth2(OAuth2Base):
     AUTH_URL = 'http://test/oauth2/authorize'
     TOKEN_URL = 'http://test/oauth2/access_token'
-
-    def __init__(self, app):
-        super(ApiOAuth2, self).__init__(app)
 
 
 class RequestBase(TestBase):

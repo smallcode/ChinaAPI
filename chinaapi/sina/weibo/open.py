@@ -76,9 +76,6 @@ class OAuth2(OAuth2Base):
     AUTH_URL = BASE_URL + 'authorize'
     TOKEN_URL = BASE_URL + 'access_token'
 
-    def __init__(self, app):
-        super(OAuth2, self).__init__(app)
-
     def _parse_token(self, response):
         data = parse(response)
         data['created_at'] = data.get('create_at', None)

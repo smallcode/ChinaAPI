@@ -105,9 +105,6 @@ class OAuth2(OAuth2Base):
     AUTH_URL = 'https://oauth.taobao.com/authorize'
     TOKEN_URL = 'https://oauth.taobao.com/token'
 
-    def __init__(self, app):
-        super(OAuth2, self).__init__(app)
-
     def _parse_token(self, response):
         data = parse(response)
         return Token(**data)
@@ -124,9 +121,6 @@ class OAuth(OAuthBase):
     基于TOP协议的登录授权方式
     """
     URL = 'http://container.open.taobao.com/container'
-
-    def __init__(self, app):
-        super(OAuth, self).__init__(app)
 
     def _sign_by_md5(self, data):
         message = join_dict(data) + self.app.secret

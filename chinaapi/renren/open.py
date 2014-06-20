@@ -33,9 +33,6 @@ class OAuth2(OAuth2Base):
     AUTH_URL = 'https://graph.renren.com/oauth/authorize'
     TOKEN_URL = 'https://graph.renren.com/oauth/token'
 
-    def __init__(self, app):
-        super(OAuth2, self).__init__(app)
-
     def _parse_token(self, response):
         r = response.json_dict()
         if 'error_code' in r:
