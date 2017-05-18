@@ -17,21 +17,21 @@ IS_POST_METHOD = {
 DEFAULT_IS_POST_METHOD = lambda m: False
 
 RET = {
-    0: u'成功返回',
-    1: u'参数错误',
-    2: u'频率受限',
-    3: u'鉴权失败',
-    4: u'服务器内部错误',
-    5: u'用户错误',
-    6: u'未注册微博',
-    7: u'未实名认证'
+    0: '成功返回',
+    1: '参数错误',
+    2: '频率受限',
+    3: '鉴权失败',
+    4: '服务器内部错误',
+    5: '用户错误',
+    6: '未注册微博',
+    7: '未实名认证'
 }
 
 
 def parse(response):
     r = response.json_dict()
     if 'ret' in r and r.ret != 0:
-        raise ApiResponseError(response, r.ret, RET.get(r.ret, u''), r.get('errcode', ''), r.get('msg', ''))
+        raise ApiResponseError(response, r.ret, RET.get(r.ret, ''), r.get('errcode', ''), r.get('msg', ''))
     if 'data' in r:
         return r.data
     return r

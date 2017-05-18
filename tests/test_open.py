@@ -3,7 +3,7 @@ from unittest import TestCase
 import httpretty
 from chinaapi.open import ClientBase, OAuth2Base, Method, Token, App
 from chinaapi.exceptions import MissingRedirectUri, ApiError
-from test_request import BASE_URL, TestBase
+from .test_request import BASE_URL, TestBase
 
 
 class ApiClient(ClientBase):

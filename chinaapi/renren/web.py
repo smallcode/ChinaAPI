@@ -9,7 +9,7 @@ class Client(ClientBase):
     @staticmethod
     def encrypt_password(e, m, s):
         def _encrypt_chunk(e, m, chunk):
-            chunk = map(ord, chunk)
+            chunk = list(map(ord, chunk))
 
             # 补成偶数长度
             if not len(chunk) % 2 == 0:
@@ -68,8 +68,8 @@ class Client(ClientBase):
             if self.get_show_captcha(username) == 1:
                 fn = 'icode.%s.jpg' % os.getpid()
                 self.get_icode(fn)
-                print "Please input the code in file '%s':" % fn
-                icode = raw_input().strip()
+                print("Please input the code in file '%s':" % fn)
+                icode = input().strip()
                 os.remove(fn)
             else:
                 icode = ''

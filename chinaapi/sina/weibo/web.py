@@ -2,7 +2,7 @@
 from chinaapi.utils import parse_querystring
 from chinaapi.web import ClientBase
 from chinaapi.exceptions import ApiResponseError
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import re
 import base64
 import rsa
@@ -35,7 +35,7 @@ class Client(ClientBase):
         return r.jsonp_dict()
 
     def login(self, username, password):
-        su = base64.b64encode(urllib.quote(username))
+        su = base64.b64encode(urllib.parse.quote(username))
         pre_data = self.pre_login(su)
         sp = self.encrypt_password(password, pre_data)
         data = {

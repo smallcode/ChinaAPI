@@ -5,7 +5,7 @@ from hashlib import md5
 import time
 
 ERROR = {
-    'error3': u'用户名或密码错误',
+    'error3': '用户名或密码错误',
 }
 
 

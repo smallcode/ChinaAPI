@@ -23,4 +23,4 @@ class RenRenTest(TestCase):
         self.client.token.access_token = ''
         with self.assertRaises(ApiError) as cm:
             self.client.user.get(userId=self.uid)
-        self.assertEqual(u'验证参数错误。', cm.exception.message)
+        self.assertEqual('验证参数错误。', cm.exception.message)

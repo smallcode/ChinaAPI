@@ -10,14 +10,14 @@ from .exceptions import ApiResponseError
 
 def json_dict(self):
     try:
-        return self.json(object_hook=lambda pairs: JsonDict(pairs.iteritems()))
-    except ValueError, e:
+        return self.json(object_hook=lambda pairs: JsonDict(iter(pairs.items())))
+    except ValueError as e:
         try:
             self.raise_for_status()
-        except requests.RequestException, e:
-            raise ApiResponseError(self, message=u'%s, response: %s' % (e, self.text))
+        except requests.RequestException as e:
+            raise ApiResponseError(self, message='%s, response: %s' % (e, self.text))
         else:
-            raise ApiResponseError(self, e.__class__.__name__, u'%s, value: %s' % (e, self.text))
+            raise ApiResponseError(self, e.__class__.__name__, '%s, value: %s' % (e, self.text))
 
 
 def jsonp_dict(self):

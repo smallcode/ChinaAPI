@@ -22,12 +22,12 @@ def use_cassette(vcr=VCR(), path='fixtures/vcr_cassettes/', **kwargs):
             if os.path.isabs(path):
                 file_path = path
             else:
-                fun_path, fun_filename = os.path.split(func.func_code.co_filename)
+                fun_path, fun_filename = os.path.split(func.__code__.co_filename)
                 file_path = os.path.join(fun_path, path, os.path.splitext(fun_filename)[0])
 
             if not os.path.splitext(file_path)[1]:
                 serializer = kwargs.get('serializer', vcr.serializer)
-                file_path = os.path.join(file_path, '{0}.{1}'.format(func.func_name.lower(), serializer))
+                file_path = os.path.join(file_path, '{0}.{1}'.format(func.__name__.lower(), serializer))
 
             with vcr.use_cassette(file_path, **kwargs):
                 return func(*args, **kw)

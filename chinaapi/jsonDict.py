@@ -42,4 +42,4 @@ def loads(string):
     >>> r['score']
     95
     """
-    return json.loads(string, object_hook=lambda pairs: JsonDict(pairs.iteritems()))
+    return json.loads(string, object_hook=lambda pairs: JsonDict(iter(pairs.items())))

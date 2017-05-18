@@ -12,10 +12,10 @@ class ApiError(IOError):
 
     @staticmethod
     def format(code, message):
-        return u'[%s]: %s, ' % (code, message) if code or message else ''
+        return '[%s]: %s, ' % (code, message) if code or message else ''
 
     def __str__(self):
-        return u'%s%srequest: %s' % (
+        return '%s%srequest: %s' % (
             self.format(self.code, self.message), self.format(self.sub_code, self.sub_message), self.url)
 
 
@@ -29,7 +29,7 @@ class ApiRequestError(ApiError):
 
     def get_url(self):
         if not self.is_multipart() and self.request.body:
-            return u'%s?%s' % (self.request.url, self.request.body)
+            return '%s?%s' % (self.request.url, self.request.body)
         return self.request.url
 
 

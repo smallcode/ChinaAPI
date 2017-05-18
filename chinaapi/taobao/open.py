@@ -3,7 +3,7 @@ import base64
 import hmac
 from hashlib import md5
 from datetime import datetime
-from urllib import unquote
+from urllib.parse import unquote
 from chinaapi.open import ClientBase, OAuthBase, OAuth2Base, App, Token
 from chinaapi.exceptions import ApiResponseError
 from chinaapi.utils import parse_querystring
@@ -11,7 +11,7 @@ from chinaapi.utils import parse_querystring
 DEFAULT_VALUE_TO_STR = lambda x: str(x)
 VALUE_TO_STR = {
     type(datetime.now()): lambda v: v.strftime('%Y-%m-%d %H:%M:%S'),
-    type(u'a'): lambda v: v.encode('utf-8'),
+    type('a'): lambda v: v.encode('utf-8'),
     type(0.1): lambda v: "%.2f" % v,
     type(True): lambda v: str(v).lower(),
 }
@@ -32,7 +32,7 @@ RETRY_SUB_CODES = (
 
 
 def join_dict(data):
-    return ''.join(["%s%s" % (k, v) for k, v in sorted(data.iteritems())])
+    return ''.join(["%s%s" % (k, v) for k, v in sorted(data.items())])
 
 
 class Client(ClientBase):
@@ -70,7 +70,7 @@ class Client(ClientBase):
         Return encoded data and files
         """
         data, files = {}, {}
-        for k, v in queries.items():
+        for k, v in list(queries.items()):
             kk = k.replace('__', '.')
             if hasattr(v, 'read'):
                 files[kk] = v
@@ -86,7 +86,7 @@ class Client(ClientBase):
             raise ApiResponseError(response, error.get('code', ''), error.get('msg', ''),
                                    error.get('sub_code', ''), error.get('sub_msg', ''))
         else:
-            keys = r.keys()
+            keys = list(r.keys())
             if keys and keys[0].endswith('_response'):
                 return r.get(keys[0])
 

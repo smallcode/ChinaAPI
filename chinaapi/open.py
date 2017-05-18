@@ -98,7 +98,7 @@ class ClientBase(Request):
 
     def _prepare_body(self, queries):
         results = ({}, {})
-        for k, v in queries.items():
+        for k, v in list(queries.items()):
             results[hasattr(v, 'read')][k] = v
         return results
 
@@ -125,7 +125,7 @@ class ClientBase(Request):
         def handle_error(e):
             if self._is_retry_error(e):
                 if files:
-                    for f in files.values():
+                    for f in list(files.values()):
                         f.seek(0)
             else:
                 raise e

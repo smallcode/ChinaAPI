@@ -12,7 +12,7 @@ def retry(max_tries, exceptions=(Exception,), hook=None):
             while tries > 1:
                 try:
                     return f(*args, **kwargs)
-                except exceptions, e:
+                except exceptions as e:
                     if hook is not None:
                         hook(e)
                     tries -= 1

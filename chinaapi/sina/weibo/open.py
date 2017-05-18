@@ -113,7 +113,7 @@ class OAuth2(OAuth2Base):
         sign = base64decode(encoded_sign)
         data = loads(base64decode(encoded_data))
         token = Token(data.oauth_token, data.expires, uid=data.user_id, created_at=data.issued_at, **data)
-        is_valid = data.algorithm == u'HMAC-SHA256' and hmac.new(self.app.key, encoded_data,
+        is_valid = data.algorithm == 'HMAC-SHA256' and hmac.new(self.app.key, encoded_data,
                                                                  hashlib.sha256).digest() == sign
         return token, is_valid
 
